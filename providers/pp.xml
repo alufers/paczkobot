@@ -1,0 +1,498 @@
+<?xml version="1.0" encoding="UTF-8"?><wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns1="http://org.apache.axis2/xsd" xmlns:ns="http://sledzenie.pocztapolska.pl" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:ax21="http://ws.sledzenie.pocztapolska.pl/xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://sledzenie.pocztapolska.pl">
+    <wsdl:documentation>Sledzenie przesylek Poczty Polskiej S.A. dla klientow indywidualnych. - 0.71 </wsdl:documentation>
+    <wsdl:types>
+        <xs:schema xmlns:ax22="http://ws.sledzenie.pocztapolska.pl/xsd" attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://sledzenie.pocztapolska.pl">
+            <xs:import namespace="http://ws.sledzenie.pocztapolska.pl/xsd"/>
+            <xs:element name="maksymalnaLiczbaPrzesylekResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" type="xs:int"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="sprawdzPrzesylkePl">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="numer" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="sprawdzPrzesylkePlResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax22:Przesylka"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="sprawdzPrzesylki">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="numer" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="sprawdzPrzesylkiResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax22:Komunikat"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="sprawdzPrzesylkiPl">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="numer" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="sprawdzPrzesylkiPlResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax22:Komunikat"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="sprawdzPrzesylkiOdDo">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="numer" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="odDnia" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="doDnia" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="sprawdzPrzesylkiOdDoResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax22:Komunikat"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="sprawdzPrzesylkiOdDoPl">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element maxOccurs="unbounded" minOccurs="0" name="numer" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="odDnia" nillable="true" type="xs:string"/>
+                        <xs:element minOccurs="0" name="doDnia" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="sprawdzPrzesylkiOdDoPlResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax22:Komunikat"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="wersjaResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="witaj">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="imie" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="witajResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="sprawdzPrzesylke">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="numer" nillable="true" type="xs:string"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+            <xs:element name="sprawdzPrzesylkeResponse">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element minOccurs="0" name="return" nillable="true" type="ax22:Przesylka"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:schema>
+        <xs:schema attributeFormDefault="qualified" elementFormDefault="qualified" targetNamespace="http://ws.sledzenie.pocztapolska.pl/xsd">
+            <xs:complexType name="Przesylka">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="danePrzesylki" nillable="true" type="ax21:DanePrzesylki"/>
+                    <xs:element minOccurs="0" name="numer" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="status" type="xs:int"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="DanePrzesylki">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="dataNadania" nillable="true" type="xs:date"/>
+                    <xs:element minOccurs="0" name="format" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="kodKrajuNadania" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="kodKrajuPrzezn" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="kodRodzPrzes" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="krajNadania" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="krajPrzezn" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="masa" nillable="true" type="xs:float"/>
+                    <xs:element minOccurs="0" name="numer" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="proceduraSerwis" nillable="true" type="ax21:Procedura"/>
+                    <xs:element minOccurs="0" name="rodzPrzes" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="urzadNadania" nillable="true" type="ax21:Jednostka"/>
+                    <xs:element minOccurs="0" name="urzadPrzezn" nillable="true" type="ax21:Jednostka"/>
+                    <xs:element minOccurs="0" name="zakonczonoObsluge" type="xs:boolean"/>
+                    <xs:element minOccurs="0" name="zdarzenia" nillable="true" type="ax21:ListaZdarzen"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="Procedura">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="kod" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="kopertaFirmowa" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="nazwa" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="przesylkiPowiazane" nillable="true" type="ax21:ListaPrzesylekPowiazanych"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="ListaPrzesylekPowiazanych">
+                <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="przesylkaPowiazana" nillable="true" type="ax21:PrzesylkaPowiazana"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="PrzesylkaPowiazana">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="nrPrzesylkiPowiazanej" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="Jednostka">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="daneSzczegolowe" nillable="true" type="ax21:SzczDaneJednostki"/>
+                    <xs:element minOccurs="0" name="nazwa" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="SzczDaneJednostki">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="dlGeogr" type="xs:float"/>
+                    <xs:element minOccurs="0" name="godzinyPracy" nillable="true" type="ax21:GodzinyPracy"/>
+                    <xs:element minOccurs="0" name="miejscowosc" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="nrDomu" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="nrLokalu" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="pna" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="szerGeogr" type="xs:float"/>
+                    <xs:element minOccurs="0" name="ulica" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="GodzinyPracy">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="dniRobocze" nillable="true" type="ax21:GodzinyZUwagami"/>
+                    <xs:element minOccurs="0" name="niedzISw" nillable="true" type="ax21:GodzinyZUwagami"/>
+                    <xs:element minOccurs="0" name="soboty" nillable="true" type="ax21:GodzinyZUwagami"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="GodzinyZUwagami">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="godziny" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="uwagi" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="ListaZdarzen">
+                <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="zdarzenie" nillable="true" type="ax21:Zdarzenie"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="Zdarzenie">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="czas" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="jednostka" nillable="true" type="ax21:Jednostka"/>
+                    <xs:element minOccurs="0" name="kod" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="konczace" type="xs:boolean"/>
+                    <xs:element minOccurs="0" name="nazwa" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="przyczyna" nillable="true" type="ax21:Przyczyna"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="Przyczyna">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="kod" nillable="true" type="xs:string"/>
+                    <xs:element minOccurs="0" name="nazwa" nillable="true" type="xs:string"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="Komunikat">
+                <xs:sequence>
+                    <xs:element minOccurs="0" name="przesylki" nillable="true" type="ax21:ListaPrzesylek"/>
+                    <xs:element minOccurs="0" name="status" type="xs:int"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="ListaPrzesylek">
+                <xs:sequence>
+                    <xs:element maxOccurs="unbounded" minOccurs="0" name="przesylka" nillable="true" type="ax21:Przesylka"/>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:schema>
+    </wsdl:types>
+    <wsdl:message name="wersjaRequest"/>
+    <wsdl:message name="wersjaResponse">
+        <wsdl:part name="parameters" element="ns:wersjaResponse"/>
+    </wsdl:message>
+    <wsdl:message name="sprawdzPrzesylkiPlRequest">
+        <wsdl:part name="parameters" element="ns:sprawdzPrzesylkiPl"/>
+    </wsdl:message>
+    <wsdl:message name="sprawdzPrzesylkiPlResponse">
+        <wsdl:part name="parameters" element="ns:sprawdzPrzesylkiPlResponse"/>
+    </wsdl:message>
+    <wsdl:message name="sprawdzPrzesylkePlRequest">
+        <wsdl:part name="parameters" element="ns:sprawdzPrzesylkePl"/>
+    </wsdl:message>
+    <wsdl:message name="sprawdzPrzesylkePlResponse">
+        <wsdl:part name="parameters" element="ns:sprawdzPrzesylkePlResponse"/>
+    </wsdl:message>
+    <wsdl:message name="sprawdzPrzesylkiOdDoRequest">
+        <wsdl:part name="parameters" element="ns:sprawdzPrzesylkiOdDo"/>
+    </wsdl:message>
+    <wsdl:message name="sprawdzPrzesylkiOdDoResponse">
+        <wsdl:part name="parameters" element="ns:sprawdzPrzesylkiOdDoResponse"/>
+    </wsdl:message>
+    <wsdl:message name="maksymalnaLiczbaPrzesylekRequest"/>
+    <wsdl:message name="maksymalnaLiczbaPrzesylekResponse">
+        <wsdl:part name="parameters" element="ns:maksymalnaLiczbaPrzesylekResponse"/>
+    </wsdl:message>
+    <wsdl:message name="sprawdzPrzesylkeRequest">
+        <wsdl:part name="parameters" element="ns:sprawdzPrzesylke"/>
+    </wsdl:message>
+    <wsdl:message name="sprawdzPrzesylkeResponse">
+        <wsdl:part name="parameters" element="ns:sprawdzPrzesylkeResponse"/>
+    </wsdl:message>
+    <wsdl:message name="sprawdzPrzesylkiOdDoPlRequest">
+        <wsdl:part name="parameters" element="ns:sprawdzPrzesylkiOdDoPl"/>
+    </wsdl:message>
+    <wsdl:message name="sprawdzPrzesylkiOdDoPlResponse">
+        <wsdl:part name="parameters" element="ns:sprawdzPrzesylkiOdDoPlResponse"/>
+    </wsdl:message>
+    <wsdl:message name="witajRequest">
+        <wsdl:part name="parameters" element="ns:witaj"/>
+    </wsdl:message>
+    <wsdl:message name="witajResponse">
+        <wsdl:part name="parameters" element="ns:witajResponse"/>
+    </wsdl:message>
+    <wsdl:message name="sprawdzPrzesylkiRequest">
+        <wsdl:part name="parameters" element="ns:sprawdzPrzesylki"/>
+    </wsdl:message>
+    <wsdl:message name="sprawdzPrzesylkiResponse">
+        <wsdl:part name="parameters" element="ns:sprawdzPrzesylkiResponse"/>
+    </wsdl:message>
+    <wsdl:portType name="SledzeniePortType">
+        <wsdl:operation name="wersja">
+            <wsdl:input message="ns:wersjaRequest" wsaw:Action="urn:wersja"/>
+            <wsdl:output message="ns:wersjaResponse" wsaw:Action="urn:wersjaResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="sprawdzPrzesylkiPl">
+            <wsdl:input message="ns:sprawdzPrzesylkiPlRequest" wsaw:Action="urn:sprawdzPrzesylkiPl"/>
+            <wsdl:output message="ns:sprawdzPrzesylkiPlResponse" wsaw:Action="urn:sprawdzPrzesylkiPlResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="sprawdzPrzesylkePl">
+            <wsdl:input message="ns:sprawdzPrzesylkePlRequest" wsaw:Action="urn:sprawdzPrzesylkePl"/>
+            <wsdl:output message="ns:sprawdzPrzesylkePlResponse" wsaw:Action="urn:sprawdzPrzesylkePlResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="sprawdzPrzesylkiOdDo">
+            <wsdl:input message="ns:sprawdzPrzesylkiOdDoRequest" wsaw:Action="urn:sprawdzPrzesylkiOdDo"/>
+            <wsdl:output message="ns:sprawdzPrzesylkiOdDoResponse" wsaw:Action="urn:sprawdzPrzesylkiOdDoResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="maksymalnaLiczbaPrzesylek">
+            <wsdl:input message="ns:maksymalnaLiczbaPrzesylekRequest" wsaw:Action="urn:maksymalnaLiczbaPrzesylek"/>
+            <wsdl:output message="ns:maksymalnaLiczbaPrzesylekResponse" wsaw:Action="urn:maksymalnaLiczbaPrzesylekResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="sprawdzPrzesylke">
+            <wsdl:input message="ns:sprawdzPrzesylkeRequest" wsaw:Action="urn:sprawdzPrzesylke"/>
+            <wsdl:output message="ns:sprawdzPrzesylkeResponse" wsaw:Action="urn:sprawdzPrzesylkeResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="sprawdzPrzesylkiOdDoPl">
+            <wsdl:input message="ns:sprawdzPrzesylkiOdDoPlRequest" wsaw:Action="urn:sprawdzPrzesylkiOdDoPl"/>
+            <wsdl:output message="ns:sprawdzPrzesylkiOdDoPlResponse" wsaw:Action="urn:sprawdzPrzesylkiOdDoPlResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="witaj">
+            <wsdl:input message="ns:witajRequest" wsaw:Action="urn:witaj"/>
+            <wsdl:output message="ns:witajResponse" wsaw:Action="urn:witajResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="sprawdzPrzesylki">
+            <wsdl:input message="ns:sprawdzPrzesylkiRequest" wsaw:Action="urn:sprawdzPrzesylki"/>
+            <wsdl:output message="ns:sprawdzPrzesylkiResponse" wsaw:Action="urn:sprawdzPrzesylkiResponse"/>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="SledzenieSoap11Binding" type="ns:SledzeniePortType">
+        <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+        <wsdl:operation name="wersja">
+            <soap:operation soapAction="urn:wersja" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="sprawdzPrzesylkiPl">
+            <soap:operation soapAction="urn:sprawdzPrzesylkiPl" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="sprawdzPrzesylkePl">
+            <soap:operation soapAction="urn:sprawdzPrzesylkePl" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="sprawdzPrzesylkiOdDo">
+            <soap:operation soapAction="urn:sprawdzPrzesylkiOdDo" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="maksymalnaLiczbaPrzesylek">
+            <soap:operation soapAction="urn:maksymalnaLiczbaPrzesylek" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="sprawdzPrzesylke">
+            <soap:operation soapAction="urn:sprawdzPrzesylke" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="sprawdzPrzesylkiOdDoPl">
+            <soap:operation soapAction="urn:sprawdzPrzesylkiOdDoPl" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="witaj">
+            <soap:operation soapAction="urn:witaj" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="sprawdzPrzesylki">
+            <soap:operation soapAction="urn:sprawdzPrzesylki" style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:binding name="SledzenieHttpBinding" type="ns:SledzeniePortType">
+        <http:binding verb="POST"/>
+        <wsdl:operation name="wersja">
+            <http:operation location="Sledzenie/wersja"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="wersja"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="wersja"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="sprawdzPrzesylkiPl">
+            <http:operation location="Sledzenie/sprawdzPrzesylkiPl"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="sprawdzPrzesylkiPl"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="sprawdzPrzesylkiPl"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="sprawdzPrzesylkePl">
+            <http:operation location="Sledzenie/sprawdzPrzesylkePl"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="sprawdzPrzesylkePl"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="sprawdzPrzesylkePl"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="sprawdzPrzesylkiOdDo">
+            <http:operation location="Sledzenie/sprawdzPrzesylkiOdDo"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="sprawdzPrzesylkiOdDo"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="sprawdzPrzesylkiOdDo"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="maksymalnaLiczbaPrzesylek">
+            <http:operation location="Sledzenie/maksymalnaLiczbaPrzesylek"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="maksymalnaLiczbaPrzesylek"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="maksymalnaLiczbaPrzesylek"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="sprawdzPrzesylke">
+            <http:operation location="Sledzenie/sprawdzPrzesylke"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="sprawdzPrzesylke"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="sprawdzPrzesylke"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="sprawdzPrzesylkiOdDoPl">
+            <http:operation location="Sledzenie/sprawdzPrzesylkiOdDoPl"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="sprawdzPrzesylkiOdDoPl"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="sprawdzPrzesylkiOdDoPl"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="witaj">
+            <http:operation location="Sledzenie/witaj"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="witaj"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="witaj"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="sprawdzPrzesylki">
+            <http:operation location="Sledzenie/sprawdzPrzesylki"/>
+            <wsdl:input>
+                <mime:content type="text/xml" part="sprawdzPrzesylki"/>
+            </wsdl:input>
+            <wsdl:output>
+                <mime:content type="text/xml" part="sprawdzPrzesylki"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="Sledzenie">
+        <wsdl:port name="SledzenieHttpSoap11Endpoint" binding="ns:SledzenieSoap11Binding">
+            <soap:address location="https://tt.poczta-polska.pl/Sledzenie/services/Sledzenie.SledzenieHttpSoap11Endpoint/"/>
+        </wsdl:port>
+        <wsdl:port name="SledzenieHttpEndpoint" binding="ns:SledzenieHttpBinding">
+            <http:address location="https://tt.poczta-polska.pl/Sledzenie/services/Sledzenie.SledzenieHttpEndpoint/"/>
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>
+
