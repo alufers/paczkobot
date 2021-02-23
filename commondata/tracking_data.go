@@ -5,6 +5,7 @@ import "time"
 type TrackingData struct {
 	ShipmentNumber string
 	ProviderName   string
+	Destination    string
 	TrackingSteps  []*TrackingStep
 }
 

@@ -142,7 +142,7 @@ func (a *BotApp) handleTrackCommand(update tgbotapi.Update) error {
 			statuses[rep.provider.GetName()] = "🔎 " + status
 			sendStatuses()
 
-			var longTracking = fmt.Sprintf("Detailed tracking for package <i>%v</i> provided by <i>%v</i>:\n", rep.data.ShipmentNumber, rep.data.ProviderName)
+			var longTracking = fmt.Sprintf("Detailed tracking for package <i>%v</i> provided by <b>%v</b>:\n", rep.data.ShipmentNumber, rep.data.ProviderName)
 
 			for i, ts := range rep.data.TrackingSteps {
 				shouldBold := i == len(rep.data.TrackingSteps)-1
@@ -158,6 +158,11 @@ func (a *BotApp) handleTrackCommand(update tgbotapi.Update) error {
 					longTracking += "</b>"
 				}
 			}
+
+			if rep.data.Destination != "" {
+				longTracking += "\nThe package is headed to " + rep.data.Destination
+			}
+
 			msg := tgbotapi.NewMessage(update.Message.Chat.ID, longTracking)
 			msg.ParseMode = "HTML"
 			msg.ReplyToMessageID = update.Message.MessageID

@@ -6,14 +6,12 @@ import (
 	"fmt"
 	"github.com/alufers/paczkobot/commondata"
 	"io"
-	"log"
 	"net/http"
 	"strings"
 	"time"
 
 	"github.com/alufers/paczkobot/commonerrors"
 	"github.com/alufers/paczkobot/providers/pocztapolska/sledzeniehttpbinding"
-	"github.com/davecgh/go-spew/spew"
 )
 
 type PocztaPolskaProvider struct {
@@ -81,13 +79,13 @@ func (ip *PocztaPolskaProvider) Track(trackingNumber string) (*commondata.Tracki
 	}
 
 	if httpResponse.StatusCode != 200 {
-		return nil, fmt.Errorf("POST request to PP failed with status code %v: %w", httpResponse.StatusCode, err)
+		return nil, fmt.Errorf("HTTP status code: %v", httpResponse.StatusCode)
 	}
 	data, err := io.ReadAll(httpResponse.Body)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read XMl response from PP: %w", err)
 	}
-	log.Printf("xmlData = %v", string(data))
+	//log.Printf("xmlData = %v", string(data))
 
 	var resp = &SledzEnvelope{}
 	if err := xml.Unmarshal(data, resp); err != nil {
@@ -101,12 +99,13 @@ func (ip *PocztaPolskaProvider) Track(trackingNumber string) (*commondata.Tracki
 		ProviderName:   ip.GetName(),
 		TrackingSteps:  []*commondata.TrackingStep{},
 	}
-	spew.Dump(resp)
-	if resp.Body.SprawdzPrzesylkeResponse.Return.DanePrzesylki.Zdarzenia == nil {
+	if resp.Body.SprawdzPrzesylkeResponse.Return == nil ||
+		resp.Body.SprawdzPrzesylkeResponse.Return.DanePrzesylki == nil ||
+		resp.Body.SprawdzPrzesylkeResponse.Return.DanePrzesylki.Zdarzenia == nil {
 		return nil, commonerrors.NotFoundError
 	}
 	for _, z := range resp.Body.SprawdzPrzesylkeResponse.Return.DanePrzesylki.Zdarzenia.Zdarzenie {
-		log.Printf("%#v", *z)
+		//log.Printf("%#v", *z)
 		t, _ := time.Parse("2006-01-02 15:04", *z.Czas)
 		td.TrackingSteps = append(td.TrackingSteps, &commondata.TrackingStep{
 			Datetime:   t,
@@ -114,6 +113,10 @@ func (ip *PocztaPolskaProvider) Track(trackingNumber string) (*commondata.Tracki
 			Message:    *z.Nazwa,
 			Location:   *z.Jednostka.Nazwa,
 		})
+	}
+	up := resp.Body.SprawdzPrzesylkeResponse.Return.DanePrzesylki.UrzadPrzezn
+	if up != nil && up.Nazwa != nil {
+		td.Destination = *up.Nazwa
 	}
 	return td, nil
 
