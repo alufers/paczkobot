@@ -1,8 +1,10 @@
-package providers
+package pocztapolska
 
 import (
+	"bytes"
 	"encoding/xml"
 	"fmt"
+	"github.com/alufers/paczkobot/commondata"
 	"io"
 	"log"
 	"net/http"
@@ -10,7 +12,7 @@ import (
 	"time"
 
 	"github.com/alufers/paczkobot/commonerrors"
-	"github.com/alufers/paczkobot/providers/sledzeniehttpbinding"
+	"github.com/alufers/paczkobot/providers/pocztapolska/sledzeniehttpbinding"
 	"github.com/davecgh/go-spew/spew"
 )
 
@@ -41,7 +43,13 @@ type SledzEnvelopeBody struct {
 	SprawdzPrzesylkeResponse *sledzeniehttpbinding.SprawdzPrzesylkeResponse `xml:"sprawdzPrzesylkeResponse"`
 }
 
-func (ip *PocztaPolskaProvider) Track(trackingNumber string) (*TrackingData, error) {
+func EscapeXML(d string) string {
+	buf := &bytes.Buffer{}
+	xml.Escape(buf, []byte(d))
+	return buf.String()
+}
+
+func (ip *PocztaPolskaProvider) Track(trackingNumber string) (*commondata.TrackingData, error) {
 
 	req, err := http.NewRequest("POST", "https://tt.poczta-polska.pl/Sledzenie/services/Sledzenie?wsdl", strings.NewReader(fmt.Sprintf(`
 	<soapenv:Envelope   xmlns:sled="http://sledzenie.pocztapolska.pl" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
@@ -88,10 +96,10 @@ func (ip *PocztaPolskaProvider) Track(trackingNumber string) (*TrackingData, err
 	if err != nil {
 		return nil, fmt.Errorf("failed to request poczta polska: %v", err)
 	}
-	td := &TrackingData{
+	td := &commondata.TrackingData{
 		ShipmentNumber: trackingNumber,
 		ProviderName:   ip.GetName(),
-		TrackingSteps:  []*TrackingStep{},
+		TrackingSteps:  []*commondata.TrackingStep{},
 	}
 	spew.Dump(resp)
 	if resp.Body.SprawdzPrzesylkeResponse.Return.DanePrzesylki.Zdarzenia == nil {
@@ -100,7 +108,7 @@ func (ip *PocztaPolskaProvider) Track(trackingNumber string) (*TrackingData, err
 	for _, z := range resp.Body.SprawdzPrzesylkeResponse.Return.DanePrzesylki.Zdarzenia.Zdarzenie {
 		log.Printf("%#v", *z)
 		t, _ := time.Parse("2006-01-02 15:04", *z.Czas)
-		td.TrackingSteps = append(td.TrackingSteps, &TrackingStep{
+		td.TrackingSteps = append(td.TrackingSteps, &commondata.TrackingStep{
 			Datetime:   t,
 			CommonType: *z.Kod,
 			Message:    *z.Nazwa,

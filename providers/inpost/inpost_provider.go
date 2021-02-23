@@ -1,10 +1,11 @@
-package providers
+package inpost
 
 import (
 	"fmt"
+	"github.com/alufers/paczkobot/commondata"
 	"regexp"
 
-	"github.com/alufers/paczkobot/providers/inposttrackingapi"
+	"github.com/alufers/paczkobot/providers/inpost/inposttrackingapi"
 )
 
 type InpostProvider struct {
@@ -20,19 +21,19 @@ func (ip *InpostProvider) MatchesNumber(trackingNumber string) bool {
 	return inpostNumberRegex.MatchString(trackingNumber)
 }
 
-func (ip *InpostProvider) Track(trackingNumber string) (*TrackingData, error) {
+func (ip *InpostProvider) Track(trackingNumber string) (*commondata.TrackingData, error) {
 	data, err := inposttrackingapi.GetTrackingData(trackingNumber)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get data from inpost API: %w", err)
 	}
-	td := &TrackingData{
+	td := &commondata.TrackingData{
 		ShipmentNumber: trackingNumber,
 		ProviderName:   "inpost",
-		TrackingSteps:  []*TrackingStep{},
+		TrackingSteps:  []*commondata.TrackingStep{},
 	}
 	for i := len(data.TrackingDetails) - 1; i >= 0; i-- {
 		d := data.TrackingDetails[i]
-		td.TrackingSteps = append(td.TrackingSteps, &TrackingStep{
+		td.TrackingSteps = append(td.TrackingSteps, &commondata.TrackingStep{
 			Datetime:   d.Datetime,
 			CommonType: d.Status,
 			Message:    d.Status,

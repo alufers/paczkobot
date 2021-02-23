@@ -3,6 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"github.com/alufers/paczkobot/commondata"
 	"html"
 	"log"
 	"strings"
@@ -55,7 +56,7 @@ func (a *BotApp) Run() {
 
 type providerReply struct {
 	provider providers.Provider
-	data     *providers.TrackingData
+	data     *commondata.TrackingData
 	err      error
 }
 
