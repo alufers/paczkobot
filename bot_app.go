@@ -41,6 +41,9 @@ func (a *BotApp) Run() {
 			if strings.HasPrefix(update.Message.Text, "/track") {
 				err = a.handleTrackCommand(update)
 			}
+			if strings.HasPrefix(update.Message.Text, "/start") {
+				err = a.handleStartCommand(update)
+			}
 			log.Print(err)
 			if err != nil {
 				msg := tgbotapi.NewMessage(update.Message.Chat.ID, "🚫 Error: <b>"+html.EscapeString(err.Error())+"</b>")
@@ -172,4 +175,24 @@ func (a *BotApp) handleTrackCommand(update tgbotapi.Update) error {
 	}
 
 	return nil
+}
+
+func (a *BotApp) handleStartCommand(update tgbotapi.Update) error {
+	providerNames := []string{}
+	for _, p := range providers.AllProviders {
+		providerNames = append(providerNames, p.GetName())
+	}
+
+	msg := tgbotapi.NewMessage(update.Message.Chat.ID, fmt.Sprintf(`
+<b>Welcome to @paczko_bot!</b>
+
+Available commands:
+/track  &lt;shipmentNumber&gt;
+
+Supported tracking providers:
+%v
+`, strings.Join(providerNames, ", ")))
+	msg.ParseMode = "HTML"
+	_, err := a.Bot.Send(msg)
+	return err
 }
