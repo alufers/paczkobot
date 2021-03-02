@@ -18,7 +18,7 @@ type DpdComPlProvider struct {
 }
 
 func (dp *DpdComPlProvider) GetName() string {
-	return "dpdcompl-com-pl"
+	return "dpd-com-pl"
 }
 
 func (dp *DpdComPlProvider) MatchesNumber(trackingNumber string) bool {
