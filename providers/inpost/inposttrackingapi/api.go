@@ -1,6 +1,7 @@
 package inposttrackingapi
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -10,8 +11,8 @@ import (
 	"github.com/alufers/paczkobot/commonerrors"
 )
 
-func GetTrackingData(parcelNumber string) (*TrackingAPISchema, error) {
-	request, err := http.NewRequest("GET", fmt.Sprintf("https://api-shipx-pl.easypack24.net/v1/tracking/%s", url.QueryEscape(parcelNumber)), nil)
+func GetTrackingData(ctx context.Context, parcelNumber string) (*TrackingAPISchema, error) {
+	request, err := http.NewRequestWithContext(ctx, "GET", fmt.Sprintf("https://api-shipx-pl.easypack24.net/v1/tracking/%s", url.QueryEscape(parcelNumber)), nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create GET request to get tracking data: %w", err)
 	}

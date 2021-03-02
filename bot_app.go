@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"github.com/alufers/paczkobot/commondata"
@@ -86,7 +87,7 @@ func (a *BotApp) handleTrackCommand(update tgbotapi.Update) error {
 	for _, p := range providersToCheck {
 		statuses[p.GetName()] = "⌛ checking..."
 		go func(p providers.Provider) {
-			d, err := p.Track(shipmentNumber)
+			d, err := providers.InvokeProvider(context.Background(), p, shipmentNumber)
 			if err != nil {
 				replyChan <- &providerReply{
 					provider: p,

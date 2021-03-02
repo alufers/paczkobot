@@ -1,6 +1,7 @@
 package inpost
 
 import (
+	"context"
 	"fmt"
 	"github.com/alufers/paczkobot/commondata"
 	"regexp"
@@ -21,8 +22,8 @@ func (ip *InpostProvider) MatchesNumber(trackingNumber string) bool {
 	return inpostNumberRegex.MatchString(trackingNumber)
 }
 
-func (ip *InpostProvider) Track(trackingNumber string) (*commondata.TrackingData, error) {
-	data, err := inposttrackingapi.GetTrackingData(trackingNumber)
+func (ip *InpostProvider) Track(ctx context.Context, trackingNumber string) (*commondata.TrackingData, error) {
+	data, err := inposttrackingapi.GetTrackingData(ctx, trackingNumber)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get data from inpost API: %w", err)
 	}

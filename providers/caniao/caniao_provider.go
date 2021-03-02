@@ -1,6 +1,7 @@
 package caniao
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/PuerkitoBio/goquery"
@@ -24,7 +25,7 @@ func (pp *CaniaoProvider) MatchesNumber(trackingNumber string) bool {
 	return true
 }
 
-func (pp *CaniaoProvider) Track(trackingNumber string) (*commondata.TrackingData, error) {
+func (pp *CaniaoProvider) Track(ctx context.Context, trackingNumber string) (*commondata.TrackingData, error) {
 
 	requestData := url.Values{}
 	requestData.Set("barcodes", trackingNumber)

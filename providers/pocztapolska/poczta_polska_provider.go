@@ -2,6 +2,7 @@ package pocztapolska
 
 import (
 	"bytes"
+	"context"
 	"encoding/xml"
 	"fmt"
 	"github.com/alufers/paczkobot/commondata"
@@ -47,9 +48,9 @@ func EscapeXML(d string) string {
 	return buf.String()
 }
 
-func (ip *PocztaPolskaProvider) Track(trackingNumber string) (*commondata.TrackingData, error) {
+func (ip *PocztaPolskaProvider) Track(ctx context.Context, trackingNumber string) (*commondata.TrackingData, error) {
 
-	req, err := http.NewRequest("POST", "https://tt.poczta-polska.pl/Sledzenie/services/Sledzenie?wsdl", strings.NewReader(fmt.Sprintf(`
+	req, err := http.NewRequestWithContext(ctx, "POST", "https://tt.poczta-polska.pl/Sledzenie/services/Sledzenie?wsdl", strings.NewReader(fmt.Sprintf(`
 	<soapenv:Envelope   xmlns:sled="http://sledzenie.pocztapolska.pl" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
     <soapenv:Header>
         <wsse:Security           soapenv:mustUnderstand="1"          xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd">

@@ -1,6 +1,7 @@
 package postnl
 
 import (
+	"context"
 	"fmt"
 	"github.com/alufers/paczkobot/commondata"
 	"github.com/alufers/paczkobot/commonerrors"
@@ -24,7 +25,7 @@ func (pp *PostnlProvider) MatchesNumber(trackingNumber string) bool {
 	return true
 }
 
-func (pp *PostnlProvider) Track(trackingNumber string) (*commondata.TrackingData, error) {
+func (pp *PostnlProvider) Track(ctx context.Context, trackingNumber string) (*commondata.TrackingData, error) {
 
 	//await fetch("https://postnl.post/details/", {
 	//"credentials": "include",
@@ -45,7 +46,8 @@ func (pp *PostnlProvider) Track(trackingNumber string) (*commondata.TrackingData
 	requestData := url.Values{}
 	requestData.Set("barcodes", trackingNumber)
 
-	req, err := http.NewRequest(
+	req, err := http.NewRequestWithContext(
+		ctx,
 		"POST",
 		"https://postnl.post/details/",
 		strings.NewReader(requestData.Encode()),
