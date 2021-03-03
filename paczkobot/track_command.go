@@ -1,61 +1,28 @@
-package main
+package paczkobot
 
 import (
 	"context"
 	"errors"
 	"fmt"
 	"github.com/alufers/paczkobot/commondata"
-	"html"
-	"log"
-	"strings"
-
 	"github.com/alufers/paczkobot/commonerrors"
 	"github.com/alufers/paczkobot/providers"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+	"html"
+	"log"
+	"strings"
 )
 
-type BotApp struct {
-	Bot *tgbotapi.BotAPI
+type TrackCommand struct {
+	App *BotApp
 }
 
-func NewBotApp(b *tgbotapi.BotAPI) *BotApp {
-	return &BotApp{
-		Bot: b,
-	}
+func (t *TrackCommand) Usage() string {
+	return "/track <shipmentNumber>"
 }
 
-func (a *BotApp) Run() {
-	u := tgbotapi.NewUpdate(0)
-	u.Timeout = 60
-
-	updates, err := a.Bot.GetUpdatesChan(u)
-
-	if err != nil {
-		log.Fatalf("telegram updates error: %v", err)
-	}
-	log.Printf("Telegram bot is starting...")
-
-	for u := range updates {
-		go func(update tgbotapi.Update) {
-			var err error
-			log.Printf("msg: %v", update.Message.Text)
-			if strings.HasPrefix(update.Message.Text, "/track") {
-				err = a.handleTrackCommand(update)
-			}
-			if strings.HasPrefix(update.Message.Text, "/start") {
-				err = a.handleStartCommand(update)
-			}
-			log.Print(err)
-			if err != nil {
-				msg := tgbotapi.NewMessage(update.Message.Chat.ID, "🚫 Error: <b>"+html.EscapeString(err.Error())+"</b>")
-				msg.ParseMode = "HTML"
-				msg.ReplyToMessageID = update.Message.MessageID
-
-				a.Bot.Send(msg)
-			}
-		}(u)
-	}
-
+func (t *TrackCommand) Help() string {
+	return "shows up-to-date tracking information about a package with the given number"
 }
 
 type providerReply struct {
@@ -64,8 +31,8 @@ type providerReply struct {
 	err      error
 }
 
-func (a *BotApp) handleTrackCommand(update tgbotapi.Update) error {
-	var segments = strings.Split(update.Message.Text, " ")
+func (t *TrackCommand) Execute(ctx context.Context, args *CommandArguments) error {
+	var segments = strings.Split(args.update.Message.Text, " ")
 	log.Printf("segments = %#v", segments)
 	if len(segments) < 2 {
 		return fmt.Errorf("usage: /track &lt;shipmentNumber&gt;")
@@ -108,19 +75,19 @@ func (a *BotApp) handleTrackCommand(update tgbotapi.Update) error {
 			msgText += fmt.Sprintf("%v: <b>%v</b>\n", n, html.EscapeString(v))
 		}
 		if msgIdToEdit != 0 {
-			msg := tgbotapi.NewEditMessageText(update.Message.Chat.ID, msgIdToEdit, msgText)
+			msg := tgbotapi.NewEditMessageText(args.update.Message.Chat.ID, msgIdToEdit, msgText)
 			msg.ParseMode = "HTML"
-			_, err := a.Bot.Send(msg)
+			_, err := t.App.Bot.Send(msg)
 			if err != nil {
 				log.Printf("failed to edit status msg: %v", err)
 				return
 			}
 		} else {
-			msg := tgbotapi.NewMessage(update.Message.Chat.ID, msgText)
+			msg := tgbotapi.NewMessage(args.update.Message.Chat.ID, msgText)
 			msg.ParseMode = "HTML"
 			// msg.ReplyToMessageID = update.Message.MessageID
 
-			res, err := a.Bot.Send(msg)
+			res, err := t.App.Bot.Send(msg)
 			if err != nil {
 				log.Printf("failed to send status msg: %v", err)
 				return
@@ -167,33 +134,13 @@ func (a *BotApp) handleTrackCommand(update tgbotapi.Update) error {
 				longTracking += "\nThe package is headed to " + rep.data.Destination
 			}
 
-			msg := tgbotapi.NewMessage(update.Message.Chat.ID, longTracking)
+			msg := tgbotapi.NewMessage(args.update.Message.Chat.ID, longTracking)
 			msg.ParseMode = "HTML"
-			msg.ReplyToMessageID = update.Message.MessageID
+			msg.ReplyToMessageID = args.update.Message.MessageID
 
-			a.Bot.Send(msg)
+			t.App.Bot.Send(msg)
 		}
 	}
 
 	return nil
-}
-
-func (a *BotApp) handleStartCommand(update tgbotapi.Update) error {
-	providerNames := []string{}
-	for _, p := range providers.AllProviders {
-		providerNames = append(providerNames, p.GetName())
-	}
-
-	msg := tgbotapi.NewMessage(update.Message.Chat.ID, fmt.Sprintf(`
-<b>Welcome to @paczko_bot!</b>
-
-Available commands:
-/track  &lt;shipmentNumber&gt;
-
-Supported tracking providers:
-%v
-`, strings.Join(providerNames, ", ")))
-	msg.ParseMode = "HTML"
-	_, err := a.Bot.Send(msg)
-	return err
 }
