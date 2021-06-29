@@ -51,7 +51,7 @@ func (pp *UPSProvider) Track(ctx context.Context, trackingNumber string) (*commo
 	httpResponse, err := client.Do(req)
 
 	if err != nil {
-		return nil, fmt.Errorf("failed to make GET request to %v: %w", req.URL.String(), err)
+		return nil, commonerrors.NewNetworkError(pp.GetName(), req)
 	}
 
 	if httpResponse.StatusCode != 200 {
@@ -85,7 +85,7 @@ func (pp *UPSProvider) Track(ctx context.Context, trackingNumber string) (*commo
 	httpResponse, err = client.Do(req)
 
 	if err != nil {
-		return nil, fmt.Errorf("failed to make POST request to %v: %w", req.URL.String(), err)
+		return nil, commonerrors.NewNetworkError(pp.GetName(), req)
 	}
 
 	if httpResponse.StatusCode != 200 {
@@ -102,6 +102,10 @@ func (pp *UPSProvider) Track(ctx context.Context, trackingNumber string) (*commo
 		return nil, commonerrors.NotFoundError
 	}
 	details := decodedBody.TrackDetails[0]
+
+	if details.ErrorCode == "504" || details.ErrorCode == "Tracking number not found in database" {
+		return nil, commonerrors.NotFoundError
+	}
 	destinationPartsAll := []string{}
 	destinationParts := []string{}
 	destinationPartsAll = []string{

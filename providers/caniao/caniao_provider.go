@@ -4,14 +4,15 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/PuerkitoBio/goquery"
-	"github.com/alufers/paczkobot/commondata"
-	"github.com/alufers/paczkobot/commonerrors"
 	"log"
 	"net/http"
 	"net/url"
 	"strings"
 	"time"
+
+	"github.com/PuerkitoBio/goquery"
+	"github.com/alufers/paczkobot/commondata"
+	"github.com/alufers/paczkobot/commonerrors"
 )
 
 type CaniaoProvider struct {
@@ -42,7 +43,7 @@ func (pp *CaniaoProvider) Track(ctx context.Context, trackingNumber string) (*co
 	httpResponse, err := http.DefaultClient.Do(req)
 
 	if err != nil {
-		return nil, fmt.Errorf("failed to make GET request to %v: %w", req.URL.String(), err)
+		return nil, commonerrors.NewNetworkError(pp.GetName(), req)
 	}
 
 	if httpResponse.StatusCode != 200 {

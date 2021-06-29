@@ -5,11 +5,12 @@ import (
 	"context"
 	"encoding/xml"
 	"fmt"
-	"github.com/alufers/paczkobot/commondata"
 	"io"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/alufers/paczkobot/commondata"
 
 	"github.com/alufers/paczkobot/commonerrors"
 	"github.com/alufers/paczkobot/providers/pocztapolska/sledzeniehttpbinding"
@@ -76,7 +77,7 @@ func (ip *PocztaPolskaProvider) Track(ctx context.Context, trackingNumber string
 	httpResponse, err := http.DefaultClient.Do(req)
 
 	if err != nil {
-		return nil, fmt.Errorf("failed to make POST request to %v: %w", req.URL.String(), err)
+		return nil, commonerrors.NewNetworkError(ip.GetName(), req)
 	}
 
 	if httpResponse.StatusCode != 200 {

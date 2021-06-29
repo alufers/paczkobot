@@ -3,13 +3,14 @@ package postnl
 import (
 	"context"
 	"fmt"
-	"github.com/alufers/paczkobot/commondata"
-	"github.com/alufers/paczkobot/commonerrors"
 	"log"
 	"net/http"
 	"net/url"
 	"strings"
 	"time"
+
+	"github.com/alufers/paczkobot/commondata"
+	"github.com/alufers/paczkobot/commonerrors"
 
 	"github.com/PuerkitoBio/goquery"
 )
@@ -60,7 +61,7 @@ func (pp *PostnlProvider) Track(ctx context.Context, trackingNumber string) (*co
 	httpResponse, err := http.DefaultClient.Do(req)
 
 	if err != nil {
-		return nil, fmt.Errorf("failed to make POST request to %v: %w", req.URL.String(), err)
+		return nil, commonerrors.NewNetworkError(pp.GetName(), req)
 	}
 
 	if httpResponse.StatusCode != 200 {
