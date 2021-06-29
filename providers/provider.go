@@ -2,12 +2,14 @@ package providers
 
 import (
 	"context"
+
 	"github.com/alufers/paczkobot/commondata"
 	"github.com/alufers/paczkobot/providers/caniao"
 	"github.com/alufers/paczkobot/providers/dpdcompl"
 	"github.com/alufers/paczkobot/providers/inpost"
 	"github.com/alufers/paczkobot/providers/pocztapolska"
 	"github.com/alufers/paczkobot/providers/postnl"
+	"github.com/alufers/paczkobot/providers/ups"
 )
 
 var AllProviders = []Provider{
@@ -16,6 +18,7 @@ var AllProviders = []Provider{
 	&postnl.PostnlProvider{},
 	&caniao.CaniaoProvider{},
 	&dpdcompl.DpdComPlProvider{},
+	&ups.UPSProvider{},
 }
 
 type Provider interface {
