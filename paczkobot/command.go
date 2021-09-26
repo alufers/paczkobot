@@ -2,11 +2,13 @@ package paczkobot
 
 import (
 	"context"
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"strings"
+
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
 type Command interface {
+	Helpable
 	Usage() string
 	Execute(ctx context.Context, args *CommandArguments) error
 }

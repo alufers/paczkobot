@@ -14,7 +14,6 @@ import (
 
 	"github.com/alufers/paczkobot/commondata"
 	"github.com/alufers/paczkobot/commonerrors"
-	"github.com/davecgh/go-spew/spew"
 )
 
 type UPSProvider struct {
@@ -97,7 +96,6 @@ func (pp *UPSProvider) Track(ctx context.Context, trackingNumber string) (*commo
 	if err := decoder.Decode(decodedBody); err != nil {
 		return nil, fmt.Errorf("failed to parse tracking response JSON: %w", err)
 	}
-	spew.Dump(decodedBody)
 	if decodedBody.TrackDetails == nil || len(decodedBody.TrackDetails) == 0 {
 		return nil, commonerrors.NotFoundError
 	}
@@ -106,9 +104,8 @@ func (pp *UPSProvider) Track(ctx context.Context, trackingNumber string) (*commo
 	if details.ErrorCode == "504" || details.ErrorCode == "Tracking number not found in database" {
 		return nil, commonerrors.NotFoundError
 	}
-	destinationPartsAll := []string{}
 	destinationParts := []string{}
-	destinationPartsAll = []string{
+	destinationPartsAll := []string{
 		details.ShipToAddress.AttentionName,
 		details.ShipToAddress.CompanyName,
 		details.ShipToAddress.StreetAddress1,

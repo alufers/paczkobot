@@ -4,13 +4,14 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"html"
+	"log"
+	"strings"
+
 	"github.com/alufers/paczkobot/commondata"
 	"github.com/alufers/paczkobot/commonerrors"
 	"github.com/alufers/paczkobot/providers"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
-	"html"
-	"log"
-	"strings"
 )
 
 type TrackCommand struct {
@@ -33,7 +34,6 @@ type providerReply struct {
 
 func (t *TrackCommand) Execute(ctx context.Context, args *CommandArguments) error {
 	var segments = strings.Split(args.update.Message.Text, " ")
-	log.Printf("segments = %#v", segments)
 	if len(segments) < 2 {
 		return fmt.Errorf("usage: /track &lt;shipmentNumber&gt;")
 	}
@@ -54,7 +54,7 @@ func (t *TrackCommand) Execute(ctx context.Context, args *CommandArguments) erro
 	for _, p := range providersToCheck {
 		statuses[p.GetName()] = "⌛ checking..."
 		go func(p providers.Provider) {
-			d, err := providers.InvokeProvider(context.Background(), p, shipmentNumber)
+			d, err := t.App.TrackingService.InvokeProviderAndNotifyFollowers(context.Background(), p, shipmentNumber)
 			if err != nil {
 				replyChan <- &providerReply{
 					provider: p,

@@ -3,6 +3,8 @@ package paczkobot
 import (
 	"log"
 
+	"github.com/alufers/paczkobot/providers"
+	"github.com/alufers/paczkobot/providers/mock"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/spf13/viper"
 )
@@ -17,6 +19,10 @@ func Run() {
 	viper.SetDefault("telegram.username", "paczko_bot")
 	viper.SetDefault("telegram.debug", false)
 
+	if viper.GetBool("debug.mock_provider") {
+		providers.AllProviders = append(providers.AllProviders, &mock.MockProvider{})
+	}
+
 	err := viper.ReadInConfig() // Find and read the config file
 	if err != nil {             // Handle errors reading the config file
 		viper.SafeWriteConfig()
@@ -28,7 +34,7 @@ func Run() {
 		log.Fatalf("failed to connect to db: %v", db)
 	}
 
-	if err := db.AutoMigrate(&FollowedPackage{}, &FollowedPackageProvider{}, &FollowedPackageTelegramUser{}); err != nil {
+	if err := db.AutoMigrate(&FollowedPackage{}, &FollowedPackageProvider{}, &FollowedPackageTelegramUser{}, &EnqueuedNotification{}); err != nil {
 		log.Fatalf("failed to AutoMigrate: %v", err)
 	}
 

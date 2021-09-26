@@ -69,9 +69,10 @@ func (f *FollowCommand) Execute(ctx context.Context, args *CommandArguments) err
 			lastStep = d.TrackingSteps[len(d.TrackingSteps)-1]
 		}
 		providersToFollow = append(providersToFollow, &FollowedPackageProvider{
-			ProviderName:    p.GetName(),
-			LastStatusValue: lastStep.Message,
-			LastStatusDate:  lastStep.Datetime,
+			ProviderName:       p.GetName(),
+			LastStatusValue:    lastStep.Message,
+			LastStatusDate:     lastStep.Datetime,
+			LastStatusLocation: lastStep.Location,
 		})
 	}
 
@@ -81,7 +82,8 @@ func (f *FollowCommand) Execute(ctx context.Context, args *CommandArguments) err
 
 	followedPackage := &FollowedPackage{
 		TrackingNumber:           shipmentNumber,
-		LastCheck:                time.Now(),
+		LastAutomaticCheck:       time.Now(),
+		LastChange:               time.Now(),
 		FollowedPackageProviders: providersToFollow,
 	}
 
@@ -92,6 +94,7 @@ func (f *FollowCommand) Execute(ctx context.Context, args *CommandArguments) err
 	followedPackageTelegramUser := &FollowedPackageTelegramUser{
 		FollowedPackageID: followedPackage.ID,
 		TelegramUserID:    args.update.Message.From.ID,
+		ChatID:            args.update.Message.Chat.ID,
 	}
 
 	if err := f.App.DB.Where("followed_package_id = ? AND telegram_user_id = ?",
@@ -110,7 +113,7 @@ func (f *FollowCommand) Execute(ctx context.Context, args *CommandArguments) err
 			return fmt.Errorf("failed to create FollowedPackageTelegramUser: %v", err)
 		}
 	}
-	msg2 := tgbotapi.NewMessage(args.update.Message.Chat.ID, fmt.Sprintf(`Package %v has been added to your followed packages!`))
+	msg2 := tgbotapi.NewMessage(args.update.Message.Chat.ID, fmt.Sprintf(`Package %v has been added to your followed packages!`, shipmentNumber))
 	msg2.ParseMode = "HTML"
 	_, err = f.App.Bot.Send(msg2)
 	return err
