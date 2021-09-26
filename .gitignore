@@ -26,3 +26,4 @@
 # End of https://www.toptal.com/developers/gitignore/api/go
 
 paczkobot.yaml
+paczkobot_dev.db

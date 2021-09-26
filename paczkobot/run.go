@@ -1,9 +1,10 @@
 package paczkobot
 
 import (
+	"log"
+
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/spf13/viper"
-	"log"
 )
 
 func Run() {
@@ -21,15 +22,25 @@ func Run() {
 		viper.SafeWriteConfig()
 		log.Fatalf("config file: %v", err)
 	}
+
+	db, err := InitDB()
+	if err != nil {
+		log.Fatalf("failed to connect to db: %v", db)
+	}
+
+	if err := db.AutoMigrate(&FollowedPackage{}, &FollowedPackageProvider{}, &FollowedPackageTelegramUser{}); err != nil {
+		log.Fatalf("failed to AutoMigrate: %v", err)
+	}
+
 	token := viper.GetString("telegram.token")
 	if token == "" {
 		log.Fatal("no token provided")
 	}
 	bot, err := tgbotapi.NewBotAPI(token)
 	if err != nil {
-		log.Panic(err)
+		log.Fatal(err)
 	}
 	bot.Debug = viper.GetBool("telegram.debug")
-	app := NewBotApp(bot)
+	app := NewBotApp(bot, db)
 	app.Run()
 }

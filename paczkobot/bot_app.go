@@ -2,26 +2,32 @@ package paczkobot
 
 import (
 	"context"
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"html"
 	"log"
 	"strings"
+
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+	"gorm.io/gorm"
 )
 
 type BotApp struct {
 	Bot      *tgbotapi.BotAPI
+	DB       *gorm.DB
 	Commands []Command
 }
 
-func NewBotApp(b *tgbotapi.BotAPI) (a *BotApp) {
+func NewBotApp(b *tgbotapi.BotAPI, DB *gorm.DB) (a *BotApp) {
 	a = &BotApp{
 		Bot: b,
+		DB:  DB,
 	}
 	a.Commands = []Command{
 		&StartCommand{App: a, ExtraHelp: []Helpable{
 			&AvailableProvidersExtraHelp{},
 		}},
 		&TrackCommand{App: a},
+		&FollowCommand{App: a},
+		&PackagesCommand{App: a},
 	}
 	return
 }
