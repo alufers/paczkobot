@@ -43,6 +43,6 @@ type Data struct {
 	Status             string             `json:"status"`
 	StatusDesc         string             `json:"statusDesc"`
 	Success            bool               `json:"success"`
-	ErrorCode          string             `json:"errorCode""`
+	ErrorCode          string             `json:"errorCode"`
 	SyncQuery          bool               `json:"syncQuery"`
 }
