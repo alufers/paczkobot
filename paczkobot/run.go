@@ -25,14 +25,16 @@ func Run() {
 	viper.SetDefault("tracking.automatic_tracking_check_jitter", time.Minute*7)
 	viper.SetDefault("tracking.max_packages_per_automatic_tracking_check", 15)
 	viper.SetDefault("tracking.delay_between_packages_in_automatic_tracking", time.Minute)
-	if viper.GetBool("tracking.mock_provider") {
-		providers.AllProviders = append(providers.AllProviders, &mock.MockProvider{})
-	}
 
 	err := viper.ReadInConfig() // Find and read the config file
 	if err != nil {             // Handle errors reading the config file
 		viper.SafeWriteConfig()
 		log.Fatalf("config file: %v", err)
+	}
+
+	if viper.GetBool("tracking.providers.mock.enable") {
+		log.Printf("Mock provider is enabled!")
+		providers.AllProviders = append(providers.AllProviders, &mock.MockProvider{})
 	}
 
 	db, err := InitDB()

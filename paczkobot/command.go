@@ -21,6 +21,8 @@ type CommandArguments struct {
 	update      *tgbotapi.Update
 	CommandName string
 	Arguments   []string
+	ChatID      int64
+	FromUserID int
 }
 
 func CommandMatches(cmd Command, userInput string) bool {

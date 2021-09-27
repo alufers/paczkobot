@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"strings"
+	"log"
 	"time"
 
 	"github.com/alufers/paczkobot/commondata"
@@ -26,22 +26,21 @@ func (f *FollowCommand) Help() string {
 }
 
 func (f *FollowCommand) Execute(ctx context.Context, args *CommandArguments) error {
-	msg := tgbotapi.NewMessage(args.update.Message.Chat.ID, "⌛ loading...")
+	msg := tgbotapi.NewMessage(args.ChatID, "⌛ loading...")
 	msg.ParseMode = "HTML"
 	loadingRes, err := f.App.Bot.Send(msg)
 	if err != nil {
 		return fmt.Errorf("failed to send loading message: %w", err)
 	}
 	defer func() {
-		f.App.Bot.DeleteMessage(tgbotapi.NewDeleteMessage(args.update.Message.Chat.ID, loadingRes.MessageID))
+		f.App.Bot.DeleteMessage(tgbotapi.NewDeleteMessage(args.ChatID, loadingRes.MessageID))
 	}()
 
-	var segments = strings.Split(args.update.Message.Text, " ")
-
-	if len(segments) < 2 {
-		return fmt.Errorf("usage: /follow &lt;shipmentNumber&gt;")
+	if len(args.Arguments) < 1 {
+		return fmt.Errorf("usage: /follow <shipmentNumber>")
 	}
-	shipmentNumber := segments[1]
+	shipmentNumber := args.Arguments[0]
+	log.Printf("following shipmentNumber = %v", shipmentNumber)
 	providersToCheck := []providers.Provider{}
 	for _, provider := range providers.AllProviders {
 		if provider.MatchesNumber(shipmentNumber) {
@@ -93,8 +92,8 @@ func (f *FollowCommand) Execute(ctx context.Context, args *CommandArguments) err
 
 	followedPackageTelegramUser := &FollowedPackageTelegramUser{
 		FollowedPackageID: followedPackage.ID,
-		TelegramUserID:    args.update.Message.From.ID,
-		ChatID:            args.update.Message.Chat.ID,
+		TelegramUserID:    args.FromUserID,
+		ChatID:            args.ChatID,
 	}
 
 	if err := f.App.DB.Where("followed_package_id = ? AND telegram_user_id = ?",
@@ -113,8 +112,13 @@ func (f *FollowCommand) Execute(ctx context.Context, args *CommandArguments) err
 			return fmt.Errorf("failed to create FollowedPackageTelegramUser: %v", err)
 		}
 	}
-	msg2 := tgbotapi.NewMessage(args.update.Message.Chat.ID, fmt.Sprintf(`Package %v has been added to your followed packages!`, shipmentNumber))
+	msg2 := tgbotapi.NewMessage(args.ChatID, fmt.Sprintf(`Package %v has been added to your followed packages!`, shipmentNumber))
 	msg2.ParseMode = "HTML"
+	msg2.ReplyMarkup = tgbotapi.NewInlineKeyboardMarkup(
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData("📦 See followed packages", "/packages"),
+		),
+	)
 	_, err = f.App.Bot.Send(msg2)
 	return err
 }

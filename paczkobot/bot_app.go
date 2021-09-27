@@ -64,29 +64,47 @@ func (a *BotApp) Run() {
 	if err := a.Bot.SetMyCommands(myCommands); err != nil {
 		log.Fatalf("Failed to set my commands: %v", err)
 	}
+	a.Bot.SetChatDescription(tgbotapi.SetChatDescriptionConfig{
+		
+	})
 	go a.TrackingService.RunAutomaticTrackingLoop()
 	for u := range updates {
 		go func(update tgbotapi.Update) {
 			var err error
+			var cmdText string
+
+			args := &CommandArguments{
+				update: &update,
+			}
+			if update.Message != nil {
+				cmdText = update.Message.Text
+				args.ChatID = update.Message.Chat.ID
+				args.FromUserID = update.Message.From.ID
+			}
+			if update.CallbackQuery != nil {
+				cmdText = update.CallbackQuery.Data
+				args.ChatID = update.CallbackQuery.Message.Chat.ID
+				args.FromUserID = update.CallbackQuery.From.ID
+			}
+			seg := strings.Split(cmdText, " ")
+			args.CommandName = seg[0]
+			args.Arguments = seg[1:]
 
 			for _, cmd := range a.Commands {
-				if CommandMatches(cmd, update.Message.Text) {
+
+				if CommandMatches(cmd, cmdText) {
 					ctx := context.TODO()
-					seg := strings.Split(update.Message.Text, " ")
-					err = cmd.Execute(ctx, &CommandArguments{
-						update:      &update,
-						CommandName: seg[0],
-						Arguments:   seg[1:],
-					})
+					err = cmd.Execute(ctx, args)
 				}
 			}
 
 			if err != nil {
-				log.Printf("Error while processing command %v: %v", update.Message.Text, err)
-				msg := tgbotapi.NewMessage(update.Message.Chat.ID, "🚫 Error: <b>"+html.EscapeString(err.Error())+"</b>")
+				log.Printf("Error while processing command %v: %v", cmdText, err)
+				msg := tgbotapi.NewMessage(args.ChatID, "🚫 Error: <b>"+html.EscapeString(err.Error())+"</b>")
 				msg.ParseMode = "HTML"
-				msg.ReplyToMessageID = update.Message.MessageID
-
+				if update.Message != nil {
+					msg.ReplyToMessageID = update.Message.MessageID
+				}
 				a.Bot.Send(msg)
 			}
 		}(u)

@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"html"
 	"log"
-	"strings"
+	"sort"
 
 	"github.com/alufers/paczkobot/commondata"
 	"github.com/alufers/paczkobot/commonerrors"
@@ -33,11 +33,11 @@ type providerReply struct {
 }
 
 func (t *TrackCommand) Execute(ctx context.Context, args *CommandArguments) error {
-	var segments = strings.Split(args.update.Message.Text, " ")
-	if len(segments) < 2 {
+
+	if len(args.Arguments) < 1 {
 		return fmt.Errorf("usage: /track &lt;shipmentNumber&gt;")
 	}
-	shipmentNumber := segments[1]
+	shipmentNumber := args.Arguments[0]
 	providersToCheck := []providers.Provider{}
 	for _, provider := range providers.AllProviders {
 		if provider.MatchesNumber(shipmentNumber) {
@@ -71,7 +71,13 @@ func (t *TrackCommand) Execute(ctx context.Context, args *CommandArguments) erro
 	var msgIdToEdit int
 	sendStatuses := func() {
 		var msgText string
-		for n, v := range statuses {
+		statusesKeys := []string{}
+		for k := range statuses {
+			statusesKeys = append(statusesKeys, k)
+		}
+		sort.Strings(statusesKeys)
+		for _, n := range statusesKeys {
+			v := statuses[n]
 			msgText += fmt.Sprintf("%v: <b>%v</b>\n", n, html.EscapeString(v))
 		}
 		if msgIdToEdit != 0 {
@@ -137,7 +143,11 @@ func (t *TrackCommand) Execute(ctx context.Context, args *CommandArguments) erro
 			msg := tgbotapi.NewMessage(args.update.Message.Chat.ID, longTracking)
 			msg.ParseMode = "HTML"
 			msg.ReplyToMessageID = args.update.Message.MessageID
-
+			msg.ReplyMarkup = tgbotapi.NewInlineKeyboardMarkup(
+				tgbotapi.NewInlineKeyboardRow(
+					tgbotapi.NewInlineKeyboardButtonData("🚶 Follow this package", fmt.Sprintf("/follow %v", rep.data.ShipmentNumber)),
+				),
+			)
 			t.App.Bot.Send(msg)
 		}
 	}

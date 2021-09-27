@@ -3,7 +3,6 @@ package paczkobot
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
@@ -22,12 +21,10 @@ func (s *UnfollowCommand) Help() string {
 
 func (s *UnfollowCommand) Execute(ctx context.Context, args *CommandArguments) error {
 
-	var segments = strings.Split(args.update.Message.Text, " ")
-
-	if len(segments) < 2 {
+	if len(args.Arguments) < 1 {
 		return fmt.Errorf("usage: /unfollow &lt;shipmentNumber&gt;")
 	}
-	shipmentNumber := segments[1]
+	shipmentNumber := args.Arguments[0]
 
 	followedPackage := &FollowedPackage{}
 

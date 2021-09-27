@@ -26,7 +26,7 @@ func (s *PackagesCommand) Execute(ctx context.Context, args *CommandArguments) e
 
 	followedPackages := []FollowedPackageTelegramUser{}
 
-	if err := s.App.DB.Where("telegram_user_id = ?", args.update.Message.From.ID).
+	if err := s.App.DB.Where("telegram_user_id = ?", args.FromUserID).
 		Preload("FollowedPackage").
 		Preload("FollowedPackage.FollowedPackageProviders").
 		Find(&followedPackages).Error; err != nil {
@@ -45,7 +45,7 @@ func (s *PackagesCommand) Execute(ctx context.Context, args *CommandArguments) e
 		packagesText += "\n"
 	}
 
-	msg := tgbotapi.NewMessage(args.update.Message.Chat.ID, fmt.Sprintf(`
+	msg := tgbotapi.NewMessage(args.ChatID, fmt.Sprintf(`
 Your followed packages:
 
 %v

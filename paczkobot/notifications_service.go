@@ -105,11 +105,16 @@ func (s *NotificationsService) FlushEnqueuedNotifications() error {
 			return nil
 		}
 		var nextNotification *EnqueuedNotification
-		if err := s.app.DB.Preload("FollowedPackageTelegramUser").First(&nextNotification).Error; err != nil {
+		result := s.app.DB.Preload("FollowedPackageTelegramUser").Limit(1).Find(&nextNotification)
+		if err := result.Error; err != nil {
 			if errors.Is(err, gorm.ErrRecordNotFound) {
 				return nil
 			}
 			return fmt.Errorf("failed to fetch notifications to flush: %w", err)
+		}
+
+		if nextNotification == nil || result.RowsAffected < 1 {
+			return nil
 		}
 
 		if err := s.sendNotificationsForUser(nextNotification.FollowedPackageTelegramUser); err != nil {
