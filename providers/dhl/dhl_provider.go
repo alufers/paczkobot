@@ -22,7 +22,7 @@ func (pp *DHLProvider) GetName() string {
 }
 
 func (pp *DHLProvider) MatchesNumber(trackingNumber string) bool {
-	return viper.GetBool("tracking.providers.dhl.enabled")
+	return viper.GetBool("tracking.providers.dhl.enable")
 }
 
 func (pp *DHLProvider) Track(ctx context.Context, trackingNumber string) (*commondata.TrackingData, error) {
