@@ -65,9 +65,10 @@ func (pp *CaniaoProvider) Track(ctx context.Context, trackingNumber string) (*co
 	if len(trackingData.Data) <= 0 {
 		return nil, fmt.Errorf("len(trackingData.Data) <= 0")
 	}
-	if trackingData.Data[0].ErrorCode == "RESULT_EMPTY" {
+	if trackingData.Data[0].ErrorCode == "RESULT_EMPTY" || trackingData.Data[0].ErrorCode == "ORDER_NOT_FOUND" {
 		return nil, commonerrors.NotFoundError
 	}
+
 	if !trackingData.Data[0].Success {
 		return nil, fmt.Errorf("caniao error: trackingData.Data[0].ErrorCode = %v", trackingData.Data[0].ErrorCode)
 	}

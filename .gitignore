@@ -29,3 +29,4 @@ paczkobot.yaml
 paczkobot_dev.db
 .idea
 mock-package.json
+deobfuscated

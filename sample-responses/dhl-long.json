@@ -1,0 +1,208 @@
+{
+  "possibleAdditionalShipmentsUrl": [
+    "/track/shipments?trackingNumber=24171351605\u0026service=freight",
+    "/track/shipments?trackingNumber=24171351605\u0026service=dgf",
+    "/track/shipments?trackingNumber=24171351605\u0026service=ecommerce",
+    "/track/shipments?trackingNumber=24171351605\u0026service=parcel-de",
+    "/track/shipments?trackingNumber=24171351605\u0026service=parcel-nl",
+    "/track/shipments?trackingNumber=24171351605\u0026service=express"
+  ],
+  "shipments": [
+    {
+      "destination": {
+        "address": {
+          "addressLocality": "Tarnów"
+        }
+      },
+      "events": [
+        {
+          "description": "przesyłka zwrócona nadawcy",
+          "location": {
+            "address": {
+              "addressLocality": "Lublin"
+            }
+          },
+          "statusCode": "delivered",
+          "timestamp": "2021-09-27T14:13:35"
+        },
+        {
+          "description": "przesyłka przekazana kurierowi do doręczenia",
+          "location": {
+            "address": {
+              "addressLocality": "Lublin"
+            }
+          },
+          "statusCode": "transit",
+          "timestamp": "2021-09-27T09:00:34"
+        },
+        {
+          "description": "przesyłka dotarła do oddziału",
+          "location": {
+            "address": {
+              "addressLocality": "Lublin"
+            }
+          },
+          "statusCode": "transit",
+          "timestamp": "2021-09-27T08:41:08"
+        },
+        {
+          "description": "przesyłka jest obsługiwana w centrum sortowania",
+          "location": {
+            "address": {
+              "addressLocality": "Warszawa"
+            }
+          },
+          "statusCode": "transit",
+          "timestamp": "2021-09-26T23:08:35"
+        },
+        {
+          "description": "przesyłka jest obsługiwana w centrum sortowania",
+          "location": {
+            "address": {
+              "addressLocality": "Zabrze"
+            }
+          },
+          "statusCode": "transit",
+          "timestamp": "2021-09-24T21:35:00"
+        },
+        {
+          "description": "przesyłka jest obsługiwana w centrum sortowania",
+          "location": {
+            "address": {
+              "addressLocality": "Tarnów"
+            }
+          },
+          "statusCode": "transit",
+          "timestamp": "2021-09-24T17:32:18"
+        },
+        {
+          "description": "przesyłka będzie zwrócona do nadawcy. Doręczenie nie było możliwe",
+          "location": {
+            "address": {
+              "addressLocality": "Tarnów"
+            }
+          },
+          "statusCode": "failure",
+          "timestamp": "2021-09-24T00:00:00"
+        },
+        {
+          "description": "przesyłka jest obsługiwana w centrum sortowania",
+          "location": {
+            "address": {
+              "addressLocality": "Tarnów"
+            }
+          },
+          "statusCode": "transit",
+          "timestamp": "2021-09-23T16:20:21"
+        },
+        {
+          "description": "przesyłka jest obsługiwana w centrum sortowania",
+          "location": {
+            "address": {
+              "addressLocality": "Tarnów"
+            }
+          },
+          "statusCode": "transit",
+          "timestamp": "2021-09-22T19:23:18"
+        },
+        {
+          "description": "próba doręczenia zakończona niepowodzeniem. Przesyłka oczekuje na kolejny cykl doręczenia",
+          "location": {
+            "address": {
+              "addressLocality": "Tarnów"
+            }
+          },
+          "statusCode": "transit",
+          "timestamp": "2021-09-22T14:46:00"
+        },
+        {
+          "description": "przesyłka przekazana kurierowi do doręczenia",
+          "location": {
+            "address": {
+              "addressLocality": "Tarnów"
+            }
+          },
+          "statusCode": "transit",
+          "timestamp": "2021-09-22T08:19:59"
+        },
+        {
+          "description": "doręczenie przesyłki do DHL Parcelshop zostało wstrzymane. Prosimy o kontakt z Działem Obsługi Klienta DHL Parcel pod numerem 42 6 345 345",
+          "location": {
+            "address": {
+              "addressLocality": "Tarnów"
+            }
+          },
+          "statusCode": "failure",
+          "timestamp": "2021-09-21T14:04:56"
+        },
+        {
+          "description": "przesyłka przekazana kurierowi do doręczenia",
+          "location": {
+            "address": {
+              "addressLocality": "Tarnów"
+            }
+          },
+          "statusCode": "transit",
+          "timestamp": "2021-09-21T09:22:04"
+        },
+        {
+          "description": "przesyłka dotarła do oddziału",
+          "location": {
+            "address": {
+              "addressLocality": "Tarnów"
+            }
+          },
+          "statusCode": "transit",
+          "timestamp": "2021-09-21T08:49:50"
+        },
+        {
+          "description": "przesyłka jest obsługiwana w centrum sortowania",
+          "location": {
+            "address": {
+              "addressLocality": "Warszawa"
+            }
+          },
+          "statusCode": "transit",
+          "timestamp": "2021-09-20T22:45:10"
+        },
+        {
+          "description": "przesyłka jest obsługiwana w centrum sortowania",
+          "location": {
+            "address": {
+              "addressLocality": "Lublin"
+            }
+          },
+          "statusCode": "transit",
+          "timestamp": "2021-09-20T16:28:03"
+        },
+        {
+          "description": "przesyłka przyjęta w terminalu nadawczym DHL",
+          "location": {
+            "address": {
+              "addressLocality": "Lublin"
+            }
+          },
+          "statusCode": "transit",
+          "timestamp": "2021-09-20T14:33:00"
+        }
+      ],
+      "id": "24171351605",
+      "origin": {
+        "address": {
+          "addressLocality": "Lublin"
+        }
+      },
+      "service": "parcel-pl",
+      "status": {
+        "description": "przesyłka zwrócona nadawcy",
+        "location": {
+          "address": {
+            "addressLocality": "Lublin"
+          }
+        },
+        "statusCode": "delivered",
+        "timestamp": "2021-09-27T14:13:35"
+      }
+    }
+  ]
+}

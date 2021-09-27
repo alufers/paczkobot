@@ -2,6 +2,7 @@ package paczkobot
 
 import (
 	"log"
+	"time"
 
 	"github.com/alufers/paczkobot/providers"
 	"github.com/alufers/paczkobot/providers/mock"
@@ -19,7 +20,12 @@ func Run() {
 	viper.SetDefault("telegram.username", "paczko_bot")
 	viper.SetDefault("telegram.debug", false)
 
-	if viper.GetBool("debug.mock_provider") {
+	viper.SetDefault("tracking.max_time_without_change", time.Hour*24*14)
+	viper.SetDefault("tracking.automatic_tracking_check_interval", time.Minute*20)
+	viper.SetDefault("tracking.automatic_tracking_check_jitter", time.Minute*7)
+	viper.SetDefault("tracking.max_packages_per_automatic_tracking_check", 15)
+	viper.SetDefault("tracking.delay_between_packages_in_automatic_tracking", time.Minute)
+	if viper.GetBool("tracking.mock_provider") {
 		providers.AllProviders = append(providers.AllProviders, &mock.MockProvider{})
 	}
 

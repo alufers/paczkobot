@@ -64,7 +64,7 @@ func (a *BotApp) Run() {
 	if err := a.Bot.SetMyCommands(myCommands); err != nil {
 		log.Fatalf("Failed to set my commands: %v", err)
 	}
-
+	go a.TrackingService.RunAutomaticTrackingLoop()
 	for u := range updates {
 		go func(update tgbotapi.Update) {
 			var err error
