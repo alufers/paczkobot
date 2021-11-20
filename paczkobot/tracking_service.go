@@ -87,7 +87,7 @@ func (ts *TrackingService) notifyFollowersOfPackageIfNeeded(ctx context.Context,
 
 func (ts *TrackingService) MarkPackagesWithoutChangesAsInactive() error {
 	var followedPackages []FollowedPackage
-	if err := ts.app.DB.Where("last_change < ?", time.Now().Add(-viper.GetDuration("tracking.max_time_without_change"))).
+	if err := ts.app.DB.Where("last_change < ? AND inactive = false", time.Now().Add(-viper.GetDuration("tracking.max_time_without_change"))).
 		Find(&followedPackages).Error; err != nil {
 		return fmt.Errorf("failed to find followed expired packages: %w", err)
 	}
@@ -155,6 +155,11 @@ func (ts *TrackingService) runAutomaticTrackingForPackage(pkg *FollowedPackage) 
 		didChange, err := ts.notifyFollowersOfPackageIfNeeded(ctx, pkg, provider, result)
 		if err != nil {
 			return fmt.Errorf("failed to notify followers of package: %w", err)
+		}
+		pkg.LastAutomaticCheck = time.Now()
+		// save the package in the database
+		if err := ts.app.DB.Save(pkg).Error; err != nil {
+			return fmt.Errorf("failed to save package: %w", err)
 		}
 		if didChange {
 			log.Printf("Package %v (%v) changed! -> %v", pkg.TrackingNumber, prov.ProviderName, result.TrackingSteps[len(result.TrackingSteps)-1].Message)
