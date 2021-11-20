@@ -18,6 +18,7 @@ type FollowedPackageTelegramUser struct {
 	FollowedPackage   *FollowedPackage
 	TelegramUserID    int
 	ChatID            int64
+	CustomName        string
 }
 
 type FollowedPackageProvider struct {

@@ -74,8 +74,13 @@ func (s *NotificationsService) sendNotificationsForUser(tgUser *FollowedPackageT
 		if strings.TrimSpace(n.FollowedPackageProvider.LastStatusLocation) != "" {
 			loc = " 📌" + n.FollowedPackageProvider.LastStatusLocation
 		}
-		msgContents += fmt.Sprintf("<b>%v</b> (%v): %v %v%v\n",
+		customName := ""
+		if n.FollowedPackageTelegramUser.CustomName != "" {
+			customName = " (" + n.FollowedPackageTelegramUser.CustomName + ")"
+		}
+		msgContents += fmt.Sprintf("<b>%v</b>%v (%v): %v %v%v\n",
 			n.FollowedPackageProvider.FollowedPackage.TrackingNumber,
+			customName,
 			n.FollowedPackageProvider.ProviderName,
 			n.FollowedPackageProvider.LastStatusValue,
 			n.FollowedPackageProvider.LastStatusDate.Format("2006-01-02 15:04"),

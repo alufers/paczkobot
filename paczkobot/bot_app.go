@@ -31,6 +31,7 @@ func NewBotApp(b *tgbotapi.BotAPI, DB *gorm.DB) (a *BotApp) {
 		&FollowCommand{App: a},
 		&PackagesCommand{App: a},
 		&UnfollowCommand{App: a},
+		&SetNameCommand{App: a},
 	}
 	a.NotificationsService = NewNotificationsService(a)
 	a.TrackingService = NewTrackingService(a)
@@ -64,9 +65,7 @@ func (a *BotApp) Run() {
 	if err := a.Bot.SetMyCommands(myCommands); err != nil {
 		log.Fatalf("Failed to set my commands: %v", err)
 	}
-	a.Bot.SetChatDescription(tgbotapi.SetChatDescriptionConfig{
-		
-	})
+	a.Bot.SetChatDescription(tgbotapi.SetChatDescriptionConfig{})
 	go a.TrackingService.RunAutomaticTrackingLoop()
 	for u := range updates {
 		go func(update tgbotapi.Update) {
