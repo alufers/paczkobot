@@ -2,6 +2,7 @@ package paczkobot
 
 import (
 	"errors"
+	"log"
 	"strings"
 	"sync"
 	"time"
@@ -46,6 +47,7 @@ func (a *AskService) ProcessIncomingMessage(update tgbotapi.Update) bool {
 	}
 
 	if update.Message != nil {
+		log.Printf("Processing msg, ", update.Message.Text)
 		if strings.HasPrefix(update.Message.Text, "/") {
 			if callback, ok := a.AskCallbacks[update.Message.From.ID]; ok {
 				callback("", errors.New("canceled"))
@@ -88,9 +90,17 @@ func (a *AskService) AskForArgument(chatID int64, question string) (string, erro
 		defer a.AskCallbacksMutex.Unlock()
 		a.AskCallbacks[chatID] = func(answer string, err error) {
 			if err != nil {
-				retChan <- err
+				select {
+				case retChan <- err:
+				default:
+				}
+				return
 			}
-			retChan <- answer
+			select {
+			case retChan <- answer:
+			default:
+
+			}
 		}
 	}()
 
@@ -151,9 +161,17 @@ func (a *AskService) Confirm(chatID int64, question string) error {
 		a.AskCallbacks[chatID] = func(answer string, err error) {
 
 			if err != nil {
-				retChan <- err
+				select {
+				case retChan <- err:
+				default:
+				}
+				return
 			}
-			retChan <- answer
+			select {
+			case retChan <- answer:
+			default:
+
+			}
 		}
 	}()
 	defer a.BotApp.Bot.Send(tgbotapi.NewDeleteMessage(chatID, sentMsg.MessageID))
