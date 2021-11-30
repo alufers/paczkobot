@@ -6,7 +6,7 @@ import (
 	"log"
 	"strings"
 
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"gorm.io/gorm"
 )
 
@@ -16,6 +16,7 @@ type BotApp struct {
 	Commands             []Command
 	NotificationsService *NotificationsService
 	TrackingService      *TrackingService
+	AskService           *AskService
 }
 
 func NewBotApp(b *tgbotapi.BotAPI, DB *gorm.DB) (a *BotApp) {
@@ -32,9 +33,11 @@ func NewBotApp(b *tgbotapi.BotAPI, DB *gorm.DB) (a *BotApp) {
 		&PackagesCommand{App: a},
 		&UnfollowCommand{App: a},
 		&SetNameCommand{App: a},
+		&UnfollowAllCommand{App: a},
 	}
 	a.NotificationsService = NewNotificationsService(a)
 	a.TrackingService = NewTrackingService(a)
+	a.AskService = NewAskService(a)
 	return
 }
 
@@ -48,32 +51,38 @@ func (a *BotApp) Run() {
 	}
 	log.Printf("Done flushing enqueued notifications!")
 
-	updates, err := a.Bot.GetUpdatesChan(u)
-	if err != nil {
-		log.Fatalf("telegram updates error: %v", err)
-	}
+	updates := a.Bot.GetUpdatesChan(u)
+
 	log.Printf("Telegram bot is starting...")
 
 	myCommands := []tgbotapi.BotCommand{}
 	for _, cmd := range a.Commands {
-		rawCmd := strings.TrimPrefix(strings.Split(cmd.Usage(), " ")[0], "/")
+		rawCmd := strings.TrimPrefix(strings.Split(cmd.Aliases()[0], " ")[0], "/")
 		myCommands = append(myCommands, tgbotapi.BotCommand{
 			Command:     rawCmd,
 			Description: cmd.Help(),
 		})
 	}
-	if err := a.Bot.SetMyCommands(myCommands); err != nil {
+
+	commandsConfig := tgbotapi.NewSetMyCommands(myCommands...)
+
+	if _, err := a.Bot.Request(commandsConfig); err != nil {
 		log.Fatalf("Failed to set my commands: %v", err)
 	}
-	a.Bot.SetChatDescription(tgbotapi.SetChatDescriptionConfig{})
+
 	go a.TrackingService.RunAutomaticTrackingLoop()
 	for u := range updates {
 		go func(update tgbotapi.Update) {
+			if a.AskService.ProcessIncomingMessage(update) {
+				return
+			}
 			var err error
 			var cmdText string
 
 			args := &CommandArguments{
-				update: &update,
+				BotApp:         a,
+				update:         &update,
+				namedArguments: map[string]string{},
 			}
 			if update.Message != nil {
 				cmdText = update.Message.Text
@@ -92,8 +101,20 @@ func (a *BotApp) Run() {
 			for _, cmd := range a.Commands {
 
 				if CommandMatches(cmd, cmdText) {
+					args.Command = cmd
+					for i, argTpl := range cmd.Arguments() {
+						if argTpl.Variadic {
+							args.namedArguments[argTpl.Name] = strings.Join(args.Arguments[i:], " ")
+							break
+						}
+						if i >= len(args.Arguments) {
+							break
+						}
+						args.namedArguments[argTpl.Name] = args.Arguments[i]
+					}
 					ctx := context.TODO()
 					err = cmd.Execute(ctx, args)
+					break
 				}
 			}
 

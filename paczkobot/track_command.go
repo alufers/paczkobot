@@ -11,15 +11,25 @@ import (
 	"github.com/alufers/paczkobot/commondata"
 	"github.com/alufers/paczkobot/commonerrors"
 	"github.com/alufers/paczkobot/providers"
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
 type TrackCommand struct {
 	App *BotApp
 }
 
-func (t *TrackCommand) Usage() string {
-	return "/track <shipmentNumber>"
+func (s *TrackCommand) Aliases() []string {
+	return []string{"/track"}
+}
+
+func (s *TrackCommand) Arguments() []*CommandDefArgument {
+	return []*CommandDefArgument{
+		&CommandDefArgument{
+			Name:        "shipmentNumber",
+			Description: "shipment number of the package",
+			Question:    "Please enter the shipment number to track:",
+		},
+	}
 }
 
 func (t *TrackCommand) Help() string {
@@ -34,10 +44,10 @@ type providerReply struct {
 
 func (t *TrackCommand) Execute(ctx context.Context, args *CommandArguments) error {
 
-	if len(args.Arguments) < 1 {
-		return fmt.Errorf("usage: /track &lt;shipmentNumber&gt;")
+	shipmentNumber, err := args.GetOrAskForArgument("shipmentNumber")
+	if err != nil {
+		return err
 	}
-	shipmentNumber := args.Arguments[0]
 	providersToCheck := []providers.Provider{}
 	for _, provider := range providers.AllProviders {
 		if provider.MatchesNumber(shipmentNumber) {

@@ -3,9 +3,10 @@ package paczkobot
 import (
 	"context"
 	"fmt"
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
-	"github.com/spf13/viper"
 	"html"
+
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"github.com/spf13/viper"
 )
 
 type StartCommand struct {
@@ -13,8 +14,12 @@ type StartCommand struct {
 	ExtraHelp []Helpable
 }
 
-func (s *StartCommand) Usage() string {
-	return "/start"
+func (s *StartCommand) Aliases() []string {
+	return []string{"/start"}
+}
+
+func (s *StartCommand) Arguments() []*CommandDefArgument {
+	return []*CommandDefArgument{}
 }
 
 func (s *StartCommand) Help() string {
@@ -27,7 +32,10 @@ func (s *StartCommand) Execute(ctx context.Context, args *CommandArguments) erro
 	extraHelp := ""
 
 	for _, cmd := range s.App.Commands {
-		line := html.EscapeString(cmd.Usage())
+		line := html.EscapeString(cmd.Aliases()[0])
+		for _, arg := range cmd.Arguments() {
+			line += fmt.Sprintf(" [%s]", arg.Name)
+		}
 		if helpable, ok := cmd.(Helpable); ok {
 			line += " - " + html.EscapeString(helpable.Help())
 		}

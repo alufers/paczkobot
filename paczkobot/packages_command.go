@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/xeonx/timeago"
 )
 
@@ -12,12 +12,16 @@ type PackagesCommand struct {
 	App *BotApp
 }
 
-func (s *PackagesCommand) Usage() string {
-	return "/packages"
+func (s *PackagesCommand) Aliases() []string {
+	return []string{"/packages"}
+}
+
+func (s *PackagesCommand) Arguments() []*CommandDefArgument {
+	return []*CommandDefArgument{}
 }
 
 func (s *PackagesCommand) Help() string {
-	return "prints your followed commands"
+	return "prints your followed packages"
 }
 
 func (s *PackagesCommand) Execute(ctx context.Context, args *CommandArguments) error {
@@ -40,7 +44,7 @@ func (s *PackagesCommand) Execute(ctx context.Context, args *CommandArguments) e
 		}
 		packagesText += fmt.Sprintf("<b>%v</b>%v", p.FollowedPackage.TrackingNumber, customName)
 		for i, prov := range p.FollowedPackage.FollowedPackageProviders {
-			packagesText += fmt.Sprintf("%v (<i>%v %v</i>)",
+			packagesText += fmt.Sprintf(" %v (<i>%v %v</i>)",
 				prov.ProviderName,
 				prov.LastStatusValue,
 				timeago.English.Format(prov.LastStatusDate))

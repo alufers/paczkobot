@@ -4,12 +4,20 @@ import (
 	"context"
 	"strings"
 
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
+
+type CommandDefArgument struct {
+	Name        string
+	Description string
+	Question    string
+	Variadic    bool
+}
 
 type Command interface {
 	Helpable
-	Usage() string
+	Aliases() []string
+	Arguments() []*CommandDefArgument
 	Execute(ctx context.Context, args *CommandArguments) error
 }
 
@@ -18,14 +26,39 @@ type Helpable interface {
 }
 
 type CommandArguments struct {
-	update      *tgbotapi.Update
-	CommandName string
-	Arguments   []string
-	ChatID      int64
-	FromUserID int
+	BotApp         *BotApp
+	update         *tgbotapi.Update
+	CommandName    string
+	Arguments      []string
+	ChatID         int64
+	FromUserID     int64
+	namedArguments map[string]string
+	Command        Command
+}
+
+func (a *CommandArguments) GetOrAskForArgument(name string) (string, error) {
+	if val, ok := a.namedArguments[name]; ok {
+		return val, nil
+	}
+	var cmdTemplate *CommandDefArgument
+	for _, arg := range a.Command.Arguments() {
+		if arg.Name == name {
+			cmdTemplate = arg
+			break
+		}
+	}
+	if cmdTemplate == nil {
+		return "", nil
+	}
+	return a.BotApp.AskService.AskForArgument(a.ChatID, "❓ "+cmdTemplate.Question)
 }
 
 func CommandMatches(cmd Command, userInput string) bool {
-	usage := cmd.Usage()
-	return strings.Split(userInput, " ")[0] == strings.Split(usage, " ")[0]
+	usersCmd := strings.Split(userInput, " ")[0]
+	for _, alias := range cmd.Aliases() {
+		if alias == usersCmd {
+			return true
+		}
+	}
+	return false
 }

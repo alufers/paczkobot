@@ -16,7 +16,7 @@ type FollowedPackageTelegramUser struct {
 	Model
 	FollowedPackageID string
 	FollowedPackage   *FollowedPackage
-	TelegramUserID    int
+	TelegramUserID    int64
 	ChatID            int64
 	CustomName        string
 }

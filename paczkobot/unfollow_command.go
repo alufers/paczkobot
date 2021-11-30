@@ -4,15 +4,25 @@ import (
 	"context"
 	"fmt"
 
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
 type UnfollowCommand struct {
 	App *BotApp
 }
 
-func (s *UnfollowCommand) Usage() string {
-	return "/unfollow <shipmentNumber>"
+func (s *UnfollowCommand) Aliases() []string {
+	return []string{"/unfollow"}
+}
+
+func (s *UnfollowCommand) Arguments() []*CommandDefArgument {
+	return []*CommandDefArgument{
+		&CommandDefArgument{
+			Name:        "shipmentNumber",
+			Description: "shipment number of the package",
+			Question:    "Please enter the shipment number to unfollow:",
+		},
+	}
 }
 
 func (s *UnfollowCommand) Help() string {
@@ -21,10 +31,10 @@ func (s *UnfollowCommand) Help() string {
 
 func (s *UnfollowCommand) Execute(ctx context.Context, args *CommandArguments) error {
 
-	if len(args.Arguments) < 1 {
-		return fmt.Errorf("usage: /unfollow &lt;shipmentNumber&gt;")
+	shipmentNumber, err := args.GetOrAskForArgument("shipmentNumber")
+	if err != nil {
+		return err
 	}
-	shipmentNumber := args.Arguments[0]
 
 	followedPackage := &FollowedPackage{}
 
@@ -56,6 +66,6 @@ func (s *UnfollowCommand) Execute(ctx context.Context, args *CommandArguments) e
 
 	msg := tgbotapi.NewMessage(args.update.Message.Chat.ID, fmt.Sprintf(`Package %v has been unfollowed!`, shipmentNumber))
 	msg.ParseMode = "HTML"
-	_, err := s.App.Bot.Send(msg)
+	_, err = s.App.Bot.Send(msg)
 	return err
 }

@@ -10,15 +10,25 @@ import (
 	"github.com/alufers/paczkobot/commondata"
 	"github.com/alufers/paczkobot/commonerrors"
 	"github.com/alufers/paczkobot/providers"
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
 type FollowCommand struct {
 	App *BotApp
 }
 
-func (f *FollowCommand) Usage() string {
-	return "/follow <shipmentNumber>"
+func (s *FollowCommand) Aliases() []string {
+	return []string{"/follow"}
+}
+
+func (s *FollowCommand) Arguments() []*CommandDefArgument {
+	return []*CommandDefArgument{
+		&CommandDefArgument{
+			Name:        "shipmentNumber",
+			Description: "shipment number of the package",
+			Question:    "Please enter the shipment number:",
+		},
+	}
 }
 
 func (f *FollowCommand) Help() string {
@@ -33,13 +43,13 @@ func (f *FollowCommand) Execute(ctx context.Context, args *CommandArguments) err
 		return fmt.Errorf("failed to send loading message: %w", err)
 	}
 	defer func() {
-		f.App.Bot.DeleteMessage(tgbotapi.NewDeleteMessage(args.ChatID, loadingRes.MessageID))
+		f.App.Bot.Send(tgbotapi.NewDeleteMessage(args.ChatID, loadingRes.MessageID))
 	}()
 
-	if len(args.Arguments) < 1 {
-		return fmt.Errorf("usage: /follow <shipmentNumber>")
+	shipmentNumber, err := args.GetOrAskForArgument("shipmentNumber")
+	if err != nil {
+		return err
 	}
-	shipmentNumber := args.Arguments[0]
 	log.Printf("following shipmentNumber = %v", shipmentNumber)
 	providersToCheck := []providers.Provider{}
 	for _, provider := range providers.AllProviders {
@@ -86,8 +96,15 @@ func (f *FollowCommand) Execute(ctx context.Context, args *CommandArguments) err
 		FollowedPackageProviders: providersToFollow,
 	}
 
-	if err := f.App.DB.Where("tracking_number = ?", shipmentNumber).FirstOrCreate(followedPackage).Error; err != nil {
+	if err := f.App.DB.Unscoped().Where("tracking_number = ?", shipmentNumber).FirstOrCreate(followedPackage).Error; err != nil {
 		return fmt.Errorf("failed to create FollowedPackage: %v", err)
+	}
+
+	if followedPackage.DeletedAt.Valid {
+		followedPackage.DeletedAt.Valid = false
+		if err := f.App.DB.Save(followedPackage).Error; err != nil {
+			return fmt.Errorf("failed to restore FollowedPackage: %v", err)
+		}
 	}
 
 	followedPackageTelegramUser := &FollowedPackageTelegramUser{
@@ -115,6 +132,9 @@ func (f *FollowCommand) Execute(ctx context.Context, args *CommandArguments) err
 	msg2 := tgbotapi.NewMessage(args.ChatID, fmt.Sprintf(`Package %v has been added to your followed packages!`, shipmentNumber))
 	msg2.ParseMode = "HTML"
 	msg2.ReplyMarkup = tgbotapi.NewInlineKeyboardMarkup(
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData("🖊️ Set a name for this package", "/setname "+shipmentNumber),
+		),
 		tgbotapi.NewInlineKeyboardRow(
 			tgbotapi.NewInlineKeyboardButtonData("📦 See followed packages", "/packages"),
 		),

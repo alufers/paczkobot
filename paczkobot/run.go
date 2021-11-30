@@ -6,7 +6,7 @@ import (
 
 	"github.com/alufers/paczkobot/providers"
 	"github.com/alufers/paczkobot/providers/mock"
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/spf13/viper"
 )
 
