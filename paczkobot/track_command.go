@@ -136,7 +136,11 @@ func (t *TrackCommand) Execute(ctx context.Context, args *CommandArguments) erro
 				if shouldBold {
 					longTracking += "<b>"
 				}
-				longTracking += ts.Datetime.Format("2006-01-02 15:04") + " " + ts.Message
+				emoji := commondata.CommonTrackingStepTypeEmoji[ts.CommonType]
+				if emoji != "" {
+					emoji += " "
+				}
+				longTracking += ts.Datetime.Format("2006-01-02 15:04") + " " + emoji + ts.Message
 				if ts.Location != "" {
 					longTracking += " 📌 " + ts.Location
 				}
