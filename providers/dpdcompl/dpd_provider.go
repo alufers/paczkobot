@@ -15,6 +15,19 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
+var descriptionMappings = map[string]commondata.CommonTrackingStepType{
+
+	"Przyjęcie przesyłki w oddziale DPD": commondata.CommonTrackingStepType_IN_TRANSIT,
+	"Przesyłka odebrana przez Kuriera":   commondata.CommonTrackingStepType_IN_TRANSIT,
+	"Przekazanie przesyłki kurierowi":    commondata.CommonTrackingStepType_IN_TRANSIT,
+
+	"Przesyłka doręczona":                    commondata.CommonTrackingStepType_DELIVERED,
+	"przesyłka oczekuje na odbiór w DHL POP": commondata.CommonTrackingStepType_READY_FOR_PICKUP,
+	"Wydanie przesyłki do doręczenia":        commondata.CommonTrackingStepType_OUT_FOR_DELIVERY,
+	"Nadanie przesyłki w punkcie Pickup":     commondata.CommonTrackingStepType_SENT,
+	"Zarejestrowano dane przesyłki":          commondata.CommonTrackingStepType_INFORMATION_PREPARED,
+}
+
 type DpdComPlProvider struct {
 }
 
@@ -74,9 +87,16 @@ func (dp *DpdComPlProvider) Track(ctx context.Context, trackingNumber string) (*
 		if err != nil {
 			log.Printf("error while parsing date from DPD: %v", err)
 		}
+		var commonType commondata.CommonTrackingStepType
+		for k, v := range descriptionMappings {
+			if strings.Contains(description, k) {
+				commonType = v
+				break
+			}
+		}
 		td.TrackingSteps = append(td.TrackingSteps, &commondata.TrackingStep{
 			Datetime:   t,
-			CommonType: strings.TrimSpace(description),
+			CommonType: commonType,
 			Message:    strings.TrimSpace(description),
 			Location:   location,
 		})

@@ -56,5 +56,9 @@ func Run() {
 	}
 	bot.Debug = viper.GetBool("telegram.debug")
 	app := NewBotApp(bot, db)
+	err = app.TranslationService.ParseTranslationFiles()
+	if err != nil {
+		log.Fatal(err)
+	}
 	app.Run()
 }

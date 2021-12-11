@@ -86,7 +86,7 @@ func (pp *CaniaoProvider) Track(ctx context.Context, trackingNumber string) (*co
 		}
 		td.TrackingSteps = append(td.TrackingSteps, &commondata.TrackingStep{
 			Datetime:   t,
-			CommonType: status,
+			CommonType: commondata.CommonTrackingStepType_UNKNOWN,
 			Message:    d.Desc,
 		})
 	}

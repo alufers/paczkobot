@@ -16,6 +16,12 @@ import (
 	"github.com/alufers/paczkobot/providers/pocztapolska/sledzeniehttpbinding"
 )
 
+var codeMappings = map[string]commondata.CommonTrackingStepType{
+	"P_NAD": commondata.CommonTrackingStepType_SENT,
+	"P_WD":  commondata.CommonTrackingStepType_OUT_FOR_DELIVERY,
+	"P_D":   commondata.CommonTrackingStepType_DELIVERED,
+}
+
 type PocztaPolskaProvider struct {
 }
 
@@ -107,11 +113,16 @@ func (ip *PocztaPolskaProvider) Track(ctx context.Context, trackingNumber string
 		return nil, commonerrors.NotFoundError
 	}
 	for _, z := range resp.Body.SprawdzPrzesylkeResponse.Return.DanePrzesylki.Zdarzenia.Zdarzenie {
-		//log.Printf("%#v", *z)
 		t, _ := time.Parse("2006-01-02 15:04", *z.Czas)
+		var commonType commondata.CommonTrackingStepType
+		if v, ok := codeMappings[*z.Kod]; ok {
+			commonType = v
+		} else {
+			commonType = commondata.CommonTrackingStepType_UNKNOWN
+		}
 		td.TrackingSteps = append(td.TrackingSteps, &commondata.TrackingStep{
 			Datetime:   t,
-			CommonType: *z.Kod,
+			CommonType: commonType,
 			Message:    *z.Nazwa,
 			Location:   *z.Jednostka.Nazwa,
 		})

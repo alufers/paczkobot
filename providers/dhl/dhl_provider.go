@@ -7,12 +7,26 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/alufers/paczkobot/commondata"
 	"github.com/alufers/paczkobot/commonerrors"
 	"github.com/spf13/viper"
 )
+
+var statusCodeMappings = map[string]commondata.CommonTrackingStepType{
+	"delivered": commondata.CommonTrackingStepType_DELIVERED,
+	"transit":   commondata.CommonTrackingStepType_IN_TRANSIT,
+	"failure":   commondata.CommonTrackingStepType_FAILURE,
+}
+
+var descriptionMappings = map[string]commondata.CommonTrackingStepType{
+	"przesyłka oczekuje na odbiór w DHL POP":       commondata.CommonTrackingStepType_READY_FOR_PICKUP,
+	"przesyłka w drodze do Punktu DHL POP":         commondata.CommonTrackingStepType_OUT_FOR_DELIVERY,
+	"przesyłka przyjęta w terminalu nadawczym DHL": commondata.CommonTrackingStepType_SENT,
+	"DHL otrzymał dane elektroniczne przesyłki.":   commondata.CommonTrackingStepType_INFORMATION_PREPARED,
+}
 
 type DHLProvider struct {
 }
@@ -79,11 +93,28 @@ func (pp *DHLProvider) Track(ctx context.Context, trackingNumber string) (*commo
 			loc = ev.Location.String()
 		}
 		datetime, _ := time.Parse("2006-01-02T15:04:05", ev.Timestamp)
+
+		var commonType commondata.CommonTrackingStepType
+		for k, v := range descriptionMappings {
+			if strings.Contains(ev.Description, k) {
+				commonType = v
+				break
+			}
+		}
+		if commonType == commondata.CommonTrackingStepType_UNKNOWN {
+			for k, v := range statusCodeMappings {
+				if ev.StatusCode == k {
+					commonType = v
+					break
+				}
+			}
+		}
+
 		trackingData.TrackingSteps = append(trackingData.TrackingSteps, &commondata.TrackingStep{
 			Datetime:   datetime,
 			Location:   loc,
 			Message:    ev.Description,
-			CommonType: ev.StatusCode,
+			CommonType: commonType,
 		})
 	}
 

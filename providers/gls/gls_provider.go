@@ -77,7 +77,7 @@ func (p *GLSProvider) Track(ctx context.Context, trackingNumber string) (*common
 	}
 
 	for _, event := range parcel.History {
-		datetime, _ := time.Parse("2006-01-02T15:04:05", event.Date + "T" + event.Time)
+		datetime, _ := time.Parse("2006-01-02T15:04:05", event.Date+"T"+event.Time)
 		location := event.Address.CountryName
 		if event.Address.City != "" {
 			location = event.Address.City + ", " + location
@@ -85,7 +85,7 @@ func (p *GLSProvider) Track(ctx context.Context, trackingNumber string) (*common
 
 		trackingData.TrackingSteps = append(trackingData.TrackingSteps, &commondata.TrackingStep{
 			Datetime:   datetime,
-			CommonType: "",
+			CommonType: commondata.CommonTrackingStepType_UNKNOWN,
 			Message:    event.EvtDscr,
 			Location:   location,
 		})

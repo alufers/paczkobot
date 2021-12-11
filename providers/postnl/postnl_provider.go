@@ -89,7 +89,7 @@ func (pp *PostnlProvider) Track(ctx context.Context, trackingNumber string) (*co
 		}
 		td.TrackingSteps = append(td.TrackingSteps, &commondata.TrackingStep{
 			Datetime:   t,
-			CommonType: description,
+			CommonType: commondata.CommonTrackingStepType_UNKNOWN,
 			Message:    description,
 		})
 	})

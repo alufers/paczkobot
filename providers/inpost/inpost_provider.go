@@ -3,11 +3,27 @@ package inpost
 import (
 	"context"
 	"fmt"
-	"github.com/alufers/paczkobot/commondata"
 	"regexp"
+
+	"github.com/alufers/paczkobot/commondata"
 
 	"github.com/alufers/paczkobot/providers/inpost/inposttrackingapi"
 )
+
+var statusMappings = map[string]commondata.CommonTrackingStepType{
+	"confirmed":             commondata.CommonTrackingStepType_INFORMATION_PREPARED,
+	"collected_from_sender": commondata.CommonTrackingStepType_SENT,
+	"dispatched_by_sender":  commondata.CommonTrackingStepType_SENT,
+
+	"taken_by_courier":         commondata.CommonTrackingStepType_IN_TRANSIT,
+	"adopted_at_source_branch": commondata.CommonTrackingStepType_IN_TRANSIT,
+	"sent_from_source_branch":  commondata.CommonTrackingStepType_IN_TRANSIT,
+
+	"out_for_delivery":     commondata.CommonTrackingStepType_OUT_FOR_DELIVERY,
+	"ready_to_pickup":      commondata.CommonTrackingStepType_READY_FOR_PICKUP,
+	"stack_in_box_machine": commondata.CommonTrackingStepType_READY_FOR_PICKUP,
+	"delivered":            commondata.CommonTrackingStepType_DELIVERED,
+}
 
 type InpostProvider struct {
 }
@@ -34,9 +50,15 @@ func (ip *InpostProvider) Track(ctx context.Context, trackingNumber string) (*co
 	}
 	for i := len(data.TrackingDetails) - 1; i >= 0; i-- {
 		d := data.TrackingDetails[i]
+		var commonStep commondata.CommonTrackingStepType
+		if s, ok := statusMappings[d.Status]; ok {
+			commonStep = s
+		} else {
+			commonStep = commondata.CommonTrackingStepType_UNKNOWN
+		}
 		td.TrackingSteps = append(td.TrackingSteps, &commondata.TrackingStep{
 			Datetime:   d.Datetime,
-			CommonType: d.Status,
+			CommonType: commonStep,
 			Message:    d.Status,
 		})
 	}

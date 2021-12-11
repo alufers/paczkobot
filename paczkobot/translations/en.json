@@ -1,0 +1,8 @@
+{
+  "commonTrackingStepType.INFORMATION_PREPARED": "Information abount the package has been entered into the system",
+  "commonTrackingStepType.SENT": "The package has started its journey",
+  "commonTrackingStepType.IN_TRANSIT": "The package is in transit",
+  "commonTrackingStepType.OUT_FOR_DELIVERY": "The package is out for delivery",
+  "commonTrackingStepType.READY_FOR_PICKUP": "The package is ready for pickup",
+  "commonTrackingStepType.DELIVERED": "The package has been delivered"
+}

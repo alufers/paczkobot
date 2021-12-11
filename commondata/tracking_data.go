@@ -12,7 +12,7 @@ type TrackingData struct {
 type TrackingStep struct {
 	Datetime time.Time `json:"datetime"`
 	// CommonType denotes a type of this step that is well-known within the app
-	CommonType string `json:"commonType"`
+	CommonType CommonTrackingStepType `json:"commonType"`
 
 	// Message is the message returned by the provider
 	Message string `json:"message"`

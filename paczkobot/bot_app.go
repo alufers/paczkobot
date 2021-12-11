@@ -17,6 +17,7 @@ type BotApp struct {
 	NotificationsService *NotificationsService
 	TrackingService      *TrackingService
 	AskService           *AskService
+	TranslationService   *TranslationService
 }
 
 func NewBotApp(b *tgbotapi.BotAPI, DB *gorm.DB) (a *BotApp) {
@@ -38,6 +39,7 @@ func NewBotApp(b *tgbotapi.BotAPI, DB *gorm.DB) (a *BotApp) {
 	a.NotificationsService = NewNotificationsService(a)
 	a.TrackingService = NewTrackingService(a)
 	a.AskService = NewAskService(a)
+	a.TranslationService = NewTranslationService()
 	return
 }
 

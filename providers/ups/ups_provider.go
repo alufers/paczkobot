@@ -141,7 +141,7 @@ func (pp *UPSProvider) Track(ctx context.Context, trackingNumber string) (*commo
 		steps = append(steps, &commondata.TrackingStep{
 			Datetime:   t,
 			Message:    strings.TrimSpace(actScan),
-			CommonType: strings.TrimSpace(actScan),
+			CommonType: commondata.CommonTrackingStepType_UNKNOWN,
 			Location:   d.Location,
 		})
 	}

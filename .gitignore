@@ -30,3 +30,4 @@ paczkobot_dev.db
 .idea
 mock-package.json
 deobfuscated
+paczkobot.db
