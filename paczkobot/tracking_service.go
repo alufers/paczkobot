@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/alufers/paczkobot/commondata"
+	"github.com/alufers/paczkobot/inpostextra"
 	"github.com/alufers/paczkobot/providers"
 	"github.com/spf13/viper"
 	"gorm.io/gorm"
@@ -134,6 +135,11 @@ func (ts *TrackingService) RunAutomaticTrackingLoop() {
 		jitterValue := time.Duration(rand.Int()%int(viper.GetDuration("tracking.automatic_tracking_check_jitter")) - viper.GetInt("tracking.automatic_tracking_check_jitter")/2)
 
 		timeToWait := viper.GetDuration("tracking.automatic_tracking_check_interval") - time.Since(lastCheckStarted) + jitterValue
+		log.Printf("Automatic tracking finished, now scanning inpost accounts...")
+		err := ts.ScanInpostAccounts()
+		if err != nil {
+			log.Printf("Failed to scan inpost accounts: %v", err)
+		}
 		log.Printf("Automatic tracking finished, next check scheduled in %v", timeToWait)
 		if timeToWait > 0 {
 			time.Sleep(timeToWait)
@@ -165,5 +171,26 @@ func (ts *TrackingService) runAutomaticTrackingForPackage(pkg *FollowedPackage) 
 			log.Printf("Package %v (%v) changed! -> %v", pkg.TrackingNumber, prov.ProviderName, result.TrackingSteps[len(result.TrackingSteps)-1].Message)
 		}
 	}
+	return nil
+}
+
+func (ts *TrackingService) ScanInpostAccounts() error {
+	log.Printf("Starting inpost account scan...")
+
+	lastCheckStarted := time.Now()
+	var inpostCreds = []*inpostextra.InpostCredentials{}
+	if err := ts.app.DB.
+		Where("last_scan < ? OR last_scan IS NULL", time.Now().Add(-viper.GetDuration("tracking.inpost_scan_interval"))).
+		Find(&inpostCreds).Error; err != nil {
+		return fmt.Errorf("failed to find inpost credentials to scan: %w", err)
+	}
+	for _, c := range inpostCreds {
+		err := ts.app.InpostScannerService.ScanUserPackages(c)
+		if err != nil {
+			log.Printf("failed to scan user packages for phone number %v: %w", c.PhoneNumber, err)
+		}
+		time.Sleep(time.Second * 2)
+	}
+	log.Printf("Inpost account scan finished in %v", time.Since(lastCheckStarted))
 	return nil
 }

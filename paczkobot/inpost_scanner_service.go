@@ -2,7 +2,9 @@ package paczkobot
 
 import (
 	"context"
+	"fmt"
 	"log"
+	"time"
 
 	"github.com/alufers/paczkobot/inpostextra"
 )
@@ -46,9 +48,15 @@ func (s *InpostScannerService) ScanUserPackages(creds *inpostextra.InpostCredent
 				log.Printf("failed to follow package %v after inpost scan for user id %v: %v", parcel.ShipmentNumber, creds.TelegramUserID, followErr)
 				continue
 			}
-			
+
 		}
 	}()
+
+	creds.LastScan.Time = time.Now()
+	creds.LastScan.Valid = true
+	if err := s.app.DB.Save(creds).Error; err != nil {
+		return fmt.Errorf("failed to save InpostCredentials: %v", err)
+	}
 
 	return nil
 }

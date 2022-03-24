@@ -1,6 +1,10 @@
 package inpostextra
 
-import "github.com/alufers/paczkobot/dbutil"
+import (
+	"database/sql"
+
+	"github.com/alufers/paczkobot/dbutil"
+)
 
 type InpostCredentials struct {
 	dbutil.Model
@@ -9,4 +13,5 @@ type InpostCredentials struct {
 	PhoneNumber    string
 	AuthToken      string
 	RefreshToken   string
+	LastScan       sql.NullTime
 }
