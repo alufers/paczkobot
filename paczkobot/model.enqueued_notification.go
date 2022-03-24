@@ -1,7 +1,9 @@
 package paczkobot
 
+import "github.com/alufers/paczkobot/dbutil"
+
 type EnqueuedNotification struct {
-	Model
+	dbutil.Model
 
 	FollowedPackageTelegramUserID string
 	FollowedPackageTelegramUser   *FollowedPackageTelegramUser

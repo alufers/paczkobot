@@ -4,6 +4,7 @@ go 1.16
 
 require (
 	github.com/PuerkitoBio/goquery v1.8.0
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/fiorix/wsdl2go v1.4.7
 	github.com/go-telegram-bot-api/telegram-bot-api/v5 v5.4.0-beta.0
 	github.com/lucsky/cuid v1.2.1

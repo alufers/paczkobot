@@ -1,9 +1,13 @@
 package paczkobot
 
-import "time"
+import (
+	"time"
+
+	"github.com/alufers/paczkobot/dbutil"
+)
 
 type FollowedPackage struct {
-	Model
+	dbutil.Model
 	TrackingNumber               string `gorm:"unique"`
 	FollowedPackageProviders     []*FollowedPackageProvider
 	FollowedPackageTelegramUsers []*FollowedPackageTelegramUser
@@ -13,7 +17,7 @@ type FollowedPackage struct {
 }
 
 type FollowedPackageTelegramUser struct {
-	Model
+	dbutil.Model
 	FollowedPackageID string
 	FollowedPackage   *FollowedPackage
 	TelegramUserID    int64
@@ -22,7 +26,7 @@ type FollowedPackageTelegramUser struct {
 }
 
 type FollowedPackageProvider struct {
-	Model
+	dbutil.Model
 	FollowedPackage    *FollowedPackage
 	FollowedPackageID  string
 	ProviderName       string
