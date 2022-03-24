@@ -6,6 +6,7 @@ import (
 	"log"
 	"strings"
 
+	"github.com/alufers/paczkobot/inpostextra"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"gorm.io/gorm"
 )
@@ -18,6 +19,9 @@ type BotApp struct {
 	TrackingService      *TrackingService
 	AskService           *AskService
 	TranslationService   *TranslationService
+	InpostService        *inpostextra.InpostService
+	FollowService        *FollowService
+	InpostScannerService *InpostScannerService
 }
 
 func NewBotApp(b *tgbotapi.BotAPI, DB *gorm.DB) (a *BotApp) {
@@ -35,11 +39,16 @@ func NewBotApp(b *tgbotapi.BotAPI, DB *gorm.DB) (a *BotApp) {
 		&UnfollowCommand{App: a},
 		&SetNameCommand{App: a},
 		&UnfollowAllCommand{App: a},
+		&InpostLoginCommand{App: a},
+		&InpostScanCommand{App: a},
 	}
 	a.NotificationsService = NewNotificationsService(a)
 	a.TrackingService = NewTrackingService(a)
 	a.AskService = NewAskService(a)
 	a.TranslationService = NewTranslationService()
+	a.InpostService = inpostextra.NewInpostService()
+	a.FollowService = NewFollowService(a)
+	a.InpostScannerService = NewInpostScannerService(a)
 	return
 }
 

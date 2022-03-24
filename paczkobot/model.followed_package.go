@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/alufers/paczkobot/dbutil"
+	"github.com/alufers/paczkobot/inpostextra"
 )
 
 type FollowedPackage struct {
@@ -14,6 +15,9 @@ type FollowedPackage struct {
 	LastAutomaticCheck           time.Time
 	LastChange                   time.Time
 	Inactive                     bool
+	FromName                     string
+	InpostCredentialsID          string
+	InpostCredentials            *inpostextra.InpostCredentials
 }
 
 type FollowedPackageTelegramUser struct {

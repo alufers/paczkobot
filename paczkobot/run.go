@@ -4,6 +4,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/alufers/paczkobot/inpostextra"
 	"github.com/alufers/paczkobot/providers"
 	"github.com/alufers/paczkobot/providers/mock"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -42,7 +43,13 @@ func Run() {
 		log.Fatalf("failed to connect to db: %v", db)
 	}
 
-	if err := db.AutoMigrate(&FollowedPackage{}, &FollowedPackageProvider{}, &FollowedPackageTelegramUser{}, &EnqueuedNotification{}); err != nil {
+	if err := db.AutoMigrate(
+		&FollowedPackage{},
+		&FollowedPackageProvider{},
+		&FollowedPackageTelegramUser{},
+		&EnqueuedNotification{},
+		&inpostextra.InpostCredentials{},
+	); err != nil {
 		log.Fatalf("failed to AutoMigrate: %v", err)
 	}
 

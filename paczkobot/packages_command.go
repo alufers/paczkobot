@@ -38,9 +38,16 @@ func (s *PackagesCommand) Execute(ctx context.Context, args *CommandArguments) e
 	}
 
 	for _, p := range followedPackages {
-		customName := ""
-		if p.CustomName != "" {
-			customName = fmt.Sprintf(" (<i>%s</i>)", p.CustomName)
+		customName := p.CustomName
+
+		if p.FollowedPackage.FromName != "" {
+			if customName != "" {
+				customName += " "
+			}
+			customName = fmt.Sprintf("from %s", p.FollowedPackage.FromName)
+		}
+		if customName != "" {
+			customName = fmt.Sprintf(" <i>(%s)</i>", customName)
 		}
 		packagesText += fmt.Sprintf("<b>%v</b>%v", p.FollowedPackage.TrackingNumber, customName)
 		for i, prov := range p.FollowedPackage.FollowedPackageProviders {

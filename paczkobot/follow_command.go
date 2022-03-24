@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"log"
-	"time"
 
 	"github.com/alufers/paczkobot/commondata"
 	"github.com/alufers/paczkobot/commonerrors"
@@ -89,45 +88,16 @@ func (f *FollowCommand) Execute(ctx context.Context, args *CommandArguments) err
 		return fmt.Errorf("the package was not found in any of the providers, please double check your package number")
 	}
 
-	followedPackage := &FollowedPackage{
-		TrackingNumber:           shipmentNumber,
-		LastAutomaticCheck:       time.Now(),
-		LastChange:               time.Now(),
-		FollowedPackageProviders: providersToFollow,
-	}
-
-	if err := f.App.DB.Unscoped().Where("tracking_number = ?", shipmentNumber).FirstOrCreate(followedPackage).Error; err != nil {
-		return fmt.Errorf("failed to create FollowedPackage: %v", err)
-	}
-
-	if followedPackage.DeletedAt.Valid {
-		followedPackage.DeletedAt.Valid = false
-		if err := f.App.DB.Save(followedPackage).Error; err != nil {
-			return fmt.Errorf("failed to restore FollowedPackage: %v", err)
-		}
-	}
-
-	followedPackageTelegramUser := &FollowedPackageTelegramUser{
-		FollowedPackageID: followedPackage.ID,
-		TelegramUserID:    args.FromUserID,
-		ChatID:            args.ChatID,
-	}
-
-	if err := f.App.DB.Where("followed_package_id = ? AND telegram_user_id = ?",
-		followedPackage.ID,
-		followedPackageTelegramUser.TelegramUserID,
-	).FirstOrCreate(followedPackageTelegramUser).Error; err != nil {
-		return fmt.Errorf("failed to create FollowedPackageTelegramUser: %v", err)
-	}
-
-	for _, p := range providersToFollow {
-		p.FollowedPackageID = followedPackage.ID
-		if err := f.App.DB.Where("followed_package_id = ? AND provider_name = ?",
-			followedPackage.ID,
-			p.ProviderName,
-		).FirstOrCreate(p).Error; err != nil {
-			return fmt.Errorf("failed to create FollowedPackageTelegramUser: %v", err)
-		}
+	err = f.App.FollowService.FollowPackage(
+		ctx,
+		shipmentNumber,
+		args.FromUserID,
+		args.ChatID,
+		providersToFollow,
+		&FollowedPackage{},
+	)
+	if err != nil {
+		return fmt.Errorf("failed to follow package: %w", err)
 	}
 	msg2 := tgbotapi.NewMessage(args.ChatID, fmt.Sprintf(`Package %v has been added to your followed packages!`, shipmentNumber))
 	msg2.ParseMode = "HTML"
