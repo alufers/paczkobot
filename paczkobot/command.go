@@ -36,7 +36,7 @@ type CommandArguments struct {
 	Command        Command
 }
 
-func (a *CommandArguments) GetOrAskForArgument(name string) (string, error) {
+func (a *CommandArguments) GetOrAskForArgument(name string, suggestionsArr ...map[string]string) (string, error) {
 	if val, ok := a.namedArguments[name]; ok {
 		return val, nil
 	}
@@ -50,7 +50,7 @@ func (a *CommandArguments) GetOrAskForArgument(name string) (string, error) {
 	if cmdTemplate == nil {
 		return "", nil
 	}
-	return a.BotApp.AskService.AskForArgument(a.ChatID, "❓ "+cmdTemplate.Question)
+	return a.BotApp.AskService.AskForArgument(a.ChatID, "❓ "+cmdTemplate.Question, suggestionsArr...)
 }
 
 func CommandMatches(cmd Command, userInput string) bool {

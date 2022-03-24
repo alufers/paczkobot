@@ -184,7 +184,7 @@ func (s *InpostService) GetParcel(db *gorm.DB, creds *InpostCredentials, shipmen
 
 	// make a get request to /v1/parcel/{shipmentNumber}
 	out := &InpostParcel{}
-	err = s.makeJSONRequest(nil, "GET", fmt.Sprintf("/v1/parcel/%s", shipmentNumber), nil, out)
+	err = s.makeJSONRequest(creds, "GET", fmt.Sprintf("/v1/parcel/%s", shipmentNumber), nil, out)
 	if err != nil {
 		return nil, err
 	}

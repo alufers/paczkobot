@@ -44,10 +44,18 @@ func (a *AskService) ProcessIncomingMessage(update tgbotapi.Update) bool {
 			}
 			return true
 		}
+		if strings.HasPrefix(update.CallbackQuery.Data, "/sugg ") {
+			val := strings.TrimPrefix(update.CallbackQuery.Data, "/sugg ")
+			if callback, ok := a.AskCallbacks[update.CallbackQuery.From.ID]; ok {
+				a.BotApp.Bot.Send(tgbotapi.NewCallback(update.CallbackQuery.ID, "Suggested "+val))
+				callback(val, nil)
+				delete(a.AskCallbacks, update.CallbackQuery.From.ID)
+			}
+		}
 	}
 
 	if update.Message != nil {
-		log.Printf("Processing msg, ", update.Message.Text)
+		log.Printf("Processing msg from %v: %v", update.Message.From.ID, update.Message.Text)
 		if strings.HasPrefix(update.Message.Text, "/") {
 			if callback, ok := a.AskCallbacks[update.Message.From.ID]; ok {
 				callback("", errors.New("canceled"))
@@ -67,14 +75,26 @@ func (a *AskService) ProcessIncomingMessage(update tgbotapi.Update) bool {
 	return false
 }
 
-func (a *AskService) AskForArgument(chatID int64, question string) (string, error) {
+func (a *AskService) AskForArgument(chatID int64, question string, suggestionsArr ...map[string]string) (string, error) {
+
+	suggestions := map[string]string{}
+	if suggestionsArr != nil && len(suggestionsArr) != 0 {
+		suggestions = suggestionsArr[0]
+	}
+	extraButtons := [][]tgbotapi.InlineKeyboardButton{}
+	extraButtons = append(extraButtons, []tgbotapi.InlineKeyboardButton{
+		tgbotapi.NewInlineKeyboardButtonData("❌ Cancel", "/cancel"),
+	})
+	if len(suggestions) > 0 {
+		for key, value := range suggestions {
+			extraButtons = append(extraButtons,
+				[]tgbotapi.InlineKeyboardButton{tgbotapi.NewInlineKeyboardButtonData(value, "/sugg "+key)},
+			)
+		}
+	}
 	msg := tgbotapi.NewMessage(chatID, question)
 	msg.ReplyMarkup = tgbotapi.InlineKeyboardMarkup{
-		InlineKeyboard: [][]tgbotapi.InlineKeyboardButton{
-			{
-				tgbotapi.NewInlineKeyboardButtonData("❌ Cancel", "/cancel"),
-			},
-		},
+		InlineKeyboard: extraButtons,
 	}
 
 	msg.ReplyToMessageID = 0

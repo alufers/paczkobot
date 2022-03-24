@@ -41,6 +41,8 @@ func NewBotApp(b *tgbotapi.BotAPI, DB *gorm.DB) (a *BotApp) {
 		&UnfollowAllCommand{App: a},
 		&InpostLoginCommand{App: a},
 		&InpostScanCommand{App: a},
+		&InpostAccountsCommand{App: a},
+		&InpostQrCommand{App: a},
 	}
 	a.NotificationsService = NewNotificationsService(a)
 	a.TrackingService = NewTrackingService(a)

@@ -8,6 +8,7 @@ require (
 	github.com/fiorix/wsdl2go v1.4.7
 	github.com/go-telegram-bot-api/telegram-bot-api/v5 v5.4.0-beta.0
 	github.com/lucsky/cuid v1.2.1
+	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
 	github.com/spf13/viper v1.9.0
 	github.com/xeonx/timeago v1.0.0-rc4
 	gorm.io/driver/postgres v1.2.3
