@@ -16,7 +16,7 @@ type FollowedPackage struct {
 	LastChange                   time.Time
 	Inactive                     bool
 	FromName                     string
-	InpostCredentialsID          string
+	InpostCredentialsID          *string
 	InpostCredentials            *inpostextra.InpostCredentials
 }
 

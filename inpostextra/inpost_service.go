@@ -131,9 +131,9 @@ func (s *InpostService) Authenticate(creds *InpostCredentials) error {
 		"refreshToken": creds.RefreshToken,
 	}
 	out := &struct {
-		AuthToken                string    `json:"authToken"`
-		ReauthenticationRequired bool      `json:"reauthenticationRequired"`
-		RefreshTokenExpiryDate   time.Time `json:"refreshTokenExpiryDate"`
+		AuthToken                string     `json:"authToken"`
+		ReauthenticationRequired bool       `json:"reauthenticationRequired"`
+		RefreshTokenExpiryDate   *time.Time `json:"refreshTokenExpiryDate"`
 	}{}
 	err := s.makeJSONRequest(nil, "POST", "/v1/authenticate", data, out)
 	if err != nil {
@@ -142,7 +142,8 @@ func (s *InpostService) Authenticate(creds *InpostCredentials) error {
 	if out.ReauthenticationRequired {
 		return ErrReauthenticationRequired
 	}
-	if out.RefreshTokenExpiryDate.Before(time.Now()) {
+	log.Printf("RefreshTokenExpiryDate: %v", out.RefreshTokenExpiryDate)
+	if out.RefreshTokenExpiryDate != nil && out.RefreshTokenExpiryDate.Before(time.Now()) {
 		return ErrRefreshTokenExpired
 	}
 	creds.AuthToken = out.AuthToken
@@ -154,7 +155,7 @@ func (s *InpostService) ReauthenticateIfNeeded(db *gorm.DB, creds *InpostCredent
 		return fmt.Errorf("refresh token is empty")
 	}
 
-	log.Printf("Creds: %+v", creds)
+	log.Printf("[ReauthenticateIfNeeded] Creds: %+v", creds)
 
 	tok, _ := jwt.ParseWithClaims(strings.TrimPrefix(creds.AuthToken, "Bearer "), &jwt.StandardClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte("unused"), nil

@@ -187,7 +187,7 @@ func (ts *TrackingService) ScanInpostAccounts() error {
 	for _, c := range inpostCreds {
 		err := ts.app.InpostScannerService.ScanUserPackages(c)
 		if err != nil {
-			log.Printf("failed to scan user packages for phone number %v: %w", c.PhoneNumber, err)
+			log.Printf("failed to scan user packages for phone number %v: %v", c.PhoneNumber, err)
 		}
 		time.Sleep(time.Second * 2)
 	}
