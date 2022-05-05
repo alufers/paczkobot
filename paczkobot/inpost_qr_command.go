@@ -54,7 +54,7 @@ func (f *InpostQrCommand) Execute(ctx context.Context, args *CommandArguments) e
 				break
 			}
 		}
-		if inpostProvider == nil {
+		if inpostProvider == nil || inpostProvider.LastStatusValue == "delivered" {
 			continue
 		}
 		suggestions[p.FollowedPackage.TrackingNumber] = "📦 " + p.CustomName + " (" + p.FollowedPackage.TrackingNumber + ")"

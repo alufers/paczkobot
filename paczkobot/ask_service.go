@@ -78,7 +78,7 @@ func (a *AskService) ProcessIncomingMessage(update tgbotapi.Update) bool {
 func (a *AskService) AskForArgument(chatID int64, question string, suggestionsArr ...map[string]string) (string, error) {
 
 	suggestions := map[string]string{}
-	if suggestionsArr != nil && len(suggestionsArr) != 0 {
+	if len(suggestionsArr) != 0 {
 		suggestions = suggestionsArr[0]
 	}
 	extraButtons := [][]tgbotapi.InlineKeyboardButton{}

@@ -32,6 +32,7 @@ func NewBotApp(b *tgbotapi.BotAPI, DB *gorm.DB) (a *BotApp) {
 	a.Commands = []Command{
 		&StartCommand{App: a, ExtraHelp: []Helpable{
 			&AvailableProvidersExtraHelp{},
+			&AuthorExtraHelp{},
 		}},
 		&TrackCommand{App: a},
 		&FollowCommand{App: a},
