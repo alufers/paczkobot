@@ -23,7 +23,7 @@ func (f *InpostLoginCommand) Help() string {
 
 func (f *InpostLoginCommand) Execute(ctx context.Context, args *CommandArguments) error {
 
-	phoneNumber, err := f.App.AskService.AskForArgument(args.ChatID, "Pnter your phone number:")
+	phoneNumber, err := f.App.AskService.AskForArgument(args.ChatID, "Enter your phone number associated with your inpost account:")
 	if err != nil {
 		return err
 	}
