@@ -2,6 +2,21 @@
 
 A Telegram bot for tracking packages.
 
+
+
+## Features
+- [x] Track packages from these providers
+  - [x] dhl (requires API key)
+  - [x] ups 
+  - [x] dpd.com.pl
+  - [x] poczta-polska
+  - [x] postnl
+  - [x] Inpost
+  - [x] gls
+- Follow packages and send notifications when a package status changes
+- Generate QR codes for InPost Paczkomaty
+- Automatically import packages from InPost Paczkomaty
+
 ## Usage
 
 On first run the bot will create a file called `paczkobot.yaml` looking like this:
