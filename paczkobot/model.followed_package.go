@@ -3,6 +3,7 @@ package paczkobot
 import (
 	"time"
 
+	"github.com/alufers/paczkobot/commondata"
 	"github.com/alufers/paczkobot/dbutil"
 	"github.com/alufers/paczkobot/inpostextra"
 )
@@ -27,14 +28,16 @@ type FollowedPackageTelegramUser struct {
 	TelegramUserID    int64
 	ChatID            int64
 	CustomName        string
+	Archived          bool
 }
 
 type FollowedPackageProvider struct {
 	dbutil.Model
-	FollowedPackage    *FollowedPackage
-	FollowedPackageID  string
-	ProviderName       string
-	LastStatusDate     time.Time
-	LastStatusValue    string
-	LastStatusLocation string
+	FollowedPackage      *FollowedPackage
+	FollowedPackageID    string
+	ProviderName         string
+	LastStatusDate       time.Time
+	LastStatusValue      string
+	LastStatusCommonType commondata.CommonTrackingStepType
+	LastStatusLocation   string
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/alufers/paczkobot/commondata"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/xeonx/timeago"
 )
@@ -51,8 +52,16 @@ func (s *PackagesCommand) Execute(ctx context.Context, args *CommandArguments) e
 		}
 		packagesText += fmt.Sprintf("<b>%v</b>%v", p.FollowedPackage.TrackingNumber, customName)
 		for i, prov := range p.FollowedPackage.FollowedPackageProviders {
-			packagesText += fmt.Sprintf(" %v (<i>%v %v</i>)",
+			emojiText := ""
+			if prov.LastStatusCommonType != commondata.CommonTrackingStepType_UNKNOWN {
+				emojiText = commondata.CommonTrackingStepTypeEmoji[prov.LastStatusCommonType]
+				if emojiText != "" {
+					emojiText = " " + emojiText
+				}
+			}
+			packagesText += fmt.Sprintf(" %v (<i>%v%v %v</i>)",
 				prov.ProviderName,
+				emojiText,
 				prov.LastStatusValue,
 				timeago.English.Format(prov.LastStatusDate))
 			if i != len(p.FollowedPackage.FollowedPackageProviders)-1 {

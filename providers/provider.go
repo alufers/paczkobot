@@ -31,6 +31,11 @@ type Provider interface {
 	Track(ctx context.Context, trackingNumber string) (*commondata.TrackingData, error)
 }
 
+type ProviderWithAutoArchive interface {
+	Provider
+	ShouldAutoArchive(*commondata.TrackingData) bool
+}
+
 func GetProviderByName(name string) Provider {
 	for _, provider := range AllProviders {
 		if provider.GetName() == name {

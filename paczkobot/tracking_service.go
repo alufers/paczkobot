@@ -66,10 +66,13 @@ func (ts *TrackingService) notifyFollowersOfPackageIfNeeded(ctx context.Context,
 		followedPackage.FollowedPackageProviders = append(followedPackage.FollowedPackageProviders, providerToUpdate)
 	}
 	lastTrackingStep := result.TrackingSteps[len(result.TrackingSteps)-1]
-	if providerToUpdate.LastStatusValue != lastTrackingStep.Message || math.Abs(float64(providerToUpdate.LastStatusDate.Sub(lastTrackingStep.Datetime))) > float64(time.Minute) {
+	if providerToUpdate.LastStatusValue != lastTrackingStep.Message || // message changed
+		math.Abs(float64(providerToUpdate.LastStatusDate.Sub(lastTrackingStep.Datetime))) > float64(time.Minute) || // time changed more than 1 minute
+		providerToUpdate.LastStatusCommonType != lastTrackingStep.CommonType { // type changed (usually due to a schema update in paczkobot)
 		providerToUpdate.LastStatusValue = lastTrackingStep.Message
 		providerToUpdate.LastStatusDate = lastTrackingStep.Datetime
 		providerToUpdate.LastStatusLocation = lastTrackingStep.Location
+		providerToUpdate.LastStatusCommonType = lastTrackingStep.CommonType
 
 		if err := ts.app.DB.Save(&providerToUpdate).Error; err != nil {
 			return false, fmt.Errorf("failed to save followed package provider: %w", err)
