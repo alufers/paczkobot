@@ -65,6 +65,10 @@ func (ts *TrackingService) notifyFollowersOfPackageIfNeeded(ctx context.Context,
 		}
 		followedPackage.FollowedPackageProviders = append(followedPackage.FollowedPackageProviders, providerToUpdate)
 	}
+	if len(result.TrackingSteps) == 0 {
+		log.Printf("[WARN]: tracking result for %v is empty", followedPackage.TrackingNumber)
+		return false, nil
+	}
 	lastTrackingStep := result.TrackingSteps[len(result.TrackingSteps)-1]
 	if providerToUpdate.LastStatusValue != lastTrackingStep.Message || // message changed
 		math.Abs(float64(providerToUpdate.LastStatusDate.Sub(lastTrackingStep.Datetime))) > float64(time.Minute) || // time changed more than 1 minute
