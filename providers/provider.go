@@ -12,6 +12,7 @@ import (
 	"github.com/alufers/paczkobot/providers/pocztapolska"
 	"github.com/alufers/paczkobot/providers/postnl"
 	"github.com/alufers/paczkobot/providers/ups"
+	"github.com/alufers/paczkobot/providers/yuntrack"
 )
 
 var AllProviders = []Provider{
@@ -23,6 +24,7 @@ var AllProviders = []Provider{
 	&ups.UPSProvider{},
 	&dhl.DHLProvider{},
 	&gls.GLSProvider{},
+	&yuntrack.YunTrack{},
 }
 
 type Provider interface {

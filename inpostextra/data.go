@@ -41,6 +41,7 @@ type CashOnDelivery struct {
 	PayCode string `json:"payCode,omitempty"`
 	Price   string `json:"price,omitempty"`
 	Url     string `json:"url,omitempty"`
+	// ddd
 }
 
 type ParcelHistory struct {
