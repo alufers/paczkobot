@@ -44,7 +44,7 @@ func (s *UnfollowCommand) Execute(ctx context.Context, args *CommandArguments) e
 
 	var currentUser *FollowedPackageTelegramUser
 	for _, tgUser := range followedPackage.FollowedPackageTelegramUsers {
-		if tgUser.TelegramUserID == args.update.Message.From.ID {
+		if tgUser.ChatID == args.update.Message.Chat.ID {
 			currentUser = tgUser
 			break
 		}

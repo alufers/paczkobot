@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"github.com/spf13/viper"
 )
 
 type CommandDefArgument struct {
@@ -55,6 +56,8 @@ func (a *CommandArguments) GetOrAskForArgument(name string, suggestionsArr ...ma
 
 func CommandMatches(cmd Command, userInput string) bool {
 	usersCmd := strings.Split(userInput, " ")[0]
+	// strip bot suffix on groups
+	usersCmd = strings.TrimSuffix(usersCmd, "@"+viper.GetString("telegram.username"))
 	for _, alias := range cmd.Aliases() {
 		if alias == usersCmd {
 			return true

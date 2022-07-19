@@ -27,7 +27,7 @@ func (s *UnfollowAllCommand) Execute(ctx context.Context, args *CommandArguments
 
 	followedPackages := []*FollowedPackageTelegramUser{}
 
-	if err := s.App.DB.Where("telegram_user_id = ?", args.FromUserID).Preload("FollowedPackage").Find(&followedPackages).Error; err != nil {
+	if err := s.App.DB.Where("chat_id = ?", args.ChatID).Preload("FollowedPackage").Find(&followedPackages).Error; err != nil {
 		return fmt.Errorf("failed to query DB for packages: %v", err)
 	}
 

@@ -40,10 +40,11 @@ func (s *NotificationsService) NotifyProviderStatusChanged(provider providers.Pr
 		notif := &EnqueuedNotification{
 			FollowedPackageTelegramUser: u,
 			TelegramUserID:              u.TelegramUserID,
+			ChatID:                      u.ChatID,
 			FollowedPackageProvider:     prov,
 		}
 		if err := s.app.DB.Save(notif).Error; err != nil {
-			return fmt.Errorf("failed to enqueue notification for TG user %v, provider %v: %w", u.TelegramUserID, provider.GetName(), err)
+			return fmt.Errorf("failed to enqueue notification for TG user %v, chat ID %v, provider %v: %w", u.TelegramUserID, u.ChatID, provider.GetName(), err)
 		}
 		go func(u *FollowedPackageTelegramUser) {
 			time.Sleep(time.Second * 30)
@@ -56,7 +57,7 @@ func (s *NotificationsService) NotifyProviderStatusChanged(provider providers.Pr
 
 func (s *NotificationsService) sendNotificationsForUser(tgUser *FollowedPackageTelegramUser) error {
 	var notifications []*EnqueuedNotification
-	if err := s.app.DB.Where("telegram_user_id = ?", tgUser.TelegramUserID).
+	if err := s.app.DB.Where("chat_id = ?", tgUser.ChatID).
 		Preload("FollowedPackageProvider").
 		Preload("FollowedPackageTelegramUser").
 		Preload("FollowedPackageProvider.FollowedPackage").
@@ -95,7 +96,7 @@ func (s *NotificationsService) sendNotificationsForUser(tgUser *FollowedPackageT
 	msg := tgbotapi.NewMessage(notifications[0].FollowedPackageTelegramUser.ChatID, msgContents)
 	msg.ParseMode = "HTML"
 	if _, err := s.app.Bot.Send(msg); err != nil {
-		return fmt.Errorf("failed to send notifications to user %v: %w", tgUser.TelegramUserID, err)
+		return fmt.Errorf("failed to send notifications to chat %v: %w", tgUser.ChatID, err)
 	}
 
 	return nil

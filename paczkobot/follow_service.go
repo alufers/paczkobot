@@ -38,9 +38,9 @@ func (f *FollowService) FollowPackage(ctx context.Context, shipmentNumber string
 		ChatID:            chatID,
 	}
 
-	if err := f.App.DB.Where("followed_package_id = ? AND telegram_user_id = ?",
+	if err := f.App.DB.Where("followed_package_id = ? AND chat_id = ?",
 		followedPackage.ID,
-		followedPackageTelegramUser.TelegramUserID,
+		followedPackageTelegramUser.ChatID,
 	).FirstOrCreate(followedPackageTelegramUser).Error; err != nil {
 		return fmt.Errorf("failed to create FollowedPackageTelegramUser: %v", err)
 	}

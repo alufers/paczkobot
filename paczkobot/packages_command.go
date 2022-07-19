@@ -31,7 +31,7 @@ func (s *PackagesCommand) Execute(ctx context.Context, args *CommandArguments) e
 
 	followedPackages := []FollowedPackageTelegramUser{}
 
-	if err := s.App.DB.Where("telegram_user_id = ?", args.FromUserID).
+	if err := s.App.DB.Where("chat_id = ?", args.ChatID).
 		Preload("FollowedPackage").
 		Preload("FollowedPackage.FollowedPackageProviders").
 		Find(&followedPackages).Error; err != nil {

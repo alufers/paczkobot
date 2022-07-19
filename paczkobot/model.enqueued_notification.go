@@ -8,6 +8,7 @@ type EnqueuedNotification struct {
 	FollowedPackageTelegramUserID string
 	FollowedPackageTelegramUser   *FollowedPackageTelegramUser
 	TelegramUserID                int64 // used for querying
+	ChatID                        int64
 	FollowedPackageProviderID     string
 	FollowedPackageProvider       *FollowedPackageProvider
 }

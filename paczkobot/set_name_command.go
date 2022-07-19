@@ -48,7 +48,7 @@ func (s *SetNameCommand) Execute(ctx context.Context, args *CommandArguments) er
 	}
 
 	for _, tgUser := range followedPackage.FollowedPackageTelegramUsers {
-		if tgUser.TelegramUserID == args.FromUserID {
+		if tgUser.ChatID == args.ChatID {
 			customName, err := args.GetOrAskForArgument("name")
 			if err != nil {
 				return err
