@@ -20,7 +20,7 @@ func (s *SetNameCommand) Arguments() []*CommandDefArgument {
 		{
 			Name:        "shipmentNumber",
 			Description: "shipment number of the package",
-			Question:    "Please enter the shipment number to track:",
+			Question:    "Please enter the shipment number to set a name for:",
 		},
 		{
 			Name:        "name",
