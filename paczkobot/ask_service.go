@@ -26,21 +26,21 @@ func NewAskService(botApp *BotApp) *AskService {
 func (a *AskService) ProcessIncomingMessage(update tgbotapi.Update) bool {
 	a.AskCallbacksMutex.Lock()
 	defer a.AskCallbacksMutex.Unlock()
-
+	log.Printf("Processing incoming message: %#v", update)
 	if update.CallbackQuery != nil {
 		if update.CallbackQuery.Data == "/cancel" {
-			if callback, ok := a.AskCallbacks[update.CallbackQuery.From.ID]; ok {
+			if callback, ok := a.AskCallbacks[update.Message.Chat.ID]; ok {
 				a.BotApp.Bot.Send(tgbotapi.NewCallback(update.CallbackQuery.ID, "Canceled"))
 				callback("", errors.New("canceled"))
-				delete(a.AskCallbacks, update.CallbackQuery.From.ID)
+				delete(a.AskCallbacks, update.Message.Chat.ID)
 			}
 			return true
 		}
 		if update.CallbackQuery.Data == "/yes" {
-			if callback, ok := a.AskCallbacks[update.CallbackQuery.From.ID]; ok {
+			if callback, ok := a.AskCallbacks[update.Message.Chat.ID]; ok {
 				a.BotApp.Bot.Send(tgbotapi.NewCallback(update.CallbackQuery.ID, "Confirmed"))
 				callback("", nil)
-				delete(a.AskCallbacks, update.CallbackQuery.From.ID)
+				delete(a.AskCallbacks, update.Message.Chat.ID)
 			}
 			return true
 		}
@@ -49,25 +49,25 @@ func (a *AskService) ProcessIncomingMessage(update tgbotapi.Update) bool {
 			if callback, ok := a.AskCallbacks[update.CallbackQuery.From.ID]; ok {
 				a.BotApp.Bot.Send(tgbotapi.NewCallback(update.CallbackQuery.ID, "Suggested "+val))
 				callback(val, nil)
-				delete(a.AskCallbacks, update.CallbackQuery.From.ID)
+				delete(a.AskCallbacks, update.Message.Chat.ID)
 			}
 		}
 	}
 
 	if update.Message != nil {
-		log.Printf("Processing msg from %v: %v", update.Message.From.ID, update.Message.Text)
+		log.Printf("Processing msg from chat ID %v: %v", update.Message.Chat.ID, update.Message.Text)
 		if strings.HasPrefix(update.Message.Text, "/") {
-			if callback, ok := a.AskCallbacks[update.Message.From.ID]; ok {
+			if callback, ok := a.AskCallbacks[update.Message.Chat.ID]; ok {
 				callback("", errors.New("canceled"))
-				delete(a.AskCallbacks, update.Message.From.ID)
+				delete(a.AskCallbacks, update.Message.Chat.ID)
 				return false
 			}
 		}
 
-		if callback, ok := a.AskCallbacks[update.Message.From.ID]; ok {
+		if callback, ok := a.AskCallbacks[update.Message.Chat.ID]; ok {
 			a.BotApp.Bot.Send(tgbotapi.NewDeleteMessage(update.Message.Chat.ID, update.Message.MessageID))
 			callback(update.Message.Text, nil)
-			delete(a.AskCallbacks, update.Message.From.ID)
+			delete(a.AskCallbacks, update.Message.Chat.ID)
 			return true
 		}
 	}
@@ -83,6 +83,7 @@ func (a *AskService) AskForArgument(chatID int64, question string, suggestionsAr
 	}
 	extraButtons := [][]tgbotapi.InlineKeyboardButton{}
 	extraButtons = append(extraButtons, []tgbotapi.InlineKeyboardButton{
+		// tgbotapi.NewInlineKeyboardButtonData
 		tgbotapi.NewInlineKeyboardButtonData("❌ Cancel", "/cancel"),
 	})
 	if len(suggestions) > 0 {
@@ -93,8 +94,13 @@ func (a *AskService) AskForArgument(chatID int64, question string, suggestionsAr
 		}
 	}
 	msg := tgbotapi.NewMessage(chatID, question)
-	msg.ReplyMarkup = tgbotapi.InlineKeyboardMarkup{
-		InlineKeyboard: extraButtons,
+	// msg.ReplyMarkup = tgbotapi.InlineKeyboardMarkup{
+	// 	InlineKeyboard: extraButtons,
+	// }
+
+	msg.ReplyMarkup = &tgbotapi.ForceReply{
+		ForceReply:            true,
+		InputFieldPlaceholder: question,
 	}
 
 	msg.ReplyToMessageID = 0
@@ -129,17 +135,17 @@ func (a *AskService) AskForArgument(chatID int64, question string, suggestionsAr
 	case answer := <-retChan:
 		switch v := answer.(type) {
 		case string:
-			_, err := a.BotApp.Bot.Send(tgbotapi.NewEditMessageTextAndMarkup(
-				chatID,
-				sentMsg.MessageID,
-				question+" "+v,
-				tgbotapi.InlineKeyboardMarkup{
-					InlineKeyboard: [][]tgbotapi.InlineKeyboardButton{},
-				},
-			))
-			if err != nil {
-				return "", err
-			}
+			// _, err := a.BotApp.Bot.Send(tgbotapi.NewEditMessageText(
+			// 	chatID,
+			// 	sentMsg.MessageID,
+			// 	question+" "+v,
+			// 	// tgbotapi.InlineKeyboardMarkup{
+			// 	// 	InlineKeyboard: [][]tgbotapi.InlineKeyboardButton{},
+			// 	// },
+			// ))
+			// if err != nil {
+			// 	return "", fmt.Errorf("failed to edit question message: %w", err)
+			// }
 			return v, nil
 		case error:
 			a.BotApp.Bot.Send(tgbotapi.NewDeleteMessage(chatID, sentMsg.MessageID))
