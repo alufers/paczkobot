@@ -105,7 +105,7 @@ func (a *AskService) AskForArgument(chatID int64, question string, suggestionsAr
 
 	msg.ReplyToMessageID = 0
 	msg.ParseMode = "HTML"
-	sentMsg, err := a.BotApp.Bot.Send(msg)
+	_, err := a.BotApp.Bot.Send(msg) //sendMsg
 	if err != nil {
 		return "", err
 	}
@@ -148,17 +148,17 @@ func (a *AskService) AskForArgument(chatID int64, question string, suggestionsAr
 			// }
 			return v, nil
 		case error:
-			a.BotApp.Bot.Send(tgbotapi.NewDeleteMessage(chatID, sentMsg.MessageID))
+			// a.BotApp.Bot.Send(tgbotapi.NewDeleteMessage(chatID, sentMsg.MessageID))
 			return "", v
 		default:
-			a.BotApp.Bot.Send(tgbotapi.NewDeleteMessage(chatID, sentMsg.MessageID))
+			// a.BotApp.Bot.Send(tgbotapi.NewDeleteMessage(chatID, sentMsg.MessageID))
 			return "", errors.New("unknown answer type")
 		}
 	case <-timeout:
 		a.AskCallbacksMutex.Lock()
 		defer a.AskCallbacksMutex.Unlock()
 		delete(a.AskCallbacks, chatID)
-		a.BotApp.Bot.Send(tgbotapi.NewDeleteMessage(chatID, sentMsg.MessageID))
+		// a.BotApp.Bot.Send(tgbotapi.NewDeleteMessage(chatID, sentMsg.MessageID))
 		return "", errors.New("timed out while waiting for answer")
 	}
 }
@@ -176,7 +176,7 @@ func (a *AskService) Confirm(chatID int64, question string) error {
 
 	msg.ReplyToMessageID = 0
 	msg.ParseMode = "HTML"
-	sentMsg, err := a.BotApp.Bot.Send(msg)
+	_, err := a.BotApp.Bot.Send(msg) // sentMsg
 	if err != nil {
 		return err
 	}
@@ -200,7 +200,7 @@ func (a *AskService) Confirm(chatID int64, question string) error {
 			}
 		}
 	}()
-	defer a.BotApp.Bot.Send(tgbotapi.NewDeleteMessage(chatID, sentMsg.MessageID))
+	// defer a.BotApp.Bot.Send(tgbotapi.NewDeleteMessage(chatID, sentMsg.MessageID))
 	timeout := time.After(time.Second * 60 * 10)
 	select {
 	case answer := <-retChan:
