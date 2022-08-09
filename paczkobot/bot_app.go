@@ -12,16 +12,17 @@ import (
 )
 
 type BotApp struct {
-	Bot                  *tgbotapi.BotAPI
-	DB                   *gorm.DB
-	Commands             []Command
-	NotificationsService *NotificationsService
-	TrackingService      *TrackingService
-	AskService           *AskService
-	TranslationService   *TranslationService
-	InpostService        *inpostextra.InpostService
-	FollowService        *FollowService
-	InpostScannerService *InpostScannerService
+	Bot                   *tgbotapi.BotAPI
+	DB                    *gorm.DB
+	Commands              []Command
+	NotificationsService  *NotificationsService
+	TrackingService       *TrackingService
+	AskService            *AskService
+	TranslationService    *TranslationService
+	InpostService         *inpostextra.InpostService
+	FollowService         *FollowService
+	InpostScannerService  *InpostScannerService
+	PackagePrinterService *PackagePrinterService
 }
 
 func NewBotApp(b *tgbotapi.BotAPI, DB *gorm.DB) (a *BotApp) {
@@ -52,6 +53,7 @@ func NewBotApp(b *tgbotapi.BotAPI, DB *gorm.DB) (a *BotApp) {
 	a.InpostService = inpostextra.NewInpostService()
 	a.FollowService = NewFollowService(a)
 	a.InpostScannerService = NewInpostScannerService(a)
+	a.PackagePrinterService = NewPackagePrinterService()
 	return
 }
 

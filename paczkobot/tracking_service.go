@@ -128,9 +128,23 @@ func (ts *TrackingService) RunAutomaticTrackingLoop() {
 			Preload("FollowedPackageTelegramUsers").
 			Find(&followedPackages).Error; err != nil {
 			log.Printf("failed to find packages to track automatically: %v", err)
+			return
 		}
 
-		log.Printf("Checking %v packages for updates...", len(followedPackages))
+		totalWaitingPackages := int64(0)
+		// count total number of packages to track
+		if err := ts.app.DB.
+			Model(&FollowedPackage{}).
+			Where(
+				"inactive = false AND last_automatic_check < ?",
+				time.Now().Add(-viper.GetDuration("tracking.automatic_tracking_check_interval")),
+			).
+			Count(&totalWaitingPackages).Error; err != nil {
+			log.Printf("failed to count packages waiting to be tracked automatically: %v", err)
+			return
+		}
+
+		log.Printf("Checking %v packages for updates in this interval out of %v all packages elegible for tracking...", len(followedPackages), totalWaitingPackages)
 
 		for _, followedPackage := range followedPackages {
 			if err := ts.runAutomaticTrackingForPackage(followedPackage); err != nil {
