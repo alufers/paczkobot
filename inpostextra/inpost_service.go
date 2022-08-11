@@ -43,7 +43,7 @@ func (s *InpostService) makeJSONRequest(creds *InpostCredentials, method string,
 		}
 		bodyBuf = bytes.NewBuffer(body)
 	}
-	log.Printf("Sending %s request to %s", method, s.BaseURL+path)
+	// log.Printf("Sending %s request to %s", method, s.BaseURL+path)
 	if bodyBuf != nil {
 		log.Printf("Body: %s", bodyBuf)
 	}
@@ -77,7 +77,7 @@ func (s *InpostService) makeJSONRequest(creds *InpostCredentials, method string,
 		if err != nil {
 			return fmt.Errorf("error reading response body: %s", err)
 		}
-		log.Printf("Response: %s", bodyBuf.String())
+		// log.Printf("Response: %s", bodyBuf.String())
 		err = json.Unmarshal(bodyBuf.Bytes(), respRef)
 
 		if err != nil {
