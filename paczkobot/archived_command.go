@@ -8,23 +8,23 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
-type PackagesCommand struct {
+type ArchivedCommand struct {
 	App *BotApp
 }
 
-func (s *PackagesCommand) Aliases() []string {
-	return []string{"/packages"}
+func (s *ArchivedCommand) Aliases() []string {
+	return []string{"/archived"}
 }
 
-func (s *PackagesCommand) Arguments() []*CommandDefArgument {
+func (s *ArchivedCommand) Arguments() []*CommandDefArgument {
 	return []*CommandDefArgument{}
 }
 
-func (s *PackagesCommand) Help() string {
-	return "prints your followed packages"
+func (s *ArchivedCommand) Help() string {
+	return "prints your archived packages"
 }
 
-func (s *PackagesCommand) Execute(ctx context.Context, args *CommandArguments) error {
+func (s *ArchivedCommand) Execute(ctx context.Context, args *CommandArguments) error {
 
 	if err := s.App.ArchiveService.FetchAndArchivePackagesForUser(args.FromUserID); err != nil {
 		log.Printf("failed to fetch and archive packages for user %v: %v", args.FromUserID, err)
@@ -32,7 +32,7 @@ func (s *PackagesCommand) Execute(ctx context.Context, args *CommandArguments) e
 
 	followedPackages := []FollowedPackageTelegramUser{}
 
-	if err := s.App.DB.Where("telegram_user_id = ? AND archived = ?", args.FromUserID, false).
+	if err := s.App.DB.Where("telegram_user_id = ? AND archived = ?", args.FromUserID, true).
 		Preload("FollowedPackage").
 		Preload("FollowedPackage.FollowedPackageProviders").
 		Find(&followedPackages).Error; err != nil {
@@ -40,11 +40,10 @@ func (s *PackagesCommand) Execute(ctx context.Context, args *CommandArguments) e
 	}
 
 	msg := tgbotapi.NewMessage(args.ChatID, fmt.Sprintf(`
-Your followed packages:
+Your archived packages:
 
 %v
 
-Use /archived to see your archived packages.
 `, s.App.PackagePrinterService.PrintPackages(followedPackages)))
 	msg.ParseMode = "HTML"
 	_, err := s.App.Bot.Send(msg)

@@ -32,3 +32,5 @@ var CommonTrackingStepTypeEmoji = map[CommonTrackingStepType]string{
 	6: "✅",
 	7: "❗",
 }
+
+var CommonTrackingStepsToArchive = []CommonTrackingStepType{CommonTrackingStepType_DELIVERED}

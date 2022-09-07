@@ -23,6 +23,7 @@ type BotApp struct {
 	FollowService         *FollowService
 	InpostScannerService  *InpostScannerService
 	PackagePrinterService *PackagePrinterService
+	ArchiveService        *ArchiveService
 }
 
 func NewBotApp(b *tgbotapi.BotAPI, DB *gorm.DB) (a *BotApp) {
@@ -45,6 +46,7 @@ func NewBotApp(b *tgbotapi.BotAPI, DB *gorm.DB) (a *BotApp) {
 		&InpostScanCommand{App: a},
 		&InpostAccountsCommand{App: a},
 		&InpostQrCommand{App: a},
+		&ArchivedCommand{App: a},
 	}
 	a.NotificationsService = NewNotificationsService(a)
 	a.TrackingService = NewTrackingService(a)
@@ -54,6 +56,7 @@ func NewBotApp(b *tgbotapi.BotAPI, DB *gorm.DB) (a *BotApp) {
 	a.FollowService = NewFollowService(a)
 	a.InpostScannerService = NewInpostScannerService(a)
 	a.PackagePrinterService = NewPackagePrinterService()
+	a.ArchiveService = NewArchiveService(a)
 	return
 }
 
@@ -89,7 +92,7 @@ func (a *BotApp) Run() {
 	go a.TrackingService.RunAutomaticTrackingLoop()
 	for u := range updates {
 		go func(update tgbotapi.Update) {
-			
+
 			if a.AskService.ProcessIncomingMessage(update) {
 				return
 			}
