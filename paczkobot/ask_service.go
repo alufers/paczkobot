@@ -26,30 +26,33 @@ func NewAskService(botApp *BotApp) *AskService {
 func (a *AskService) ProcessIncomingMessage(update tgbotapi.Update) bool {
 	a.AskCallbacksMutex.Lock()
 	defer a.AskCallbacksMutex.Unlock()
-	log.Printf("Processing incoming message: %#v", update)
 	if update.CallbackQuery != nil {
+		if update.CallbackQuery.Message == nil || update.CallbackQuery.Message.Chat == nil {
+			return false
+		}
+		chatID := update.CallbackQuery.Message.Chat.ID
 		if update.CallbackQuery.Data == "/cancel" {
-			if callback, ok := a.AskCallbacks[update.Message.Chat.ID]; ok {
+			if callback, ok := a.AskCallbacks[chatID]; ok {
 				a.BotApp.Bot.Send(tgbotapi.NewCallback(update.CallbackQuery.ID, "Canceled"))
 				callback("", errors.New("canceled"))
-				delete(a.AskCallbacks, update.Message.Chat.ID)
+				delete(a.AskCallbacks, chatID)
 			}
 			return true
 		}
 		if update.CallbackQuery.Data == "/yes" {
-			if callback, ok := a.AskCallbacks[update.Message.Chat.ID]; ok {
+			if callback, ok := a.AskCallbacks[chatID]; ok {
 				a.BotApp.Bot.Send(tgbotapi.NewCallback(update.CallbackQuery.ID, "Confirmed"))
 				callback("", nil)
-				delete(a.AskCallbacks, update.Message.Chat.ID)
+				delete(a.AskCallbacks, chatID)
 			}
 			return true
 		}
 		if strings.HasPrefix(update.CallbackQuery.Data, "/sugg ") {
 			val := strings.TrimPrefix(update.CallbackQuery.Data, "/sugg ")
-			if callback, ok := a.AskCallbacks[update.CallbackQuery.From.ID]; ok {
+			if callback, ok := a.AskCallbacks[chatID]; ok {
 				a.BotApp.Bot.Send(tgbotapi.NewCallback(update.CallbackQuery.ID, "Suggested "+val))
 				callback(val, nil)
-				delete(a.AskCallbacks, update.Message.Chat.ID)
+				delete(a.AskCallbacks, chatID)
 			}
 		}
 	}
@@ -169,7 +172,7 @@ func (a *AskService) Confirm(chatID int64, question string) error {
 		InlineKeyboard: [][]tgbotapi.InlineKeyboardButton{
 			{
 				tgbotapi.NewInlineKeyboardButtonData("✅ Yes", "/yes"),
-				tgbotapi.NewInlineKeyboardButtonData("❌ No", "/no"),
+				tgbotapi.NewInlineKeyboardButtonData("❌ No", "/cancel"),
 			},
 		},
 	}

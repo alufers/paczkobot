@@ -7,19 +7,17 @@ import (
 
 	"github.com/alufers/paczkobot/inpostextra"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-
-	qrcode "github.com/skip2/go-qrcode"
 )
 
-type InpostQrCommand struct {
+type InpostOpenCommand struct {
 	App *BotApp
 }
 
-func (s *InpostQrCommand) Aliases() []string {
-	return []string{"/inpostqr"}
+func (s *InpostOpenCommand) Aliases() []string {
+	return []string{"/inpostopen"}
 }
 
-func (s *InpostQrCommand) Arguments() []*CommandDefArgument {
+func (s *InpostOpenCommand) Arguments() []*CommandDefArgument {
 	return []*CommandDefArgument{
 		{
 			Name:        "trackingNumber",
@@ -30,11 +28,11 @@ func (s *InpostQrCommand) Arguments() []*CommandDefArgument {
 	}
 }
 
-func (f *InpostQrCommand) Help() string {
-	return "Shows a QR code for a package"
+func (f *InpostOpenCommand) Help() string {
+	return "Remotely opens an Inpost locker."
 }
 
-func (f *InpostQrCommand) Execute(ctx context.Context, args *CommandArguments) error {
+func (f *InpostOpenCommand) Execute(ctx context.Context, args *CommandArguments) error {
 
 	suggestions := map[string]string{}
 	followedPackages := []FollowedPackageTelegramUser{}
@@ -72,7 +70,6 @@ func (f *InpostQrCommand) Execute(ctx context.Context, args *CommandArguments) e
 	if err := f.App.DB.Where("telegram_user_id = ?", args.FromUserID).Find(&creds).Error; err != nil {
 		return fmt.Errorf("failed to get inpost credentials: %v", err)
 	}
-
 	if len(creds) == 0 {
 		return fmt.Errorf("no Inpost credentials found. Please add them using /inpostlogin")
 	}
@@ -83,24 +80,28 @@ func (f *InpostQrCommand) Execute(ctx context.Context, args *CommandArguments) e
 			log.Printf("failed to get parcel: %v", err)
 			continue
 		}
-		if p.OpenCode != "" {
-			var png []byte
-			png, err := qrcode.Encode(p.QrCode, qrcode.High, 256)
-
-			photo := tgbotapi.NewPhoto(args.update.Message.Chat.ID, tgbotapi.FileBytes{Name: "qr.png", Bytes: png})
-			photo.Caption = fmt.Sprintf(
-				"Phone number: <b>%v</b>\nOpen code: <b>%v</b>",
-				cred.PhoneNumber,
-				p.OpenCode,
+		if p.OpenCode != "" && p.PickupPoint != nil {
+			err := f.App.AskService.Confirm(args.ChatID, fmt.Sprintf(
+				"Do you really want to open the locker at %s (%s %s, %s)?\n\n<b>WARNING:</b> The locker will open immediately, without checking your location. Make sure you are at the correct locker before confirming.",
+				p.PickupPoint.Name,
+				p.PickupPoint.AddressDetails.Street,
+				p.PickupPoint.AddressDetails.BuildingNumber,
+				p.PickupPoint.AddressDetails.City),
 			)
-
-			photo.ParseMode = "HTML"
-			_, err = f.App.Bot.Send(photo)
+			if err != nil {
+				return err
+			}
+			err = f.App.InpostService.OpenParcelLocker(f.App.DB, cred, p.ShipmentNumber)
+			if err != nil {
+				return err
+			}
+			msg := tgbotapi.NewMessage(args.ChatID, "Locker opened.")
+			_, err = f.App.Bot.Send(msg)
 			return err
 		}
 	}
 
 	msg := tgbotapi.NewMessage(args.ChatID, "No account of yours can access the package: "+trackingNumber)
-	f.App.Bot.Send(msg)
+	_, err = f.App.Bot.Send(msg)
 	return err
 }
