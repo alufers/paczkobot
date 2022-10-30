@@ -207,3 +207,36 @@ func (s *InpostService) GetUserParcels(db *gorm.DB, creds *InpostCredentials) ([
 	}
 	return out, nil
 }
+
+func (s *InpostService) OpenParcelLocker(db *gorm.DB, creds *InpostCredentials, shipmentNumber string) error {
+	parcel, err := s.GetParcel(db, creds, shipmentNumber)
+	if err != nil {
+		return fmt.Errorf("error getting parcel details before opening: %v", err)
+	}
+	if parcel.PickupPoint == nil || parcel.PickupPoint.Location == nil {
+		return fmt.Errorf("parcel %v has no pickup point or location", shipmentNumber)
+	}
+	startOpenSessionRequest := map[string]any{
+		"geoPoint": map[string]any{
+			"accuracy":  10.0,
+			"latitude":  parcel.PickupPoint.Location.Latitude,
+			"longitude": parcel.PickupPoint.Location.Longitude,
+		},
+		"parcel": map[string]any{
+			"shipmentNumber": shipmentNumber,
+			"openCode":       parcel.OpenCode,
+		},
+	}
+	validateResp := &ValidateCompartmentResponse{}
+	err = s.makeJSONRequest(creds, "POST", "/v1/collect/validate", startOpenSessionRequest, validateResp)
+	if err != nil {
+		return fmt.Errorf("error validating compartment: %v", err)
+	}
+
+	openResp := make(map[string]any)
+	err = s.makeJSONRequest(creds, "POST", "/v1/collect/compartment/open/"+validateResp.SessionUUID, map[string]any{}, &openResp)
+	if err != nil {
+		return fmt.Errorf("error opening compartment: %v", err)
+	}
+	return nil
+}

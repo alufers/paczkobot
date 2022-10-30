@@ -69,3 +69,8 @@ type InpostParcel struct {
 	StatusHistory           []ParcelHistory    `json:"statusHistory,omitempty"`
 	StoredDate              time.Time          `json:"storedDate,omitempty"`
 }
+
+type ValidateCompartmentResponse struct {
+	SessionExpirationTime time.Time `json:"sessionExpirationTime,omitempty"`
+	SessionUUID           string    `json:"sessionUuid,omitempty"`
+}
