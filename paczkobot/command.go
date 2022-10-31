@@ -26,6 +26,11 @@ type Helpable interface {
 	Help() string
 }
 
+type CommandWithCategory interface {
+	Command
+	Category() string
+}
+
 type CommandArguments struct {
 	BotApp         *BotApp
 	update         *tgbotapi.Update

@@ -32,6 +32,10 @@ func (f *InpostOpenCommand) Help() string {
 	return "Remotely opens an Inpost locker."
 }
 
+func (f *InpostOpenCommand) Category() string {
+	return "Inpost"
+}
+
 func (f *InpostOpenCommand) Execute(ctx context.Context, args *CommandArguments) error {
 
 	suggestions := map[string]string{}

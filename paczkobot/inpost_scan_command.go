@@ -24,6 +24,10 @@ func (f *InpostScanCommand) Help() string {
 	return "Scans all your inpost accounts and follows any new packages"
 }
 
+func (f *InpostScanCommand) Category() string {
+	return "Inpost"
+}
+
 func (f *InpostScanCommand) Execute(ctx context.Context, args *CommandArguments) error {
 
 	creds := []*inpostextra.InpostCredentials{}

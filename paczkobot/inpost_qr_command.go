@@ -34,6 +34,10 @@ func (f *InpostQrCommand) Help() string {
 	return "Shows a QR code for a package"
 }
 
+func (f *InpostQrCommand) Category() string {
+	return "Inpost"
+}
+
 func (f *InpostQrCommand) Execute(ctx context.Context, args *CommandArguments) error {
 
 	suggestions := map[string]string{}

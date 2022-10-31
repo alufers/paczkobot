@@ -24,6 +24,10 @@ func (f *InpostAccountsCommand) Help() string {
 	return "Shows inpost accounts you are logged into"
 }
 
+func (f *InpostAccountsCommand) Category() string {
+	return "Inpost"
+}
+
 func (f *InpostAccountsCommand) Execute(ctx context.Context, args *CommandArguments) error {
 
 	creds := []*inpostextra.InpostCredentials{}

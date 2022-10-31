@@ -21,6 +21,10 @@ func (f *InpostLoginCommand) Help() string {
 	return "logs in to the inpost service using a sms code"
 }
 
+func (f *InpostLoginCommand) Category() string {
+	return "Inpost"
+}
+
 func (f *InpostLoginCommand) Execute(ctx context.Context, args *CommandArguments) error {
 
 	phoneNumber, err := f.App.AskService.AskForArgument(args.ChatID, "Enter your phone number associated with your inpost account:")
