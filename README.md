@@ -22,7 +22,7 @@ See it in action: [@paczko_bot](https://t.me/paczko_bot)
 
 ## Screenshots
 
-![Screenshot](./docs/tracking.png)
+![Screenshot](./docs/tracking.jpg)
 ![Screenshot](./docs/barcode.png)
 ![Screenshot](./docs/inpostopen.png)
 ## Usage
