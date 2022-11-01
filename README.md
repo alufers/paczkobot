@@ -24,6 +24,7 @@ See it in action: [@paczko_bot](https://t.me/paczko_bot)
 
 ![Screenshot](./docs/tracking.png)
 ![Screenshot](./docs/barcode.png)
+![Screenshot](./docs/inpostopen.png)
 ## Usage
 
 On first run the bot will create a file called `paczkobot.yaml` looking like this:
