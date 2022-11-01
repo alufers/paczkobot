@@ -2,7 +2,7 @@
 
 A Telegram bot for tracking packages.
 
-
+See it in action: [@paczko_bot](https://t.me/paczko_bot)
 
 ## Features
 - [x] Track packages from these providers
@@ -16,7 +16,14 @@ A Telegram bot for tracking packages.
 - Follow packages and send notifications when a package status changes
 - Generate QR codes for InPost Paczkomaty
 - Automatically import packages from InPost Paczkomaty
+- Remotely open InPost Paczkomaty
+- Detect package barcodes in images
 
+
+## Screenshots
+
+![Screenshot](./docs/tracking.png)
+![Screenshot](./docs/barcode.png)
 ## Usage
 
 On first run the bot will create a file called `paczkobot.yaml` looking like this:
