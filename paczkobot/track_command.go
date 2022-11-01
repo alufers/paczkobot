@@ -32,6 +32,10 @@ func (s *TrackCommand) Arguments() []*CommandDefArgument {
 	}
 }
 
+func (s TrackCommand) Category() string {
+	return "Tracking"
+}
+
 func (t *TrackCommand) Help() string {
 	return "shows up-to-date tracking information about a package with the given number"
 }
@@ -64,7 +68,7 @@ func (t *TrackCommand) Execute(ctx context.Context, args *CommandArguments) erro
 	for _, p := range providersToCheck {
 		statuses[p.GetName()] = "⌛ checking..."
 		go func(p providers.Provider) {
-			d, err := t.App.TrackingService.InvokeProviderAndNotifyFollowers(context.Background(), p, shipmentNumber)
+			d, err := t.App.TrackingService.InvokeProviderAndNotifyFollowers(ctx, p, shipmentNumber)
 			if err != nil {
 				replyChan <- &providerReply{
 					provider: p,

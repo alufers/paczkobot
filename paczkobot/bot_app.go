@@ -2,6 +2,7 @@ package paczkobot
 
 import (
 	"context"
+	"fmt"
 	"html"
 	"log"
 	"strings"
@@ -24,6 +25,7 @@ type BotApp struct {
 	InpostScannerService  *InpostScannerService
 	PackagePrinterService *PackagePrinterService
 	ArchiveService        *ArchiveService
+	ImageScanningService  *ImageScanningService
 }
 
 func NewBotApp(b *tgbotapi.BotAPI, DB *gorm.DB) (a *BotApp) {
@@ -58,6 +60,7 @@ func NewBotApp(b *tgbotapi.BotAPI, DB *gorm.DB) (a *BotApp) {
 	a.InpostScannerService = NewInpostScannerService(a)
 	a.PackagePrinterService = NewPackagePrinterService()
 	a.ArchiveService = NewArchiveService(a)
+	a.ImageScanningService = NewImageScanningService(a)
 	return
 }
 
@@ -118,7 +121,8 @@ func (a *BotApp) Run() {
 			seg := strings.Split(cmdText, " ")
 			args.CommandName = seg[0]
 			args.Arguments = seg[1:]
-
+			didMatch := false
+			ctx := context.TODO()
 			for _, cmd := range a.Commands {
 
 				if CommandMatches(cmd, cmdText) {
@@ -133,10 +137,26 @@ func (a *BotApp) Run() {
 						}
 						args.namedArguments[argTpl.Name] = args.Arguments[i]
 					}
-					ctx := context.TODO()
+
 					err = cmd.Execute(ctx, args)
+					didMatch = true
 					break
 				}
+			}
+			if !didMatch && update.Message != nil && update.Message.Photo != nil && len(update.Message.Photo) > 0 {
+
+				photo := update.Message.Photo[len(update.Message.Photo)-1]
+
+				file, getFileErr := a.Bot.GetFile(tgbotapi.FileConfig{
+					FileID: photo.FileID,
+				})
+				if getFileErr != nil {
+					log.Printf("Failed to get file: %v", err)
+					return
+				}
+				url := fmt.Sprintf("https://api.telegram.org/file/bot%s/%s", a.Bot.Token, file.FilePath)
+				err = a.ImageScanningService.ScanIncomingImage(ctx, args, url)
+
 			}
 
 			if err != nil {

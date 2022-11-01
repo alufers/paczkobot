@@ -23,6 +23,10 @@ func (s *UnfollowAllCommand) Help() string {
 	return "stops following all packages for changes"
 }
 
+func (s *UnfollowAllCommand) Category() string {
+	return "Following packages"
+}
+
 func (s *UnfollowAllCommand) Execute(ctx context.Context, args *CommandArguments) error {
 
 	followedPackages := []*FollowedPackageTelegramUser{}

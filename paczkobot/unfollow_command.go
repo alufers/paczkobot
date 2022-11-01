@@ -29,6 +29,10 @@ func (s *UnfollowCommand) Help() string {
 	return "stops following a package for changes"
 }
 
+func (s *UnfollowCommand) Category() string {
+	return "Following packages"
+}
+
 func (s *UnfollowCommand) Execute(ctx context.Context, args *CommandArguments) error {
 
 	shipmentNumber, err := args.GetOrAskForArgument("shipmentNumber")

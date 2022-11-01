@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/alufers/paczkobot/commondata"
-	"github.com/alufers/paczkobot/providers/caniao"
 	"github.com/alufers/paczkobot/providers/dhl"
 	"github.com/alufers/paczkobot/providers/dpdcompl"
 	"github.com/alufers/paczkobot/providers/gls"
@@ -19,7 +18,7 @@ var AllProviders = []Provider{
 	&inpost.InpostProvider{},
 	&pocztapolska.PocztaPolskaProvider{},
 	&postnl.PostnlProvider{},
-	&caniao.CaniaoProvider{},
+	// &caniao.CaniaoProvider{},
 	&dpdcompl.DpdComPlProvider{},
 	&ups.UPSProvider{},
 	&dhl.DHLProvider{},

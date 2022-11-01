@@ -24,6 +24,12 @@ func (s *PackagesCommand) Help() string {
 	return "prints your followed packages"
 }
 
+
+func (s *PackagesCommand) Category() string {
+	return "Following packages"
+}
+
+
 func (s *PackagesCommand) Execute(ctx context.Context, args *CommandArguments) error {
 
 	if err := s.App.ArchiveService.FetchAndArchivePackagesForUser(args.FromUserID); err != nil {

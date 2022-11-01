@@ -34,6 +34,11 @@ func (s *SetNameCommand) Help() string {
 	return "sets a name for a package"
 }
 
+func (s *SetNameCommand) Category() string {
+	return "Following packages"
+}
+
+
 func (s *SetNameCommand) Execute(ctx context.Context, args *CommandArguments) error {
 
 	shipmentNumber, err := args.GetOrAskForArgument("shipmentNumber")

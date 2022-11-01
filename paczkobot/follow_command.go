@@ -30,6 +30,10 @@ func (s *FollowCommand) Arguments() []*CommandDefArgument {
 	}
 }
 
+func (s *FollowCommand) Category() string {
+	return "Following packages"
+}
+
 func (f *FollowCommand) Help() string {
 	return "follows a package and sends you an update every time its status changes"
 }
