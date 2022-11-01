@@ -13,12 +13,14 @@ import (
 )
 
 type NotificationsService struct {
-	app *BotApp
+	app   *BotApp
+	Hooks []PackageNotificationHook
 }
 
-func NewNotificationsService(app *BotApp) *NotificationsService {
+func NewNotificationsService(app *BotApp, hooks []PackageNotificationHook) *NotificationsService {
 	return &NotificationsService{
-		app: app,
+		app:   app,
+		Hooks: hooks,
 	}
 }
 
@@ -95,6 +97,24 @@ func (s *NotificationsService) sendNotificationsForUser(tgUser *FollowedPackageT
 
 	msg := tgbotapi.NewMessage(notifications[0].FollowedPackageTelegramUser.ChatID, msgContents)
 	msg.ParseMode = "HTML"
+	keyboard := [][]tgbotapi.InlineKeyboardButton{}
+	for _, hook := range s.Hooks {
+		for _, n := range notifications {
+			hookResult, err := hook.HookNotificationKeyboard(n)
+			if err != nil {
+				log.Printf("failed to get keyboard from hook %T: %v", hook, err)
+				continue
+			}
+			if hookResult != nil {
+				keyboard = append(keyboard, hookResult...)
+			}
+		}
+	}
+	if len(keyboard) > 0 {
+		msg.ReplyMarkup = tgbotapi.NewInlineKeyboardMarkup(keyboard...)
+	}
+	
+
 	if _, err := s.app.Bot.Send(msg); err != nil {
 		return fmt.Errorf("failed to send notifications to chat %v: %w", tgUser.ChatID, err)
 	}

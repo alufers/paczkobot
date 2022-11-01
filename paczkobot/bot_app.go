@@ -51,7 +51,9 @@ func NewBotApp(b *tgbotapi.BotAPI, DB *gorm.DB) (a *BotApp) {
 		&ArchivedCommand{App: a},
 		&InpostOpenCommand{App: a},
 	}
-	a.NotificationsService = NewNotificationsService(a)
+	a.NotificationsService = NewNotificationsService(a, []PackageNotificationHook{
+		&InpostPackageNotificationHook{},
+	})
 	a.TrackingService = NewTrackingService(a)
 	a.AskService = NewAskService(a)
 	a.TranslationService = NewTranslationService()

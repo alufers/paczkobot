@@ -153,7 +153,11 @@ func (ts *TrackingService) RunAutomaticTrackingLoop() {
 			time.Sleep(viper.GetDuration("tracking.delay_between_packages_in_automatic_tracking") - time.Duration(rand.Intn(10000)))
 		}
 
-		jitterValue := time.Duration(rand.Int()%int(viper.GetDuration("tracking.automatic_tracking_check_jitter")) - viper.GetInt("tracking.automatic_tracking_check_jitter")/2)
+		jitterModulo := int(viper.GetDuration("tracking.automatic_tracking_check_jitter")) - viper.GetInt("tracking.automatic_tracking_check_jitter")/2
+		jitterValue := time.Second * 0
+		if jitterModulo > 0 {
+			jitterValue = time.Second * time.Duration(rand.Intn(jitterModulo))
+		}
 
 		timeToWait := viper.GetDuration("tracking.automatic_tracking_check_interval") - time.Since(lastCheckStarted) + jitterValue
 		log.Printf("Automatic tracking finished, now scanning inpost accounts...")
