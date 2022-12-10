@@ -1,4 +1,4 @@
-package dpdcompl
+package packeta
 
 import (
 	"context"
@@ -16,15 +16,15 @@ import (
 )
 
 var descriptionMappings = map[string]commondata.CommonTrackingStepType{
-	"Package has been delivered.":                    commondata.CommonTrackingStepType_DELIVERED,
-	"We have received electronical information about the package.":          commondata.CommonTrackingStepType_INFORMATION_PREPARED,
+	"Package has been delivered.":                                  commondata.CommonTrackingStepType_DELIVERED,
+	"We have received electronical information about the package.": commondata.CommonTrackingStepType_INFORMATION_PREPARED,
 }
 
 type PacketaProvider struct {
 }
 
 func (dp *PacketaProvider) GetName() string {
-	return "dpd-com-pl"
+	return "packeta"
 }
 
 func (dp *PacketaProvider) MatchesNumber(trackingNumber string) bool {
@@ -57,7 +57,7 @@ func (dp *PacketaProvider) Track(ctx context.Context, trackingNumber string) (*c
 	if err != nil {
 		return nil, fmt.Errorf("failed to read HTML response from DPD: %w", err)
 	}
-	datatables := doc.Find("table.table-track")
+	datatables := doc.Find("table.packet-status-table").First()
 	if datatables.Length() <= 0 {
 		return nil, commonerrors.NotFoundError
 	}
@@ -67,12 +67,14 @@ func (dp *PacketaProvider) Track(ctx context.Context, trackingNumber string) (*c
 		TrackingSteps:  []*commondata.TrackingStep{},
 	}
 	datatables.Find("tbody tr").Each(func(i int, row *goquery.Selection) {
-		date := row.Find("td:nth-child(1)").Text()
-		timeText := row.Find("td:nth-child(2)").Text()
-		description := row.Find("td:nth-child(3)").Text()
-		location := row.Find("td:nth-child(4)").Text()
+		date := row.Find("th:nth-child(1)").Text()
 
-		t, err := time.Parse("2006-01-02 15:04:05", strings.TrimSpace(date)+" "+strings.TrimSpace(timeText))
+		description := row.Find("td:nth-child(2)").Text()
+
+		log.Printf("Packeta: %v %v", date, description)
+
+		// 2022-12-07 10:39:18
+		t, err := time.Parse("2006-01-02 15:04:05", strings.TrimSpace(date))
 		if err != nil {
 			log.Printf("error while parsing date from DPD: %v", err)
 		}
@@ -87,7 +89,6 @@ func (dp *PacketaProvider) Track(ctx context.Context, trackingNumber string) (*c
 			Datetime:   t,
 			CommonType: commonType,
 			Message:    strings.TrimSpace(description),
-			Location:   location,
 		})
 	})
 

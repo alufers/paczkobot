@@ -13,6 +13,7 @@ See it in action: [@paczko_bot](https://t.me/paczko_bot)
   - [x] postnl
   - [x] Inpost
   - [x] gls
+  - [x] packeta
 - Follow packages and send notifications when a package status changes
 - Generate QR codes for InPost Paczkomaty
 - Automatically import packages from InPost Paczkomaty
