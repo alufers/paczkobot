@@ -71,6 +71,6 @@ type InpostParcel struct {
 }
 
 type ValidateCompartmentResponse struct {
-	SessionExpirationTime time.Time `json:"sessionExpirationTime,omitempty"`
-	SessionUUID           string    `json:"sessionUuid,omitempty"`
+	SessionExpirationTime any    `json:"sessionExpirationTime,omitempty"`
+	SessionUUID           string `json:"sessionUuid,omitempty"`
 }
