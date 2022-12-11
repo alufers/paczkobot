@@ -34,15 +34,26 @@ func (f *InpostScanCommand) Execute(ctx context.Context, args *CommandArguments)
 	if err := f.App.DB.Where("telegram_user_id = ?", args.FromUserID).Find(&creds).Error; err != nil {
 		return fmt.Errorf("failed to get inpost credentials: %v", err)
 	}
+	errors := []error{}
+	successCount := 0
 	for _, cred := range creds {
 		err := f.App.InpostScannerService.ScanUserPackages(
 			cred,
 		)
 		if err != nil {
-			return fmt.Errorf("failed to scan user inpost packages: %v", err)
+			errors = append(errors, fmt.Errorf("failed to scan inpost account %v: %v", cred.PhoneNumber, err))
+		} else {
+			successCount++
 		}
 	}
-	msg := tgbotapi.NewMessage(args.update.Message.Chat.ID, fmt.Sprintf(`Scanning %v inpost accounts!`, len(creds)))
+	msgTxt := fmt.Sprintf(`Successfully scanned %v out of %v inpost accounts!`, successCount, len(creds))
+	if len(errors) > 0 {
+		msgTxt += " Errors: \n"
+		for _, err := range errors {
+			msgTxt += fmt.Sprintf("- %v \n", err)
+		}
+	}
+	msg := tgbotapi.NewMessage(args.update.Message.Chat.ID, msgTxt)
 	msg.ParseMode = "HTML"
 	_, err := f.App.Bot.Send(msg)
 

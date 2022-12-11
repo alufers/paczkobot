@@ -45,6 +45,7 @@ func NewBotApp(b *tgbotapi.BotAPI, DB *gorm.DB) (a *BotApp) {
 		&SetNameCommand{App: a},
 		&UnfollowAllCommand{App: a},
 		&InpostLoginCommand{App: a},
+		&InpostLogoutCommand{App: a},
 		&InpostScanCommand{App: a},
 		&InpostAccountsCommand{App: a},
 		&InpostQrCommand{App: a},

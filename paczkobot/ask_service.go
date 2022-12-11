@@ -78,6 +78,8 @@ func (a *AskService) ProcessIncomingMessage(update tgbotapi.Update) bool {
 	return false
 }
 
+// AskForArgument asks the user at the specified chatID for a text value.
+// suggestionsArr should contain the map of suggestions where the key is the value that will be returned and the value is the text that will be displayed to the user.
 func (a *AskService) AskForArgument(chatID int64, question string, suggestionsArr ...map[string]string) (string, error) {
 
 	suggestions := map[string]string{}
@@ -97,13 +99,15 @@ func (a *AskService) AskForArgument(chatID int64, question string, suggestionsAr
 		}
 	}
 	msg := tgbotapi.NewMessage(chatID, question)
-	// msg.ReplyMarkup = tgbotapi.InlineKeyboardMarkup{
-	// 	InlineKeyboard: extraButtons,
-	// }
-
-	msg.ReplyMarkup = &tgbotapi.ForceReply{
-		ForceReply:            true,
-		InputFieldPlaceholder: question,
+	if len(suggestions) > 0 {
+		msg.ReplyMarkup = tgbotapi.InlineKeyboardMarkup{
+			InlineKeyboard: extraButtons,
+		}
+	} else {
+		msg.ReplyMarkup = &tgbotapi.ForceReply{
+			ForceReply:            true,
+			InputFieldPlaceholder: question,
+		}
 	}
 
 	msg.ReplyToMessageID = 0
