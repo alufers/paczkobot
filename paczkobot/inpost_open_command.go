@@ -56,7 +56,7 @@ func (f *InpostOpenCommand) Execute(ctx context.Context, args *CommandArguments)
 				break
 			}
 		}
-		if inpostProvider == nil || inpostProvider.LastStatusValue == "delivered" {
+		if inpostProvider == nil || (inpostProvider.LastStatusValue != "ready_to_pickup" && inpostProvider.LastStatusValue != "stack_in_box_machine") {
 			continue
 		}
 		suggestions[p.FollowedPackage.TrackingNumber] = "📦 " + p.CustomName + " (" + p.FollowedPackage.TrackingNumber + ")"
