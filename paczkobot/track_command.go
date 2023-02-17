@@ -154,8 +154,22 @@ func (t *TrackCommand) Execute(ctx context.Context, args *CommandArguments) erro
 				}
 			}
 
-			if rep.data.Destination != "" {
-				longTracking += "\nThe package is headed to " + rep.data.Destination
+			detailsString := ""
+			if rep.data.Destination != "" && rep.data.SentFrom != "" {
+				detailsString += "The package is headed from " + rep.data.SentFrom + " to " + rep.data.Destination + "."
+			} else if rep.data.Destination != "" {
+				detailsString += "The package is headed to " + rep.data.Destination + "."
+			}
+
+			if rep.data.Weight != 0.0 {
+				if detailsString != "" {
+					detailsString += " "
+				}
+				detailsString += fmt.Sprintf("The package weighs %.2f kg.", rep.data.Weight)
+			}
+
+			if detailsString != "" {
+				longTracking += "\n" + detailsString + "\n"
 			}
 
 			msg := tgbotapi.NewMessage(args.update.Message.Chat.ID, longTracking)
