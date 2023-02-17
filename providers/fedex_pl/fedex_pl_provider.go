@@ -3,11 +3,14 @@ package fedex_pl
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/url"
+	"regexp"
 	"time"
 
 	"github.com/alufers/paczkobot/commondata"
+	"github.com/alufers/paczkobot/commonerrors"
 )
 
 // https://www.fedex.com/pl-pl/online/domestic-tracking.html
@@ -34,7 +37,9 @@ func (fp *FedexPlProvider) GetName() string {
 }
 
 func (fp *FedexPlProvider) MatchesNumber(trackingNumber string) bool {
-	return true
+	// check if the number contains only digits, and between 12 and 13 digits
+	re := regexp.MustCompile(`^\d{12,13}$`)
+	return re.MatchString(trackingNumber)
 }
 
 func (fp *FedexPlProvider) Track(ctx context.Context, trackingNumber string) (*commondata.TrackingData, error) {
@@ -48,6 +53,13 @@ func (fp *FedexPlProvider) Track(ctx context.Context, trackingNumber string) (*c
 	resp, err := http.DefaultClient.Do(trackingReq)
 	if err != nil {
 		return nil, err
+	}
+
+	if resp.StatusCode == http.StatusNoContent || resp.StatusCode == http.StatusNotFound {
+		return nil, commonerrors.NotFoundError
+	}
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("fedex_pl: unexpected status code: %d", resp.StatusCode)
 	}
 
 	respData := &FedexPlTrackingResponse{}
