@@ -6,7 +6,19 @@ type TrackingData struct {
 	ShipmentNumber string          `json:"shipmentNumber"`
 	ProviderName   string          `json:"providerName"`
 	Destination    string          `json:"destination"`
+	SentFrom       string          `json:"sentFrom"`
+	Weight         float64         `json:"weight"` // in kg
 	TrackingSteps  []*TrackingStep `json:"trackingSteps"`
+}
+
+func (td *TrackingData) ApplyCommonTypeMappings(mappings map[string]CommonTrackingStepType) {
+	for _, step := range td.TrackingSteps {
+		if step.CommonType == CommonTrackingStepType_UNKNOWN {
+			if newType, ok := mappings[step.Message]; ok {
+				step.CommonType = newType
+			}
+		}
+	}
 }
 
 type TrackingStep struct {

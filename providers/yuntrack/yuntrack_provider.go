@@ -5,8 +5,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io"
-	"log"
 	"net/http"
 	"time"
 
@@ -89,8 +87,8 @@ func (p *YunTrack) Track(ctx context.Context, trackingNumber string) (*commondat
 		return nil, commonerrors.NotFoundError
 	}
 	if res.StatusCode != 200 {
-		body, _ := io.ReadAll(res.Body)
-		log.Printf("YUNTRACK : %v", string(body))
+		// body, _ := io.ReadAll(res.Body)
+		// log.Printf("YUNTRACK : %v", string(body))
 		return nil, fmt.Errorf("HTTP status code %v", res.StatusCode)
 	}
 
