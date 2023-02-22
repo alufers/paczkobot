@@ -71,8 +71,6 @@ func (dp *PacketaProvider) Track(ctx context.Context, trackingNumber string) (*c
 
 		description := row.Find("td:nth-child(2)").Text()
 
-		log.Printf("Packeta: %v %v", date, description)
-
 		// 2022-12-07 10:39:18
 		t, err := time.Parse("2006-01-02 15:04:05", strings.TrimSpace(date))
 		if err != nil {

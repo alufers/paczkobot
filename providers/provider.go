@@ -7,6 +7,7 @@ import (
 	"github.com/alufers/paczkobot/providers/dhl"
 	"github.com/alufers/paczkobot/providers/dpdcompl"
 	"github.com/alufers/paczkobot/providers/fedex_pl"
+	"github.com/alufers/paczkobot/providers/geis_pl"
 	"github.com/alufers/paczkobot/providers/gls"
 	"github.com/alufers/paczkobot/providers/inpost"
 	"github.com/alufers/paczkobot/providers/packeta"
@@ -28,6 +29,7 @@ var AllProviders = []Provider{
 	&yuntrack.YunTrack{},
 	&packeta.PacketaProvider{},
 	&fedex_pl.FedexPlProvider{},
+	&geis_pl.GeisPlProvider{},
 }
 
 type Provider interface {
