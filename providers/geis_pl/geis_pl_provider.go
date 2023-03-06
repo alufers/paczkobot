@@ -23,8 +23,7 @@ var descriptionMappings = map[string]commondata.CommonTrackingStepType{
 	"Loading for distribution to consignee": commondata.CommonTrackingStepType_OUT_FOR_DELIVERY,
 }
 
-type GeisPlProvider struct {
-}
+type GeisPlProvider struct{}
 
 func (gp *GeisPlProvider) GetName() string {
 	return "geis-pl"
@@ -35,7 +34,6 @@ func (gp *GeisPlProvider) MatchesNumber(trackingNumber string) bool {
 }
 
 func (gp *GeisPlProvider) Track(ctx context.Context, trackingNumber string) (*commondata.TrackingData, error) {
-
 	req, err := http.NewRequestWithContext(
 		ctx,
 		"GET",
@@ -48,11 +46,10 @@ func (gp *GeisPlProvider) Track(ctx context.Context, trackingNumber string) (*co
 	commondata.SetCommonHTTPHeaders(&req.Header)
 
 	httpResponse, err := http.DefaultClient.Do(req)
-
 	if err != nil {
 		return nil, commonerrors.NewNetworkError(gp.GetName(), req)
 	}
-
+	defer httpResponse.Body.Close()
 	if httpResponse.StatusCode != 200 {
 		return nil, fmt.Errorf("HTTP status code %v", httpResponse.StatusCode)
 	}

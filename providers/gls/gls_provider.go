@@ -13,8 +13,7 @@ import (
 	"github.com/alufers/paczkobot/commonerrors"
 )
 
-type GLSProvider struct {
-}
+type GLSProvider struct{}
 
 func (p *GLSProvider) GetName() string {
 	return "gls"
@@ -40,6 +39,7 @@ func (p *GLSProvider) Track(ctx context.Context, trackingNumber string) (*common
 	if err != nil {
 		return nil, commonerrors.NewNetworkError(p.GetName(), req)
 	}
+	defer res.Body.Close()
 	if res.StatusCode == http.StatusNotFound {
 		return nil, commonerrors.NotFoundError
 	}

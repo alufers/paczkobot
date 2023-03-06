@@ -99,7 +99,6 @@ func (a *BotApp) Run() {
 	go a.TrackingService.RunAutomaticTrackingLoop()
 	for u := range updates {
 		go func(update tgbotapi.Update) {
-
 			if a.AskService.ProcessIncomingMessage(update) {
 				return
 			}
@@ -127,7 +126,6 @@ func (a *BotApp) Run() {
 			didMatch := false
 			ctx := context.TODO()
 			for _, cmd := range a.Commands {
-
 				if CommandMatches(cmd, cmdText) {
 					args.Command = cmd
 					for i, argTpl := range cmd.Arguments() {
@@ -173,5 +171,4 @@ func (a *BotApp) Run() {
 			}
 		}(u)
 	}
-
 }

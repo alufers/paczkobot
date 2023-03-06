@@ -10,8 +10,7 @@ import (
 	"github.com/alufers/paczkobot/commondata"
 )
 
-type MockProvider struct {
-}
+type MockProvider struct{}
 
 var MockNumberRegex = regexp.MustCompile(`^mock-`)
 

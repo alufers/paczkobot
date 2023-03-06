@@ -58,4 +58,3 @@ type TuStatus struct {
 	ProgressBar            ProgressBar  `json:"progressBar"`
 	ChangeDeliveryPossible bool         `json:"changeDeliveryPossible"`
 }
-

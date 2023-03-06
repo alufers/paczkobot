@@ -22,5 +22,4 @@ func InitDB() (*gorm.DB, error) {
 	default:
 		return nil, fmt.Errorf("unknown database type '%v'", dbType)
 	}
-
 }

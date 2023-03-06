@@ -21,16 +21,13 @@ var commonMappings = map[string]commondata.CommonTrackingStepType{
 	"Przesyłka doręczona do odbiorcy.":                commondata.CommonTrackingStepType_DELIVERED,
 }
 
-var (
-	// not used
-	// FedexClientID     = "l7xx474b79016a4d4ec5a60bf7a7e5e7e6fe"
-	// FedexClientSecret = "448399ccafaa4f62a4ed202fc5ef3a01"
+// not used
+// FedexClientID     = "l7xx474b79016a4d4ec5a60bf7a7e5e7e6fe"
+// FedexClientSecret = "448399ccafaa4f62a4ed202fc5ef3a01"
 
-	FedexStaticAPIKey = "l7xx492b4e2b8682483c979222bdd33216cf"
-)
+var FedexStaticAPIKey = "l7xx492b4e2b8682483c979222bdd33216cf"
 
-type FedexPlProvider struct {
-}
+type FedexPlProvider struct{}
 
 func (fp *FedexPlProvider) GetName() string {
 	return "fedex-pl"
@@ -43,7 +40,6 @@ func (fp *FedexPlProvider) MatchesNumber(trackingNumber string) bool {
 }
 
 func (fp *FedexPlProvider) Track(ctx context.Context, trackingNumber string) (*commondata.TrackingData, error) {
-
 	trackingReq, err := http.NewRequestWithContext(ctx, "GET", "https://api1.emea.fedex.com/fds2-tracking/trck-v1/info?trackingKey="+url.QueryEscape(trackingNumber), nil)
 	if err != nil {
 		return nil, err
@@ -54,6 +50,7 @@ func (fp *FedexPlProvider) Track(ctx context.Context, trackingNumber string) (*c
 	if err != nil {
 		return nil, err
 	}
+	defer resp.Body.Close()
 
 	if resp.StatusCode == http.StatusNoContent || resp.StatusCode == http.StatusNotFound {
 		return nil, commonerrors.NotFoundError

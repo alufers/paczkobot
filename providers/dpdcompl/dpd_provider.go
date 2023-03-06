@@ -16,7 +16,6 @@ import (
 )
 
 var descriptionMappings = map[string]commondata.CommonTrackingStepType{
-
 	"Przyjęcie przesyłki w oddziale DPD": commondata.CommonTrackingStepType_IN_TRANSIT,
 	"Przesyłka odebrana przez Kuriera":   commondata.CommonTrackingStepType_IN_TRANSIT,
 	"Przekazanie przesyłki kurierowi":    commondata.CommonTrackingStepType_IN_TRANSIT,
@@ -28,8 +27,7 @@ var descriptionMappings = map[string]commondata.CommonTrackingStepType{
 	"Zarejestrowano dane przesyłki":          commondata.CommonTrackingStepType_INFORMATION_PREPARED,
 }
 
-type DpdComPlProvider struct {
-}
+type DpdComPlProvider struct{}
 
 func (dp *DpdComPlProvider) GetName() string {
 	return "dpd-com-pl"
@@ -40,7 +38,6 @@ func (dp *DpdComPlProvider) MatchesNumber(trackingNumber string) bool {
 }
 
 func (dp *DpdComPlProvider) Track(ctx context.Context, trackingNumber string) (*commondata.TrackingData, error) {
-
 	requestData := url.Values{}
 	requestData.Set("q", trackingNumber)
 	requestData.Set("typ", "1")
@@ -56,10 +53,10 @@ func (dp *DpdComPlProvider) Track(ctx context.Context, trackingNumber string) (*
 	commondata.SetCommonHTTPHeaders(&req.Header)
 	req.Header.Add("Content-type", "application/x-www-form-urlencoded")
 	httpResponse, err := http.DefaultClient.Do(req)
-
 	if err != nil {
 		return nil, commonerrors.NewNetworkError(dp.GetName(), req)
 	}
+	defer httpResponse.Body.Close()
 
 	if httpResponse.StatusCode != 200 {
 		return nil, fmt.Errorf("HTTP status code %v", httpResponse.StatusCode)

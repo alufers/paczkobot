@@ -7,7 +7,7 @@ See it in action: [@paczko_bot](https://t.me/paczko_bot)
 ## Features
 - [x] Track packages from these providers
   - [x] dhl (requires API key)
-  - [x] ups 
+  - [x] ups
   - [x] dpd.com.pl
   - [x] poczta-polska
   - [x] postnl

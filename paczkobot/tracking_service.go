@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log"
 	"math"
-	"math/rand"
 	"time"
 
 	"github.com/alufers/paczkobot/commondata"
@@ -90,7 +89,6 @@ func (ts *TrackingService) notifyFollowersOfPackageIfNeeded(ctx context.Context,
 	}
 
 	return false, nil
-
 }
 
 func (ts *TrackingService) MarkPackagesWithoutChangesAsInactive() error {
@@ -153,14 +151,6 @@ func (ts *TrackingService) RunAutomaticTrackingLoop() {
 			// time.Sleep(viper.GetDuration("tracking.delay_between_packages_in_automatic_tracking") - time.Duration(rand.Intn(10000)))
 		}
 
-		jitterModulo := int(viper.GetDuration("tracking.automatic_tracking_check_jitter") - viper.GetDuration("tracking.automatic_tracking_check_jitter")/2)
-		jitterValue := time.Second * 0
-		if jitterModulo > 0 {
-			jitterValue = time.Duration(rand.Intn(jitterModulo))
-		}
-
-		jitterValue = jitterValue
-
 		timeToWait := viper.GetDuration("tracking.automatic_tracking_check_interval") - time.Since(lastCheckStarted) // + jitterValue
 		log.Printf("Automatic tracking finished, now scanning inpost accounts...")
 		err := ts.ScanInpostAccounts()
@@ -206,7 +196,7 @@ func (ts *TrackingService) ScanInpostAccounts() error {
 	log.Printf("Starting inpost account scan...")
 
 	lastCheckStarted := time.Now()
-	var inpostCreds = []*inpostextra.InpostCredentials{}
+	inpostCreds := []*inpostextra.InpostCredentials{}
 	if err := ts.app.DB.
 		Where("last_scan < ? OR last_scan IS NULL", time.Now().Add(-viper.GetDuration("tracking.inpost_scan_interval"))).
 		Find(&inpostCreds).Error; err != nil {

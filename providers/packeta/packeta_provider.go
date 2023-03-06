@@ -20,8 +20,7 @@ var descriptionMappings = map[string]commondata.CommonTrackingStepType{
 	"We have received electronical information about the package.": commondata.CommonTrackingStepType_INFORMATION_PREPARED,
 }
 
-type PacketaProvider struct {
-}
+type PacketaProvider struct{}
 
 func (dp *PacketaProvider) GetName() string {
 	return "packeta"
@@ -32,7 +31,6 @@ func (dp *PacketaProvider) MatchesNumber(trackingNumber string) bool {
 }
 
 func (dp *PacketaProvider) Track(ctx context.Context, trackingNumber string) (*commondata.TrackingData, error) {
-
 	req, err := http.NewRequestWithContext(
 		ctx,
 		"GET",
@@ -45,10 +43,10 @@ func (dp *PacketaProvider) Track(ctx context.Context, trackingNumber string) (*c
 	commondata.SetCommonHTTPHeaders(&req.Header)
 	req.Header.Add("Content-type", "application/x-www-form-urlencoded")
 	httpResponse, err := http.DefaultClient.Do(req)
-
 	if err != nil {
 		return nil, commonerrors.NewNetworkError(dp.GetName(), req)
 	}
+	defer httpResponse.Body.Close()
 
 	if httpResponse.StatusCode != 200 {
 		return nil, fmt.Errorf("HTTP status code %v", httpResponse.StatusCode)

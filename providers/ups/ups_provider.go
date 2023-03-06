@@ -16,8 +16,7 @@ import (
 	"github.com/alufers/paczkobot/commonerrors"
 )
 
-type UPSProvider struct {
-}
+type UPSProvider struct{}
 
 func (pp *UPSProvider) GetName() string {
 	return "ups"
@@ -28,7 +27,6 @@ func (pp *UPSProvider) MatchesNumber(trackingNumber string) bool {
 }
 
 func (pp *UPSProvider) Track(ctx context.Context, trackingNumber string) (*commondata.TrackingData, error) {
-
 	jar, err := cookiejar.New(nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create cookie jar: %w", err)
@@ -42,17 +40,15 @@ func (pp *UPSProvider) Track(ctx context.Context, trackingNumber string) (*commo
 		"https://www.ups.com/track?loc=en_US&requester=ST/trackdetails",
 		nil,
 	)
-
 	if err != nil {
 		return nil, fmt.Errorf("failed to create GET request to tracking page: %w", err)
 	}
 	commondata.SetCommonHTTPHeaders(&req.Header)
 	httpResponse, err := client.Do(req)
-
 	if err != nil {
 		return nil, commonerrors.NewNetworkError(pp.GetName(), req)
 	}
-
+	defer httpResponse.Body.Close()
 	if httpResponse.StatusCode != 200 {
 		return nil, fmt.Errorf("HTTP home page status code %v", httpResponse.StatusCode)
 	}
@@ -69,6 +65,9 @@ func (pp *UPSProvider) Track(ctx context.Context, trackingNumber string) (*commo
 		"TrackingNumber": []interface{}{trackingNumber},
 		"returnToValue":  "",
 	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal request body: %w", err)
+	}
 	req, err = http.NewRequestWithContext(
 		ctx,
 		"POST",
@@ -86,7 +85,7 @@ func (pp *UPSProvider) Track(ctx context.Context, trackingNumber string) (*commo
 	if err != nil {
 		return nil, commonerrors.NewNetworkError(pp.GetName(), req)
 	}
-
+	defer httpResponse.Body.Close()
 	if httpResponse.StatusCode != 200 {
 		return nil, fmt.Errorf("HTTP status code %v", httpResponse.StatusCode)
 	}

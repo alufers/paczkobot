@@ -7,8 +7,7 @@ import (
 	"github.com/xeonx/timeago"
 )
 
-type PackagePrinterService struct {
-}
+type PackagePrinterService struct{}
 
 func NewPackagePrinterService() *PackagePrinterService {
 	return &PackagePrinterService{}
@@ -24,7 +23,7 @@ func (s *PackagePrinterService) PrintPackages(followedPackages []FollowedPackage
 			if customName != "" {
 				customName += " "
 			}
-			customName = fmt.Sprintf("from %s", p.FollowedPackage.FromName)
+			customName += fmt.Sprintf("from %s", p.FollowedPackage.FromName)
 		}
 		if customName != "" {
 			customName = fmt.Sprintf(" <i>(%s)</i>", customName)

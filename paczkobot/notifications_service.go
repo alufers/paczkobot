@@ -64,7 +64,6 @@ func (s *NotificationsService) sendNotificationsForUser(tgUser *FollowedPackageT
 		Preload("FollowedPackageTelegramUser").
 		Preload("FollowedPackageProvider.FollowedPackage").
 		Find(&notifications).Error; err != nil {
-
 		return fmt.Errorf("failed to fetch notifications for user %v: %w", tgUser.TelegramUserID, err)
 	}
 	if len(notifications) == 0 {
@@ -113,7 +112,6 @@ func (s *NotificationsService) sendNotificationsForUser(tgUser *FollowedPackageT
 	if len(keyboard) > 0 {
 		msg.ReplyMarkup = tgbotapi.NewInlineKeyboardMarkup(keyboard...)
 	}
-	
 
 	if _, err := s.app.Bot.Send(msg); err != nil {
 		return fmt.Errorf("failed to send notifications to chat %v: %w", tgUser.ChatID, err)

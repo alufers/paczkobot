@@ -15,7 +15,6 @@ func NewFollowService(app *BotApp) *FollowService {
 }
 
 func (f *FollowService) FollowPackage(ctx context.Context, shipmentNumber string, telegramUserID int64, chatID int64, providersToFollow []*FollowedPackageProvider, followedPackage *FollowedPackage) error {
-
 	followedPackage.TrackingNumber = shipmentNumber
 	followedPackage.LastAutomaticCheck = time.Now()
 	followedPackage.LastChange = time.Now()

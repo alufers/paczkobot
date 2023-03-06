@@ -2,12 +2,12 @@ package paczkobot
 
 import (
 	"fmt"
-	"github.com/alufers/paczkobot/providers"
 	"strings"
+
+	"github.com/alufers/paczkobot/providers"
 )
 
-type AvailableProvidersExtraHelp struct {
-}
+type AvailableProvidersExtraHelp struct{}
 
 func (a *AvailableProvidersExtraHelp) Help() string {
 	providerNames := []string{}

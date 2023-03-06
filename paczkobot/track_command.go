@@ -24,7 +24,7 @@ func (s *TrackCommand) Aliases() []string {
 
 func (s *TrackCommand) Arguments() []*CommandDefArgument {
 	return []*CommandDefArgument{
-		&CommandDefArgument{
+		{
 			Name:        "shipmentNumber",
 			Description: "shipment number of the package",
 			Question:    "Please enter the shipment number to track:",
@@ -47,7 +47,6 @@ type providerReply struct {
 }
 
 func (t *TrackCommand) Execute(ctx context.Context, args *CommandArguments) error {
-
 	shipmentNumber, err := args.GetOrAskForArgument("shipmentNumber")
 	if err != nil {
 		return err
@@ -133,7 +132,7 @@ func (t *TrackCommand) Execute(ctx context.Context, args *CommandArguments) erro
 			statuses[rep.provider.GetName()] = "🔎 " + status
 			sendStatuses()
 
-			var longTracking = fmt.Sprintf("Detailed tracking for package <i>%v</i> provided by <b>%v</b>:\n", rep.data.ShipmentNumber, rep.data.ProviderName)
+			longTracking := fmt.Sprintf("Detailed tracking for package <i>%v</i> provided by <b>%v</b>:\n", rep.data.ShipmentNumber, rep.data.ProviderName)
 
 			for i, ts := range rep.data.TrackingSteps {
 				shouldBold := i == len(rep.data.TrackingSteps)-1

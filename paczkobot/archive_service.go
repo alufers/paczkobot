@@ -28,8 +28,8 @@ func (s *ArchiveService) FetchAndArchivePackagesForUser(telegramUserID int64) er
 	return s.ArchivePackagesIfNeeded(followedPackages)
 }
 
-//ArchivePackagesIfNeeded checks whether the passed packages meet the criteria to be archived
-//FollowedPackage and FollowedPackage.FollowedPackageProviders must be preloaded
+// ArchivePackagesIfNeeded checks whether the passed packages meet the criteria to be archived
+// FollowedPackage and FollowedPackage.FollowedPackageProviders must be preloaded
 func (s *ArchiveService) ArchivePackagesIfNeeded(packages []FollowedPackageTelegramUser) error {
 	for _, p := range packages {
 		if s.shouldArchivePackage(p) {

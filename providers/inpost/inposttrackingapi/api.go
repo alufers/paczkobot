@@ -28,7 +28,7 @@ func GetTrackingData(ctx context.Context, parcelNumber string) (*TrackingAPISche
 		if resp.StatusCode == 404 {
 			return nil, commonerrors.NotFoundError
 		}
-		return nil, fmt.Errorf("recieved HTTP error code from tracking endpoint %v, HTTP body: %v", resp.StatusCode, string(data))
+		return nil, fmt.Errorf("received HTTP error code from tracking endpoint %v, HTTP body: %v", resp.StatusCode, string(data))
 	}
 	decoder := json.NewDecoder(resp.Body)
 	trackingData := &TrackingAPISchema{}

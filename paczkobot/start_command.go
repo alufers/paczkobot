@@ -28,7 +28,6 @@ func (s *StartCommand) Help() string {
 }
 
 func (s *StartCommand) Execute(ctx context.Context, args *CommandArguments) error {
-
 	categoriesHelp := map[string][]Command{}
 	for _, cmd := range s.App.Commands {
 		if cmdWithCat, ok := cmd.(CommandWithCategory); ok {

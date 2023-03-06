@@ -22,8 +22,7 @@ var codeMappings = map[string]commondata.CommonTrackingStepType{
 	"P_D":   commondata.CommonTrackingStepType_DELIVERED,
 }
 
-type PocztaPolskaProvider struct {
-}
+type PocztaPolskaProvider struct{}
 
 func (ip *PocztaPolskaProvider) GetName() string {
 	return "poczta-polska"
@@ -56,7 +55,6 @@ func EscapeXML(d string) string {
 }
 
 func (ip *PocztaPolskaProvider) Track(ctx context.Context, trackingNumber string) (*commondata.TrackingData, error) {
-
 	req, err := http.NewRequestWithContext(ctx, "POST", "https://tt.poczta-polska.pl/Sledzenie/services/Sledzenie?wsdl", strings.NewReader(fmt.Sprintf(`
 	<soapenv:Envelope   xmlns:sled="http://sledzenie.pocztapolska.pl" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
     <soapenv:Header>
@@ -81,10 +79,10 @@ func (ip *PocztaPolskaProvider) Track(ctx context.Context, trackingNumber string
 	}
 	req.Header.Add("Content-type", "text/xml")
 	httpResponse, err := http.DefaultClient.Do(req)
-
 	if err != nil {
 		return nil, commonerrors.NewNetworkError(ip.GetName(), req)
 	}
+	defer httpResponse.Body.Close()
 
 	if httpResponse.StatusCode != 200 {
 		return nil, fmt.Errorf("HTTP status code: %v", httpResponse.StatusCode)
@@ -93,9 +91,9 @@ func (ip *PocztaPolskaProvider) Track(ctx context.Context, trackingNumber string
 	if err != nil {
 		return nil, fmt.Errorf("failed to read XMl response from PP: %w", err)
 	}
-	//log.Printf("xmlData = %v", string(data))
+	// log.Printf("xmlData = %v", string(data))
 
-	var resp = &SledzEnvelope{}
+	resp := &SledzEnvelope{}
 	if err := xml.Unmarshal(data, resp); err != nil {
 		return nil, fmt.Errorf("failed to decode XMl response from PP: %w", err)
 	}
@@ -132,5 +130,4 @@ func (ip *PocztaPolskaProvider) Track(ctx context.Context, trackingNumber string
 		td.Destination = *up.Nazwa
 	}
 	return td, nil
-
 }

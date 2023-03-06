@@ -25,7 +25,6 @@ func (s *ArchivedCommand) Help() string {
 }
 
 func (s *ArchivedCommand) Execute(ctx context.Context, args *CommandArguments) error {
-
 	if err := s.App.ArchiveService.FetchAndArchivePackagesForUser(args.FromUserID); err != nil {
 		log.Printf("failed to fetch and archive packages for user %v: %v", args.FromUserID, err)
 	}

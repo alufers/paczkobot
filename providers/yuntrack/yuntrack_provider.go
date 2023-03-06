@@ -12,8 +12,7 @@ import (
 	"github.com/alufers/paczkobot/commonerrors"
 )
 
-type YunTrack struct {
-}
+type YunTrack struct{}
 
 func (p *YunTrack) GetName() string {
 	return "yuntrack"
@@ -25,7 +24,6 @@ func (p *YunTrack) MatchesNumber(trackingNumber string) bool {
 }
 
 func (p *YunTrack) Track(ctx context.Context, trackingNumber string) (*commondata.TrackingData, error) {
-
 	bodyData := &YunTrackRequest{
 		CaptchaVerification: "",
 		Year:                0,
@@ -39,7 +37,7 @@ func (p *YunTrack) Track(ctx context.Context, trackingNumber string) (*commondat
 	req, err := http.NewRequestWithContext(
 		ctx,
 		"POST",
-		fmt.Sprintf("https://services.yuntrack.com/Track/Query"),
+		"https://services.yuntrack.com/Track/Query",
 		bytes.NewBuffer(bodyBytes),
 	)
 	if err != nil {
@@ -83,6 +81,7 @@ func (p *YunTrack) Track(ctx context.Context, trackingNumber string) (*commondat
 	if err != nil {
 		return nil, commonerrors.NewNetworkError(p.GetName(), req)
 	}
+	defer res.Body.Close()
 	if res.StatusCode == http.StatusNotFound {
 		return nil, commonerrors.NotFoundError
 	}

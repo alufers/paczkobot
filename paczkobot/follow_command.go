@@ -22,7 +22,7 @@ func (s *FollowCommand) Aliases() []string {
 
 func (s *FollowCommand) Arguments() []*CommandDefArgument {
 	return []*CommandDefArgument{
-		&CommandDefArgument{
+		{
 			Name:        "shipmentNumber",
 			Description: "shipment number of the package",
 			Question:    "Please enter the shipment number:",

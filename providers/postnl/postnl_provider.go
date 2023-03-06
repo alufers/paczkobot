@@ -15,8 +15,7 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-type PostnlProvider struct {
-}
+type PostnlProvider struct{}
 
 func (pp *PostnlProvider) GetName() string {
 	return "postnl"
@@ -27,7 +26,6 @@ func (pp *PostnlProvider) MatchesNumber(trackingNumber string) bool {
 }
 
 func (pp *PostnlProvider) Track(ctx context.Context, trackingNumber string) (*commondata.TrackingData, error) {
-
 	//await fetch("https://postnl.post/details/", {
 	//"credentials": "include",
 	//"headers": {
@@ -59,10 +57,10 @@ func (pp *PostnlProvider) Track(ctx context.Context, trackingNumber string) (*co
 	commondata.SetCommonHTTPHeaders(&req.Header)
 	req.Header.Add("Content-type", "application/x-www-form-urlencoded")
 	httpResponse, err := http.DefaultClient.Do(req)
-
 	if err != nil {
 		return nil, commonerrors.NewNetworkError(pp.GetName(), req)
 	}
+	defer httpResponse.Body.Close()
 
 	if httpResponse.StatusCode != 200 {
 		return nil, fmt.Errorf("HTTP status code %v", httpResponse.StatusCode)

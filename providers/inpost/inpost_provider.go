@@ -25,8 +25,7 @@ var statusMappings = map[string]commondata.CommonTrackingStepType{
 	"delivered":            commondata.CommonTrackingStepType_DELIVERED,
 }
 
-type InpostProvider struct {
-}
+type InpostProvider struct{}
 
 var inpostNumberRegex = regexp.MustCompile(`^\d{24}$`)
 

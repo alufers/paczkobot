@@ -28,7 +28,6 @@ func (s *UnfollowAllCommand) Category() string {
 }
 
 func (s *UnfollowAllCommand) Execute(ctx context.Context, args *CommandArguments) error {
-
 	followedPackages := []*FollowedPackageTelegramUser{}
 
 	if err := s.App.DB.Where("chat_id = ?", args.ChatID).Preload("FollowedPackage").Find(&followedPackages).Error; err != nil {

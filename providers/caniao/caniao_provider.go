@@ -15,8 +15,7 @@ import (
 	"github.com/alufers/paczkobot/commonerrors"
 )
 
-type CaniaoProvider struct {
-}
+type CaniaoProvider struct{}
 
 func (pp *CaniaoProvider) GetName() string {
 	return "caniao"
@@ -27,7 +26,6 @@ func (pp *CaniaoProvider) MatchesNumber(trackingNumber string) bool {
 }
 
 func (pp *CaniaoProvider) Track(ctx context.Context, trackingNumber string) (*commondata.TrackingData, error) {
-
 	requestData := url.Values{}
 	requestData.Set("barcodes", trackingNumber)
 
@@ -41,10 +39,10 @@ func (pp *CaniaoProvider) Track(ctx context.Context, trackingNumber string) (*co
 	}
 	commondata.SetCommonHTTPHeaders(&req.Header)
 	httpResponse, err := http.DefaultClient.Do(req)
-
 	if err != nil {
 		return nil, commonerrors.NewNetworkError(pp.GetName(), req)
 	}
+	defer httpResponse.Body.Close()
 
 	if httpResponse.StatusCode != 200 {
 		return nil, fmt.Errorf("HTTP status code %v", httpResponse.StatusCode)
@@ -80,10 +78,7 @@ func (pp *CaniaoProvider) Track(ctx context.Context, trackingNumber string) (*co
 	}
 	for _, d := range trackingData.Data[0].Section2.DetailList {
 		t, _ := time.Parse("2006-01-02 15:04:05", d.Time)
-		status := d.Status
-		if status == "" {
-			status = d.Desc
-		}
+
 		td.TrackingSteps = append(td.TrackingSteps, &commondata.TrackingStep{
 			Datetime:   t,
 			CommonType: commondata.CommonTrackingStepType_UNKNOWN,

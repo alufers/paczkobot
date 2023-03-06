@@ -29,7 +29,6 @@ func (f *InpostScanCommand) Category() string {
 }
 
 func (f *InpostScanCommand) Execute(ctx context.Context, args *CommandArguments) error {
-
 	creds := []*inpostextra.InpostCredentials{}
 	if err := f.App.DB.Where("telegram_user_id = ?", args.FromUserID).Find(&creds).Error; err != nil {
 		return fmt.Errorf("failed to get inpost credentials: %v", err)

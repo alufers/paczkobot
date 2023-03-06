@@ -28,8 +28,7 @@ var descriptionMappings = map[string]commondata.CommonTrackingStepType{
 	"DHL otrzymał dane elektroniczne przesyłki.":   commondata.CommonTrackingStepType_INFORMATION_PREPARED,
 }
 
-type DHLProvider struct {
-}
+type DHLProvider struct{}
 
 func (pp *DHLProvider) GetName() string {
 	return "dhl"
@@ -40,7 +39,6 @@ func (pp *DHLProvider) MatchesNumber(trackingNumber string) bool {
 }
 
 func (pp *DHLProvider) Track(ctx context.Context, trackingNumber string) (*commondata.TrackingData, error) {
-
 	client := &http.Client{}
 
 	req, err := http.NewRequestWithContext(
@@ -49,17 +47,16 @@ func (pp *DHLProvider) Track(ctx context.Context, trackingNumber string) (*commo
 		fmt.Sprintf("https://api-eu.dhl.com/track/shipments?trackingNumber=%v", trackingNumber),
 		nil,
 	)
-
 	if err != nil {
 		return nil, fmt.Errorf("failed to create POST request to tracking page: %w", err)
 	}
 	commondata.SetCommonHTTPHeaders(&req.Header)
 	req.Header.Set("DHL-API-Key", viper.GetString("tracking.providers.dhl.api_key"))
 	httpResponse, err := client.Do(req)
-
 	if err != nil {
 		return nil, commonerrors.NewNetworkError(pp.GetName(), req)
 	}
+	defer httpResponse.Body.Close()
 	if httpResponse.StatusCode == http.StatusNotFound {
 		return nil, commonerrors.NotFoundError
 	}

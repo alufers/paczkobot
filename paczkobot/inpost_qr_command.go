@@ -39,7 +39,6 @@ func (f *InpostQrCommand) Category() string {
 }
 
 func (f *InpostQrCommand) Execute(ctx context.Context, args *CommandArguments) error {
-
 	suggestions := map[string]string{}
 	followedPackages := []FollowedPackageTelegramUser{}
 
@@ -90,6 +89,9 @@ func (f *InpostQrCommand) Execute(ctx context.Context, args *CommandArguments) e
 		if p.OpenCode != "" {
 			var png []byte
 			png, err := qrcode.Encode(p.QrCode, qrcode.High, 256)
+			if err != nil {
+				return fmt.Errorf("failed to generate QR code: %w", err)
+			}
 
 			photo := tgbotapi.NewPhoto(args.update.Message.Chat.ID, tgbotapi.FileBytes{Name: "qr.png", Bytes: png})
 			photo.Caption = fmt.Sprintf(

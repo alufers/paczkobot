@@ -81,7 +81,6 @@ func (a *AskService) ProcessIncomingMessage(update tgbotapi.Update) bool {
 // AskForArgument asks the user at the specified chatID for a text value.
 // suggestionsArr should contain the map of suggestions where the key is the value that will be returned and the value is the text that will be displayed to the user.
 func (a *AskService) AskForArgument(chatID int64, question string, suggestionsArr ...map[string]string) (string, error) {
-
 	suggestions := map[string]string{}
 	if len(suggestionsArr) != 0 {
 		suggestions = suggestionsArr[0]
@@ -112,7 +111,7 @@ func (a *AskService) AskForArgument(chatID int64, question string, suggestionsAr
 
 	msg.ReplyToMessageID = 0
 	msg.ParseMode = "HTML"
-	_, err := a.BotApp.Bot.Send(msg) //sendMsg
+	_, err := a.BotApp.Bot.Send(msg) // sendMsg
 	if err != nil {
 		return "", err
 	}
@@ -192,7 +191,6 @@ func (a *AskService) Confirm(chatID int64, question string) error {
 		a.AskCallbacksMutex.Lock()
 		defer a.AskCallbacksMutex.Unlock()
 		a.AskCallbacks[chatID] = func(answer string, err error) {
-
 			if err != nil {
 				select {
 				case retChan <- err:
@@ -225,5 +223,4 @@ func (a *AskService) Confirm(chatID int64, question string) error {
 		delete(a.AskCallbacks, chatID)
 		return errors.New("timed out while waiting for answer")
 	}
-
 }

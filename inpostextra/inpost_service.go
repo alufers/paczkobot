@@ -163,7 +163,7 @@ func (s *InpostService) ReauthenticateIfNeeded(db *gorm.DB, creds *InpostCredent
 	claims := tok.Claims.(*jwt.StandardClaims)
 	expirationDate := time.Unix(claims.ExpiresAt, 0)
 	if expirationDate.Before(time.Now()) {
-		log.Printf("Inpost token for phone number %v expired %v ago, refreshing...", creds.PhoneNumber, time.Now().Sub(expirationDate))
+		log.Printf("Inpost token for phone number %v expired %v ago, refreshing...", creds.PhoneNumber, time.Since(expirationDate))
 		err := s.Authenticate(creds)
 		if err != nil {
 			return err
@@ -190,7 +190,6 @@ func (s *InpostService) GetParcel(db *gorm.DB, creds *InpostCredentials, shipmen
 		return nil, err
 	}
 	return out, nil
-
 }
 
 func (s *InpostService) GetUserParcels(db *gorm.DB, creds *InpostCredentials) ([]*InpostParcel, error) {

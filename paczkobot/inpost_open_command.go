@@ -37,7 +37,6 @@ func (f *InpostOpenCommand) Category() string {
 }
 
 func (f *InpostOpenCommand) Execute(ctx context.Context, args *CommandArguments) error {
-
 	suggestions := map[string]string{}
 	followedPackages := []FollowedPackageTelegramUser{}
 
