@@ -55,3 +55,11 @@ tracking:
 ```
 
 You have to enter your telegram token there.
+
+## Contributing
+
+Contributions are welcome! Please open an issue or a pull request.
+
+Please note that this repository uses [pre-commit](https://pre-commit.com/) to run some checks on the code before committing. You can install it with `pip install pre-commit` and then run `pre-commit install` to install the git hooks.
+
+Thank you!
