@@ -3,10 +3,10 @@ linters:
     - bodyclose
     - gofmt
     - gofumpt
-    # - durationcheck
-    # - misspell
-    # - nilnil
-    # - nilerr
-    # - unconvert
+    - durationcheck
+    - misspell
+    - nilnil
+    - nilerr
+    - unconvert
   disable:
     - errcheck
