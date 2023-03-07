@@ -31,3 +31,6 @@ paczkobot_dev.db
 mock-package.json
 deobfuscated
 paczkobot.db
+
+.DS_Store
+
