@@ -179,7 +179,11 @@ func (t *TrackCommand) Execute(ctx context.Context, args *CommandArguments) erro
 					tgbotapi.NewInlineKeyboardButtonData("🚶 Follow this package", fmt.Sprintf("/follow %v", rep.data.ShipmentNumber)),
 				),
 			)
-			t.App.Bot.Send(msg)
+			_, err := t.App.Bot.Send(msg)
+			if err != nil {
+				return err
+			}
+
 		}
 	}
 

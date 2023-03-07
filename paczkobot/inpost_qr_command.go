@@ -107,6 +107,6 @@ func (f *InpostQrCommand) Execute(ctx context.Context, args *CommandArguments) e
 	}
 
 	msg := tgbotapi.NewMessage(args.ChatID, "No account of yours can access the package: "+trackingNumber)
-	f.App.Bot.Send(msg)
+	_, err = f.App.Bot.Send(msg)
 	return err
 }

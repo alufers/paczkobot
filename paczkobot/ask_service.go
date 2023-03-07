@@ -33,7 +33,10 @@ func (a *AskService) ProcessIncomingMessage(update tgbotapi.Update) bool {
 		chatID := update.CallbackQuery.Message.Chat.ID
 		if update.CallbackQuery.Data == "/cancel" {
 			if callback, ok := a.AskCallbacks[chatID]; ok {
-				a.BotApp.Bot.Send(tgbotapi.NewCallback(update.CallbackQuery.ID, "Canceled"))
+				_, err := a.BotApp.Bot.Send(tgbotapi.NewCallback(update.CallbackQuery.ID, "Canceled"))
+				if err != nil {
+					log.Printf("Error sending callback: %v", err)
+				}
 				callback("", errors.New("canceled"))
 				delete(a.AskCallbacks, chatID)
 			}
@@ -41,7 +44,10 @@ func (a *AskService) ProcessIncomingMessage(update tgbotapi.Update) bool {
 		}
 		if update.CallbackQuery.Data == "/yes" {
 			if callback, ok := a.AskCallbacks[chatID]; ok {
-				a.BotApp.Bot.Send(tgbotapi.NewCallback(update.CallbackQuery.ID, "Confirmed"))
+				_, err := a.BotApp.Bot.Send(tgbotapi.NewCallback(update.CallbackQuery.ID, "Confirmed"))
+				if err != nil {
+					log.Printf("Error sending callback: %v", err)
+				}
 				callback("", nil)
 				delete(a.AskCallbacks, chatID)
 			}
@@ -50,7 +56,10 @@ func (a *AskService) ProcessIncomingMessage(update tgbotapi.Update) bool {
 		if strings.HasPrefix(update.CallbackQuery.Data, "/sugg ") {
 			val := strings.TrimPrefix(update.CallbackQuery.Data, "/sugg ")
 			if callback, ok := a.AskCallbacks[chatID]; ok {
-				a.BotApp.Bot.Send(tgbotapi.NewCallback(update.CallbackQuery.ID, "Suggested "+val))
+				_, err := a.BotApp.Bot.Send(tgbotapi.NewCallback(update.CallbackQuery.ID, "Suggested "+val))
+				if err != nil {
+					log.Printf("Error sending callback: %v", err)
+				}
 				callback(val, nil)
 				delete(a.AskCallbacks, chatID)
 			}
@@ -68,7 +77,10 @@ func (a *AskService) ProcessIncomingMessage(update tgbotapi.Update) bool {
 		}
 
 		if callback, ok := a.AskCallbacks[update.Message.Chat.ID]; ok {
-			a.BotApp.Bot.Send(tgbotapi.NewDeleteMessage(update.Message.Chat.ID, update.Message.MessageID))
+			_, err := a.BotApp.Bot.Send(tgbotapi.NewDeleteMessage(update.Message.Chat.ID, update.Message.MessageID))
+			if err != nil {
+				log.Printf("Error deleting message: %v", err)
+			}
 			callback(update.Message.Text, nil)
 			delete(a.AskCallbacks, update.Message.Chat.ID)
 			return true

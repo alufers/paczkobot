@@ -30,7 +30,10 @@ func Run() {
 
 	err := viper.ReadInConfig() // Find and read the config file
 	if err != nil {             // Handle errors reading the config file
-		viper.SafeWriteConfig()
+		err := viper.SafeWriteConfig()
+		if err != nil {
+			log.Fatalf("failed to write config file: %v", err)
+		}
 		log.Fatalf("config file: %v", err)
 	}
 

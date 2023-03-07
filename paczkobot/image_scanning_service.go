@@ -99,7 +99,10 @@ func (i *ImageScanningService) ScanIncomingImage(ctx context.Context, args *Comm
 		reader := readerConstructor()
 		readerName := fmt.Sprintf("%T", reader)
 		readerName = strings.TrimPrefix(strings.TrimSuffix(readerName, "Reader"), "*oned.")
-		progress.UpdateText(fmt.Sprintf("(2/2) Scanning %v image for barcodes... (using %v)", imgType, readerName))
+		err := progress.UpdateText(fmt.Sprintf("(2/2) Scanning %v image for barcodes... (using %v)", imgType, readerName))
+		if err != nil {
+			return fmt.Errorf("failed to update progress message: %s", err)
+		}
 		result, err := reader.Decode(bmp, map[gozxing.DecodeHintType]interface{}{
 			gozxing.DecodeHintType_TRY_HARDER: true,
 		})
@@ -114,7 +117,9 @@ func (i *ImageScanningService) ScanIncomingImage(ctx context.Context, args *Comm
 		}
 	}
 
-	progress.Delete()
+	if err := progress.Delete(); err != nil {
+		log.Printf("failed to delete progress message: %s", err)
+	}
 
 	for _, candidate := range shipmentNumberCandidates {
 

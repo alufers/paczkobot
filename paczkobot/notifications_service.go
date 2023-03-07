@@ -50,7 +50,10 @@ func (s *NotificationsService) NotifyProviderStatusChanged(provider providers.Pr
 		}
 		go func(u *FollowedPackageTelegramUser) {
 			time.Sleep(time.Second * 30)
-			s.sendNotificationsForUser(u)
+			err := s.sendNotificationsForUser(u)
+			if err != nil {
+				log.Printf("failed to send notifications for user %v: %v", u.TelegramUserID, err)
+			}
 		}(u)
 	}
 

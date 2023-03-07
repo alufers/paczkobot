@@ -46,7 +46,10 @@ func (f *FollowCommand) Execute(ctx context.Context, args *CommandArguments) err
 		return fmt.Errorf("failed to send loading message: %w", err)
 	}
 	defer func() {
-		f.App.Bot.Send(tgbotapi.NewDeleteMessage(args.ChatID, loadingRes.MessageID))
+		_, err := f.App.Bot.Send(tgbotapi.NewDeleteMessage(args.ChatID, loadingRes.MessageID))
+		if err != nil {
+			log.Printf("failed to delete loading message: %v", err)
+		}
 	}()
 
 	shipmentNumber, err := args.GetOrAskForArgument("shipmentNumber")

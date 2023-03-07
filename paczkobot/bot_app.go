@@ -167,7 +167,10 @@ func (a *BotApp) Run() {
 				if update.Message != nil {
 					msg.ReplyToMessageID = update.Message.MessageID
 				}
-				a.Bot.Send(msg)
+				_, err := a.Bot.Send(msg)
+				if err != nil {
+					log.Printf("An error has occurred while sending an error message: %v", err)
+				}
 			}
 		}(u)
 	}
