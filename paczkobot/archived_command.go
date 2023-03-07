@@ -46,5 +46,8 @@ Your archived packages:
 `, s.App.PackagePrinterService.PrintPackages(followedPackages)))
 	msg.ParseMode = "HTML"
 	_, err := s.App.Bot.Send(msg)
-	return err
+	if err != nil {
+		return fmt.Errorf("failed to list %d packages: %w", len(followedPackages), err)
+	}
+	return nil
 }
