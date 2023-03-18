@@ -72,7 +72,7 @@ func (s *NotificationsService) sendNotificationsForUser(tgUser *FollowedPackageT
 	if len(notifications) == 0 {
 		return nil
 	}
-	msgContents := "The following packages have new updates: \n"
+	msgContents := ""
 
 	for _, n := range notifications {
 		loc := ""
@@ -81,12 +81,12 @@ func (s *NotificationsService) sendNotificationsForUser(tgUser *FollowedPackageT
 		}
 		customName := ""
 		if n.FollowedPackageTelegramUser.CustomName != "" {
-			customName = " (" + n.FollowedPackageTelegramUser.CustomName + ")"
+			customName = n.FollowedPackageTelegramUser.CustomName + " "
 		}
-		msgContents += fmt.Sprintf("<b>%v</b>%v (%v): %v %v%v\n",
-			n.FollowedPackageProvider.FollowedPackage.TrackingNumber,
+		msgContents += fmt.Sprintf("%v(%v) <b>%v</b>: %v %v%v\n",
 			customName,
 			n.FollowedPackageProvider.ProviderName,
+			n.FollowedPackageProvider.FollowedPackage.TrackingNumber,
 			n.FollowedPackageProvider.LastStatusValue,
 			n.FollowedPackageProvider.LastStatusDate.Format("2006-01-02 15:04"),
 			loc,
