@@ -1,4 +1,4 @@
-package paczkobot
+package tghelpers
 
 import (
 	"errors"
@@ -10,15 +10,17 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
+// AskService allows commands to interactively ask questions to the user.
+// All question functions block the calling goroutine until an answer is given or a timeout happens
 type AskService struct {
-	BotApp            *BotApp
 	AskCallbacks      map[int64]func(string, error)
 	AskCallbacksMutex sync.Mutex
+	bot               BotAPI
 }
 
-func NewAskService(botApp *BotApp) *AskService {
+func NewAskService(bot BotAPI) *AskService {
 	return &AskService{
-		BotApp:       botApp,
+		bot:          bot,
 		AskCallbacks: map[int64]func(string, error){},
 	}
 }
@@ -33,7 +35,7 @@ func (a *AskService) ProcessIncomingMessage(update tgbotapi.Update) bool {
 		chatID := update.CallbackQuery.Message.Chat.ID
 		if update.CallbackQuery.Data == "/cancel" {
 			if callback, ok := a.AskCallbacks[chatID]; ok {
-				_, err := a.BotApp.Bot.Send(tgbotapi.NewCallback(update.CallbackQuery.ID, "Canceled"))
+				_, err := a.bot.Send(tgbotapi.NewCallback(update.CallbackQuery.ID, "Canceled"))
 				if err != nil {
 					log.Printf("Error sending callback: %v", err)
 				}
@@ -44,7 +46,7 @@ func (a *AskService) ProcessIncomingMessage(update tgbotapi.Update) bool {
 		}
 		if update.CallbackQuery.Data == "/yes" {
 			if callback, ok := a.AskCallbacks[chatID]; ok {
-				_, err := a.BotApp.Bot.Send(tgbotapi.NewCallback(update.CallbackQuery.ID, "Confirmed"))
+				_, err := a.bot.Send(tgbotapi.NewCallback(update.CallbackQuery.ID, "Confirmed"))
 				if err != nil {
 					log.Printf("Error sending callback: %v", err)
 				}
@@ -56,7 +58,7 @@ func (a *AskService) ProcessIncomingMessage(update tgbotapi.Update) bool {
 		if strings.HasPrefix(update.CallbackQuery.Data, "/sugg ") {
 			val := strings.TrimPrefix(update.CallbackQuery.Data, "/sugg ")
 			if callback, ok := a.AskCallbacks[chatID]; ok {
-				_, err := a.BotApp.Bot.Send(tgbotapi.NewCallback(update.CallbackQuery.ID, "Suggested "+val))
+				_, err := a.bot.Send(tgbotapi.NewCallback(update.CallbackQuery.ID, "Suggested "+val))
 				if err != nil {
 					log.Printf("Error sending callback: %v", err)
 				}
@@ -77,7 +79,7 @@ func (a *AskService) ProcessIncomingMessage(update tgbotapi.Update) bool {
 		}
 
 		if callback, ok := a.AskCallbacks[update.Message.Chat.ID]; ok {
-			_, err := a.BotApp.Bot.Send(tgbotapi.NewDeleteMessage(update.Message.Chat.ID, update.Message.MessageID))
+			_, err := a.bot.Send(tgbotapi.NewDeleteMessage(update.Message.Chat.ID, update.Message.MessageID))
 			if err != nil {
 				log.Printf("Error deleting message: %v", err)
 			}
@@ -109,25 +111,6 @@ func (a *AskService) AskForArgument(chatID int64, question string, suggestionsAr
 			)
 		}
 	}
-	msg := tgbotapi.NewMessage(chatID, question)
-	if len(suggestions) > 0 {
-		msg.ReplyMarkup = tgbotapi.InlineKeyboardMarkup{
-			InlineKeyboard: extraButtons,
-		}
-	} else {
-		msg.ReplyMarkup = &tgbotapi.ForceReply{
-			ForceReply:            true,
-			InputFieldPlaceholder: question,
-		}
-	}
-
-	msg.ReplyToMessageID = 0
-	msg.ParseMode = "HTML"
-	_, err := a.BotApp.Bot.Send(msg) // sendMsg
-	if err != nil {
-		return "", err
-	}
-
 	retChan := make(chan interface{})
 	func() {
 		a.AskCallbacksMutex.Lock()
@@ -148,12 +131,31 @@ func (a *AskService) AskForArgument(chatID int64, question string, suggestionsAr
 		}
 	}()
 
+	msg := tgbotapi.NewMessage(chatID, question)
+	if len(suggestions) > 0 {
+		msg.ReplyMarkup = tgbotapi.InlineKeyboardMarkup{
+			InlineKeyboard: extraButtons,
+		}
+	} else {
+		msg.ReplyMarkup = &tgbotapi.ForceReply{
+			ForceReply:            true,
+			InputFieldPlaceholder: question,
+		}
+	}
+
+	msg.ReplyToMessageID = 0
+	msg.ParseMode = "HTML"
+	_, err := a.bot.Send(msg) // sendMsg
+	if err != nil {
+		return "", err
+	}
+
 	timeout := time.After(time.Second * 60 * 10)
 	select {
 	case answer := <-retChan:
 		switch v := answer.(type) {
 		case string:
-			// _, err := a.BotApp.Bot.Send(tgbotapi.NewEditMessageText(
+			// _, err := a.bot.Send(tgbotapi.NewEditMessageText(
 			// 	chatID,
 			// 	sentMsg.MessageID,
 			// 	question+" "+v,
@@ -166,17 +168,17 @@ func (a *AskService) AskForArgument(chatID int64, question string, suggestionsAr
 			// }
 			return v, nil
 		case error:
-			// a.BotApp.Bot.Send(tgbotapi.NewDeleteMessage(chatID, sentMsg.MessageID))
+			// a.bot.Send(tgbotapi.NewDeleteMessage(chatID, sentMsg.MessageID))
 			return "", v
 		default:
-			// a.BotApp.Bot.Send(tgbotapi.NewDeleteMessage(chatID, sentMsg.MessageID))
+			// a.bot.Send(tgbotapi.NewDeleteMessage(chatID, sentMsg.MessageID))
 			return "", errors.New("unknown answer type")
 		}
 	case <-timeout:
 		a.AskCallbacksMutex.Lock()
 		defer a.AskCallbacksMutex.Unlock()
 		delete(a.AskCallbacks, chatID)
-		// a.BotApp.Bot.Send(tgbotapi.NewDeleteMessage(chatID, sentMsg.MessageID))
+		// a.bot.Send(tgbotapi.NewDeleteMessage(chatID, sentMsg.MessageID))
 		return "", errors.New("timed out while waiting for answer")
 	}
 }
@@ -194,7 +196,7 @@ func (a *AskService) Confirm(chatID int64, question string) error {
 
 	msg.ReplyToMessageID = 0
 	msg.ParseMode = "HTML"
-	_, err := a.BotApp.Bot.Send(msg) // sentMsg
+	_, err := a.bot.Send(msg) // sentMsg
 	if err != nil {
 		return err
 	}
@@ -217,7 +219,7 @@ func (a *AskService) Confirm(chatID int64, question string) error {
 			}
 		}
 	}()
-	// defer a.BotApp.Bot.Send(tgbotapi.NewDeleteMessage(chatID, sentMsg.MessageID))
+	// defer a.bot.Send(tgbotapi.NewDeleteMessage(chatID, sentMsg.MessageID))
 	timeout := time.After(time.Second * 60 * 10)
 	select {
 	case answer := <-retChan:

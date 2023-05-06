@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/alufers/paczkobot/inpostextra"
+	"github.com/alufers/paczkobot/tghelpers"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"gorm.io/gorm"
 )
@@ -20,7 +21,7 @@ type BotApp struct {
 	BaseHTTPClient        *http.Client
 	NotificationsService  *NotificationsService
 	TrackingService       *TrackingService
-	AskService            *AskService
+	AskService            *tghelpers.AskService
 	TranslationService    *TranslationService
 	InpostService         *inpostextra.InpostService
 	FollowService         *FollowService
@@ -61,7 +62,7 @@ func NewBotApp(b *tgbotapi.BotAPI, DB *gorm.DB) (a *BotApp) {
 		&InpostPackageNotificationHook{},
 	})
 	a.TrackingService = NewTrackingService(a)
-	a.AskService = NewAskService(a)
+	a.AskService = tghelpers.NewAskService(a.Bot)
 	a.TranslationService = NewTranslationService()
 	a.InpostService = inpostextra.NewInpostService(a.BaseHTTPClient)
 	a.FollowService = NewFollowService(a)
