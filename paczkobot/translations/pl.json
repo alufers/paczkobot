@@ -1,0 +1,8 @@
+{
+  "commonTrackingStepType.INFORMATION_PREPARED": "Informacje o paczce zostały wprowadzone do systemu",
+  "commonTrackingStepType.SENT": "Paczka rozpoczęła podróż",
+  "commonTrackingStepType.IN_TRANSIT": "Paczka jest w drodze",
+  "commonTrackingStepType.OUT_FOR_DELIVERY": "Paczka jest w drodze do dostarczenia",
+  "commonTrackingStepType.READY_FOR_PICKUP": "Paczka jest gotowa do odbioru",
+  "commonTrackingStepType.DELIVERED": "Paczka została dostarczona"
+}
