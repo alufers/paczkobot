@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/alufers/paczkobot/tghelpers"
 	"github.com/fogleman/gg"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/makiuchi-d/gozxing"
@@ -35,7 +36,7 @@ func NewImageScanningService(app *BotApp) *ImageScanningService {
 }
 
 func (i *ImageScanningService) ScanIncomingImage(ctx context.Context, args *CommandArguments, url string) error {
-	progress, err := NewProgressMessage(i.App.Bot, args.ChatID, "(1/2) Fetching image...")
+	progress, err := tghelpers.NewProgressMessage(i.App.Bot, args.ChatID, "(1/2) Fetching image...")
 	if err != nil {
 		return err
 	}

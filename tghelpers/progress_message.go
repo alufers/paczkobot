@@ -1,13 +1,15 @@
-package paczkobot
+package tghelpers
 
 import tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 
+// ProgressMessage is a helper struct which allows you to send a message and then update it later
+// by calling UpdateText. It also allows you to delete the message by calling Delete.
 type ProgressMessage struct {
-	Bot *tgbotapi.BotAPI
+	Bot BotAPI
 	Msg *tgbotapi.Message
 }
 
-func NewProgressMessage(bot *tgbotapi.BotAPI, chatID int64, initialText string) (*ProgressMessage, error) {
+func NewProgressMessage(bot BotAPI, chatID int64, initialText string) (*ProgressMessage, error) {
 	msg := tgbotapi.NewMessage(chatID, initialText)
 	msg.ParseMode = "HTML"
 
