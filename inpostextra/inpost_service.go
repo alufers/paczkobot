@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/alufers/paczkobot/httphelpers"
 	"github.com/dgrijalva/jwt-go"
 	"gorm.io/gorm"
 )
@@ -22,15 +23,15 @@ var (
 
 type InpostService struct {
 	BaseURL    string
-	httpClient *http.Client
+	httpClient httphelpers.Client
 }
 
-func NewInpostService() *InpostService {
+func NewInpostService(
+	httpClient httphelpers.Client,
+) *InpostService {
 	return &InpostService{
-		BaseURL: "https://api-inmobile-pl.easypack24.net",
-		httpClient: &http.Client{
-			Timeout: 10 * time.Second,
-		},
+		BaseURL:    "https://api-inmobile-pl.easypack24.net",
+		httpClient: httpClient,
 	}
 }
 

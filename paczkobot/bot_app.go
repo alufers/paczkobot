@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"html"
 	"log"
+	"net/http"
 	"strings"
 
 	"github.com/alufers/paczkobot/inpostextra"
@@ -16,6 +17,7 @@ type BotApp struct {
 	Bot                   *tgbotapi.BotAPI
 	DB                    *gorm.DB
 	Commands              []Command
+	BaseHTTPClient        *http.Client
 	NotificationsService  *NotificationsService
 	TrackingService       *TrackingService
 	AskService            *AskService
@@ -32,6 +34,9 @@ func NewBotApp(b *tgbotapi.BotAPI, DB *gorm.DB) (a *BotApp) {
 	a = &BotApp{
 		Bot: b,
 		DB:  DB,
+	}
+	a.BaseHTTPClient = &http.Client{
+		Timeout: 10,
 	}
 	a.Commands = []Command{
 		&StartCommand{App: a, ExtraHelp: []Helpable{
@@ -58,7 +63,7 @@ func NewBotApp(b *tgbotapi.BotAPI, DB *gorm.DB) (a *BotApp) {
 	a.TrackingService = NewTrackingService(a)
 	a.AskService = NewAskService(a)
 	a.TranslationService = NewTranslationService()
-	a.InpostService = inpostextra.NewInpostService()
+	a.InpostService = inpostextra.NewInpostService(a.BaseHTTPClient)
 	a.FollowService = NewFollowService(a)
 	a.InpostScannerService = NewInpostScannerService(a)
 	a.PackagePrinterService = NewPackagePrinterService()

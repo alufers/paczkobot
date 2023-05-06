@@ -1,0 +1,13 @@
+on: push
+jobs:
+  build-and-push-image:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - uses: actions/setup-go@v3
+        with:
+          go-version: '^1.20.1' # The Go version to download (if necessary) and use.
+      - name: Run unit tests
+        run: |
+          go test ./...
