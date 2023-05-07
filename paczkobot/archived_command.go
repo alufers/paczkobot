@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/alufers/paczkobot/tghelpers"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
@@ -16,15 +17,15 @@ func (s *ArchivedCommand) Aliases() []string {
 	return []string{"/archived"}
 }
 
-func (s *ArchivedCommand) Arguments() []*CommandDefArgument {
-	return []*CommandDefArgument{}
+func (s *ArchivedCommand) Arguments() []*tghelpers.CommandDefArgument {
+	return []*tghelpers.CommandDefArgument{}
 }
 
 func (s *ArchivedCommand) Help() string {
 	return "prints your archived packages"
 }
 
-func (s *ArchivedCommand) Execute(ctx context.Context, args *CommandArguments) error {
+func (s *ArchivedCommand) Execute(ctx context.Context, args *tghelpers.CommandArguments) error {
 	if err := s.App.ArchiveService.FetchAndArchivePackagesForUser(args.FromUserID); err != nil {
 		log.Printf("failed to fetch and archive packages for user %v: %v", args.FromUserID, err)
 	}

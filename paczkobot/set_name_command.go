@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/alufers/paczkobot/tghelpers"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
@@ -15,8 +16,8 @@ func (s *SetNameCommand) Aliases() []string {
 	return []string{"/setname"}
 }
 
-func (s *SetNameCommand) Arguments() []*CommandDefArgument {
-	return []*CommandDefArgument{
+func (s *SetNameCommand) Arguments() []*tghelpers.CommandDefArgument {
+	return []*tghelpers.CommandDefArgument{
 		{
 			Name:        "shipmentNumber",
 			Description: "shipment number of the package",
@@ -38,7 +39,7 @@ func (s *SetNameCommand) Category() string {
 	return "Following packages"
 }
 
-func (s *SetNameCommand) Execute(ctx context.Context, args *CommandArguments) error {
+func (s *SetNameCommand) Execute(ctx context.Context, args *tghelpers.CommandArguments) error {
 	shipmentNumber, err := args.GetOrAskForArgument("shipmentNumber")
 	if err != nil {
 		return err

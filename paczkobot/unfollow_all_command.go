@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/alufers/paczkobot/tghelpers"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
@@ -15,8 +16,8 @@ func (s *UnfollowAllCommand) Aliases() []string {
 	return []string{"/unfollowall"}
 }
 
-func (s *UnfollowAllCommand) Arguments() []*CommandDefArgument {
-	return []*CommandDefArgument{}
+func (s *UnfollowAllCommand) Arguments() []*tghelpers.CommandDefArgument {
+	return []*tghelpers.CommandDefArgument{}
 }
 
 func (s *UnfollowAllCommand) Help() string {
@@ -27,7 +28,7 @@ func (s *UnfollowAllCommand) Category() string {
 	return "Following packages"
 }
 
-func (s *UnfollowAllCommand) Execute(ctx context.Context, args *CommandArguments) error {
+func (s *UnfollowAllCommand) Execute(ctx context.Context, args *tghelpers.CommandArguments) error {
 	followedPackages := []*FollowedPackageTelegramUser{}
 
 	if err := s.App.DB.Where("chat_id = ?", args.ChatID).Preload("FollowedPackage").Find(&followedPackages).Error; err != nil {
@@ -59,7 +60,7 @@ func (s *UnfollowAllCommand) Execute(ctx context.Context, args *CommandArguments
 		}
 	}
 
-	msg := tgbotapi.NewMessage(args.update.Message.Chat.ID, fmt.Sprintf(`Removed %v followed packages!`, len(followedPackages)))
+	msg := tgbotapi.NewMessage(args.Update.Message.Chat.ID, fmt.Sprintf(`Removed %v followed packages!`, len(followedPackages)))
 	msg.ParseMode = "HTML"
 	_, err = s.App.Bot.Send(msg)
 	return err

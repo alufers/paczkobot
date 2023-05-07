@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/alufers/paczkobot/tghelpers"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
@@ -15,8 +16,8 @@ func (s *InpostLoginCommand) Aliases() []string {
 	return []string{"/inpostlogin"}
 }
 
-func (s *InpostLoginCommand) Arguments() []*CommandDefArgument {
-	return []*CommandDefArgument{}
+func (s *InpostLoginCommand) Arguments() []*tghelpers.CommandDefArgument {
+	return []*tghelpers.CommandDefArgument{}
 }
 
 func (f *InpostLoginCommand) Help() string {
@@ -27,7 +28,7 @@ func (f *InpostLoginCommand) Category() string {
 	return "Inpost"
 }
 
-func (f *InpostLoginCommand) Execute(ctx context.Context, args *CommandArguments) error {
+func (f *InpostLoginCommand) Execute(ctx context.Context, args *tghelpers.CommandArguments) error {
 	phoneNumber, err := f.App.AskService.AskForArgument(args.ChatID, "Enter your phone number associated with your inpost account:")
 	if err != nil {
 		return err

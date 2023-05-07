@@ -9,6 +9,7 @@ import (
 	"github.com/alufers/paczkobot/commondata"
 	"github.com/alufers/paczkobot/commonerrors"
 	"github.com/alufers/paczkobot/providers"
+	"github.com/alufers/paczkobot/tghelpers"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
@@ -20,8 +21,8 @@ func (s *FollowCommand) Aliases() []string {
 	return []string{"/follow"}
 }
 
-func (s *FollowCommand) Arguments() []*CommandDefArgument {
-	return []*CommandDefArgument{
+func (s *FollowCommand) Arguments() []*tghelpers.CommandDefArgument {
+	return []*tghelpers.CommandDefArgument{
 		{
 			Name:        "shipmentNumber",
 			Description: "shipment number of the package",
@@ -38,7 +39,7 @@ func (f *FollowCommand) Help() string {
 	return "follows a package and sends you an update every time its status changes"
 }
 
-func (f *FollowCommand) Execute(ctx context.Context, args *CommandArguments) error {
+func (f *FollowCommand) Execute(ctx context.Context, args *tghelpers.CommandArguments) error {
 	msg := tgbotapi.NewMessage(args.ChatID, "⌛ loading...")
 	msg.ParseMode = "HTML"
 	loadingRes, err := f.App.Bot.Send(msg)

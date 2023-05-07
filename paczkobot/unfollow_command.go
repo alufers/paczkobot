@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/alufers/paczkobot/tghelpers"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
@@ -15,8 +16,8 @@ func (s *UnfollowCommand) Aliases() []string {
 	return []string{"/unfollow"}
 }
 
-func (s *UnfollowCommand) Arguments() []*CommandDefArgument {
-	return []*CommandDefArgument{
+func (s *UnfollowCommand) Arguments() []*tghelpers.CommandDefArgument {
+	return []*tghelpers.CommandDefArgument{
 		{
 			Name:        "shipmentNumber",
 			Description: "shipment number of the package",
@@ -33,7 +34,7 @@ func (s *UnfollowCommand) Category() string {
 	return "Following packages"
 }
 
-func (s *UnfollowCommand) Execute(ctx context.Context, args *CommandArguments) error {
+func (s *UnfollowCommand) Execute(ctx context.Context, args *tghelpers.CommandArguments) error {
 	shipmentNumber, err := args.GetOrAskForArgument("shipmentNumber")
 	if err != nil {
 		return err
@@ -47,7 +48,7 @@ func (s *UnfollowCommand) Execute(ctx context.Context, args *CommandArguments) e
 
 	var currentUser *FollowedPackageTelegramUser
 	for _, tgUser := range followedPackage.FollowedPackageTelegramUsers {
-		if tgUser.ChatID == args.update.Message.Chat.ID {
+		if tgUser.ChatID == args.Update.Message.Chat.ID {
 			currentUser = tgUser
 			break
 		}
@@ -67,7 +68,7 @@ func (s *UnfollowCommand) Execute(ctx context.Context, args *CommandArguments) e
 		}
 	}
 
-	msg := tgbotapi.NewMessage(args.update.Message.Chat.ID, fmt.Sprintf(`Package %v has been unfollowed!`, shipmentNumber))
+	msg := tgbotapi.NewMessage(args.Update.Message.Chat.ID, fmt.Sprintf(`Package %v has been unfollowed!`, shipmentNumber))
 	msg.ParseMode = "HTML"
 	_, err = s.App.Bot.Send(msg)
 	return err

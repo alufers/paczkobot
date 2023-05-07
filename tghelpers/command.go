@@ -1,4 +1,4 @@
-package paczkobot
+package tghelpers
 
 import (
 	"context"
@@ -32,18 +32,18 @@ type CommandWithCategory interface {
 }
 
 type CommandArguments struct {
-	BotApp         *BotApp
-	update         *tgbotapi.Update
+	AskService     *AskService
+	Update         *tgbotapi.Update
 	CommandName    string
 	Arguments      []string
 	ChatID         int64
 	FromUserID     int64
-	namedArguments map[string]string
+	NamedArguments map[string]string
 	Command        Command
 }
 
 func (a *CommandArguments) GetOrAskForArgument(name string, suggestionsArr ...map[string]string) (string, error) {
-	if val, ok := a.namedArguments[name]; ok {
+	if val, ok := a.NamedArguments[name]; ok {
 		return val, nil
 	}
 	var cmdTemplate *CommandDefArgument
@@ -56,7 +56,7 @@ func (a *CommandArguments) GetOrAskForArgument(name string, suggestionsArr ...ma
 	if cmdTemplate == nil {
 		return "", nil
 	}
-	return a.BotApp.AskService.AskForArgument(a.ChatID, "❓ "+cmdTemplate.Question, suggestionsArr...)
+	return a.AskService.AskForArgument(a.ChatID, "❓ "+cmdTemplate.Question, suggestionsArr...)
 }
 
 func CommandMatches(cmd Command, userInput string) bool {

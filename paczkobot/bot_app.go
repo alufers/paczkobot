@@ -17,7 +17,7 @@ import (
 type BotApp struct {
 	Bot                   *tgbotapi.BotAPI
 	DB                    *gorm.DB
-	Commands              []Command
+	Commands              []tghelpers.Command
 	BaseHTTPClient        *http.Client
 	NotificationsService  *NotificationsService
 	TrackingService       *TrackingService
@@ -39,8 +39,8 @@ func NewBotApp(b *tgbotapi.BotAPI, DB *gorm.DB) (a *BotApp) {
 	a.BaseHTTPClient = &http.Client{
 		Timeout: 10,
 	}
-	a.Commands = []Command{
-		&StartCommand{App: a, ExtraHelp: []Helpable{
+	a.Commands = []tghelpers.Command{
+		&StartCommand{App: a, ExtraHelp: []tghelpers.Helpable{
 			&AvailableProvidersExtraHelp{},
 			&AuthorExtraHelp{},
 		}},
@@ -111,10 +111,10 @@ func (a *BotApp) Run() {
 			var err error
 			var cmdText string
 
-			args := &CommandArguments{
-				BotApp:         a,
-				update:         &update,
-				namedArguments: map[string]string{},
+			args := &tghelpers.CommandArguments{
+				AskService:     a.AskService,
+				Update:         &update,
+				NamedArguments: map[string]string{},
 			}
 			if update.Message != nil {
 				cmdText = update.Message.Text
@@ -132,17 +132,17 @@ func (a *BotApp) Run() {
 			didMatch := false
 			ctx := context.TODO()
 			for _, cmd := range a.Commands {
-				if CommandMatches(cmd, cmdText) {
+				if tghelpers.CommandMatches(cmd, cmdText) {
 					args.Command = cmd
 					for i, argTpl := range cmd.Arguments() {
 						if argTpl.Variadic {
-							args.namedArguments[argTpl.Name] = strings.Join(args.Arguments[i:], " ")
+							args.NamedArguments[argTpl.Name] = strings.Join(args.Arguments[i:], " ")
 							break
 						}
 						if i >= len(args.Arguments) {
 							break
 						}
-						args.namedArguments[argTpl.Name] = args.Arguments[i]
+						args.NamedArguments[argTpl.Name] = args.Arguments[i]
 					}
 
 					err = cmd.Execute(ctx, args)

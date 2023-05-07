@@ -11,6 +11,7 @@ import (
 	"github.com/alufers/paczkobot/commondata"
 	"github.com/alufers/paczkobot/commonerrors"
 	"github.com/alufers/paczkobot/providers"
+	"github.com/alufers/paczkobot/tghelpers"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
@@ -22,8 +23,8 @@ func (s *TrackCommand) Aliases() []string {
 	return []string{"/track"}
 }
 
-func (s *TrackCommand) Arguments() []*CommandDefArgument {
-	return []*CommandDefArgument{
+func (s *TrackCommand) Arguments() []*tghelpers.CommandDefArgument {
+	return []*tghelpers.CommandDefArgument{
 		{
 			Name:        "shipmentNumber",
 			Description: "shipment number of the package",
@@ -46,7 +47,7 @@ type providerReply struct {
 	err      error
 }
 
-func (t *TrackCommand) Execute(ctx context.Context, args *CommandArguments) error {
+func (t *TrackCommand) Execute(ctx context.Context, args *tghelpers.CommandArguments) error {
 	shipmentNumber, err := args.GetOrAskForArgument("shipmentNumber")
 	if err != nil {
 		return err
@@ -94,7 +95,7 @@ func (t *TrackCommand) Execute(ctx context.Context, args *CommandArguments) erro
 			msgText += fmt.Sprintf("%v: <b>%v</b>\n", n, html.EscapeString(v))
 		}
 		if msgIdToEdit != 0 {
-			msg := tgbotapi.NewEditMessageText(args.update.Message.Chat.ID, msgIdToEdit, msgText)
+			msg := tgbotapi.NewEditMessageText(args.Update.Message.Chat.ID, msgIdToEdit, msgText)
 			msg.ParseMode = "HTML"
 			_, err := t.App.Bot.Send(msg)
 			if err != nil {
@@ -102,7 +103,7 @@ func (t *TrackCommand) Execute(ctx context.Context, args *CommandArguments) erro
 				return
 			}
 		} else {
-			msg := tgbotapi.NewMessage(args.update.Message.Chat.ID, msgText)
+			msg := tgbotapi.NewMessage(args.Update.Message.Chat.ID, msgText)
 			msg.ParseMode = "HTML"
 			// msg.ReplyToMessageID = update.Message.MessageID
 
@@ -171,9 +172,9 @@ func (t *TrackCommand) Execute(ctx context.Context, args *CommandArguments) erro
 				longTracking += "\n" + detailsString + "\n"
 			}
 
-			msg := tgbotapi.NewMessage(args.update.Message.Chat.ID, longTracking)
+			msg := tgbotapi.NewMessage(args.Update.Message.Chat.ID, longTracking)
 			msg.ParseMode = "HTML"
-			msg.ReplyToMessageID = args.update.Message.MessageID
+			msg.ReplyToMessageID = args.Update.Message.MessageID
 			msg.ReplyMarkup = tgbotapi.NewInlineKeyboardMarkup(
 				tgbotapi.NewInlineKeyboardRow(
 					tgbotapi.NewInlineKeyboardButtonData("🚶 Follow this package", fmt.Sprintf("/follow %v", rep.data.ShipmentNumber)),

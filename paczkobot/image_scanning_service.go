@@ -35,7 +35,7 @@ func NewImageScanningService(app *BotApp) *ImageScanningService {
 	}
 }
 
-func (i *ImageScanningService) ScanIncomingImage(ctx context.Context, args *CommandArguments, url string) error {
+func (i *ImageScanningService) ScanIncomingImage(ctx context.Context, args *tghelpers.CommandArguments, url string) error {
 	progress, err := tghelpers.NewProgressMessage(i.App.Bot, args.ChatID, "(1/2) Fetching image...")
 	if err != nil {
 		return err
@@ -138,7 +138,7 @@ func (i *ImageScanningService) ScanIncomingImage(ctx context.Context, args *Comm
 		if err != nil {
 			return err
 		}
-		args.namedArguments = map[string]string{
+		args.NamedArguments = map[string]string{
 			"shipmentNumber": candidate.Number,
 		}
 		err := (&TrackCommand{App: i.App}).Execute(ctx, args)

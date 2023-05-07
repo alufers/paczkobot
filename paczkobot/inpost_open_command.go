@@ -6,6 +6,7 @@ import (
 	"log"
 
 	"github.com/alufers/paczkobot/inpostextra"
+	"github.com/alufers/paczkobot/tghelpers"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
@@ -17,8 +18,8 @@ func (s *InpostOpenCommand) Aliases() []string {
 	return []string{"/inpostopen"}
 }
 
-func (s *InpostOpenCommand) Arguments() []*CommandDefArgument {
-	return []*CommandDefArgument{
+func (s *InpostOpenCommand) Arguments() []*tghelpers.CommandDefArgument {
+	return []*tghelpers.CommandDefArgument{
 		{
 			Name:        "trackingNumber",
 			Description: "Tracking number of the package",
@@ -36,7 +37,7 @@ func (f *InpostOpenCommand) Category() string {
 	return "Inpost"
 }
 
-func (f *InpostOpenCommand) Execute(ctx context.Context, args *CommandArguments) error {
+func (f *InpostOpenCommand) Execute(ctx context.Context, args *tghelpers.CommandArguments) error {
 	suggestions := map[string]string{}
 	followedPackages := []FollowedPackageTelegramUser{}
 

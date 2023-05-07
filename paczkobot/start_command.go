@@ -6,31 +6,32 @@ import (
 	"html"
 	"sort"
 
+	"github.com/alufers/paczkobot/tghelpers"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/spf13/viper"
 )
 
 type StartCommand struct {
 	App       *BotApp
-	ExtraHelp []Helpable
+	ExtraHelp []tghelpers.Helpable
 }
 
 func (s *StartCommand) Aliases() []string {
 	return []string{"/start"}
 }
 
-func (s *StartCommand) Arguments() []*CommandDefArgument {
-	return []*CommandDefArgument{}
+func (s *StartCommand) Arguments() []*tghelpers.CommandDefArgument {
+	return []*tghelpers.CommandDefArgument{}
 }
 
 func (s *StartCommand) Help() string {
 	return "prints the available commands"
 }
 
-func (s *StartCommand) Execute(ctx context.Context, args *CommandArguments) error {
-	categoriesHelp := map[string][]Command{}
+func (s *StartCommand) Execute(ctx context.Context, args *tghelpers.CommandArguments) error {
+	categoriesHelp := map[string][]tghelpers.Command{}
 	for _, cmd := range s.App.Commands {
-		if cmdWithCat, ok := cmd.(CommandWithCategory); ok {
+		if cmdWithCat, ok := cmd.(tghelpers.CommandWithCategory); ok {
 			categoriesHelp[cmdWithCat.Category()] = append(categoriesHelp[cmdWithCat.Category()], cmd)
 		} else {
 			categoriesHelp["Misc"] = append(categoriesHelp["Misc"], cmd)
@@ -55,7 +56,7 @@ func (s *StartCommand) Execute(ctx context.Context, args *CommandArguments) erro
 			for _, arg := range cmd.Arguments() {
 				line += fmt.Sprintf(" [%s]", arg.Name)
 			}
-			if helpable, ok := cmd.(Helpable); ok {
+			if helpable, ok := cmd.(tghelpers.Helpable); ok {
 				line += " - " + html.EscapeString(helpable.Help())
 			}
 			commandHelp += line + "\n"
@@ -66,7 +67,7 @@ func (s *StartCommand) Execute(ctx context.Context, args *CommandArguments) erro
 		extraHelp += e.Help() + "\n"
 	}
 
-	msg := tgbotapi.NewMessage(args.update.Message.Chat.ID, fmt.Sprintf(`
+	msg := tgbotapi.NewMessage(args.Update.Message.Chat.ID, fmt.Sprintf(`
 <b>Welcome to @%v!</b>
 
 Available commands:

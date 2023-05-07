@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/alufers/paczkobot/inpostextra"
+	"github.com/alufers/paczkobot/tghelpers"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
@@ -16,8 +17,8 @@ func (s *InpostLogoutCommand) Aliases() []string {
 	return []string{"/inpostlogout"}
 }
 
-func (s *InpostLogoutCommand) Arguments() []*CommandDefArgument {
-	return []*CommandDefArgument{
+func (s *InpostLogoutCommand) Arguments() []*tghelpers.CommandDefArgument {
+	return []*tghelpers.CommandDefArgument{
 		{
 			Name:        "phoneNumber",
 			Description: "The phone number associated with the Inpost account to logout from",
@@ -35,7 +36,7 @@ func (f *InpostLogoutCommand) Category() string {
 	return "Inpost"
 }
 
-func (f *InpostLogoutCommand) Execute(ctx context.Context, args *CommandArguments) error {
+func (f *InpostLogoutCommand) Execute(ctx context.Context, args *tghelpers.CommandArguments) error {
 	creds := []*inpostextra.InpostCredentials{}
 	if err := f.App.DB.Where("telegram_user_id = ?", args.FromUserID).Find(&creds).Error; err != nil {
 		return fmt.Errorf("failed to get inpost credentials: %v", err)

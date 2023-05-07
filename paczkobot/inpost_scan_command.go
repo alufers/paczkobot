@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/alufers/paczkobot/inpostextra"
+	"github.com/alufers/paczkobot/tghelpers"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
@@ -16,8 +17,8 @@ func (s *InpostScanCommand) Aliases() []string {
 	return []string{"/inpostscan"}
 }
 
-func (s *InpostScanCommand) Arguments() []*CommandDefArgument {
-	return []*CommandDefArgument{}
+func (s *InpostScanCommand) Arguments() []*tghelpers.CommandDefArgument {
+	return []*tghelpers.CommandDefArgument{}
 }
 
 func (f *InpostScanCommand) Help() string {
@@ -28,7 +29,7 @@ func (f *InpostScanCommand) Category() string {
 	return "Inpost"
 }
 
-func (f *InpostScanCommand) Execute(ctx context.Context, args *CommandArguments) error {
+func (f *InpostScanCommand) Execute(ctx context.Context, args *tghelpers.CommandArguments) error {
 	creds := []*inpostextra.InpostCredentials{}
 	if err := f.App.DB.Where("telegram_user_id = ?", args.FromUserID).Find(&creds).Error; err != nil {
 		return fmt.Errorf("failed to get inpost credentials: %v", err)
@@ -52,7 +53,7 @@ func (f *InpostScanCommand) Execute(ctx context.Context, args *CommandArguments)
 			msgTxt += fmt.Sprintf("- %v \n", err)
 		}
 	}
-	msg := tgbotapi.NewMessage(args.update.Message.Chat.ID, msgTxt)
+	msg := tgbotapi.NewMessage(args.Update.Message.Chat.ID, msgTxt)
 	msg.ParseMode = "HTML"
 	_, err := f.App.Bot.Send(msg)
 
