@@ -28,7 +28,7 @@ See it in action: [@paczko_bot](https://t.me/paczko_bot)
 ![Screenshot](./docs/inpostopen.png)
 ## Usage
 
-On first run the bot will create a file called `paczkobot.yaml` looking like this:
+Create a file called `paczkobot.yaml` looking like this:
 
 ```yaml
 telegram:
@@ -55,6 +55,20 @@ tracking:
 ```
 
 You have to enter your telegram token there.
+
+Then you can run the bot as a Go program (`go run .`) or use the following `docker-compose.yml` file to run in docker:
+
+```
+version: '3'
+services:
+  paczkobot:
+    image: ghcr.io/alufers/paczkobot:latest
+    restart: unless-stopped
+    volumes:
+        - ./paczkobot-config.yaml:/etc/paczkobot/paczkobot.yaml
+```
+
+Images for x86_64 and aarch64 are provided.
 
 ## Contributing
 
