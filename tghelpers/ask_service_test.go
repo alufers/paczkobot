@@ -13,7 +13,7 @@ import (
 func TestAskServiceReturnsFalseForUnrelatedUpdates(t *testing.T) {
 	botApi := &tghelpers.MockBotApi{}
 	askService := tghelpers.NewAskService(botApi)
-	res := askService.ProcessIncomingMessage(tgbotapi.Update{
+	res := askService.OnUpdate(tgbotapi.Update{
 		Message: &tgbotapi.Message{
 			Text: "foo",
 			Chat: &tgbotapi.Chat{
@@ -45,7 +45,7 @@ func TestAskServiceConfirmWorks(t *testing.T) {
 				}
 				go func() {
 					time.Sleep(1 * time.Millisecond)
-					res := askService.ProcessIncomingMessage(tgbotapi.Update{
+					res := askService.OnUpdate(tgbotapi.Update{
 						CallbackQuery: &tgbotapi.CallbackQuery{
 							ID:      "123",
 							Message: &msg,
@@ -108,7 +108,7 @@ func TestAskServiceAskForArgumentWorks(t *testing.T) {
 				}
 				go func() {
 					time.Sleep(1 * time.Millisecond)
-					askService.ProcessIncomingMessage(tgbotapi.Update{
+					askService.OnUpdate(tgbotapi.Update{
 						CallbackQuery: &tgbotapi.CallbackQuery{
 							ID:      "123",
 							Message: &msg,

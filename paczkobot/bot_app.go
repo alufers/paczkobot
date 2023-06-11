@@ -105,7 +105,7 @@ func (a *BotApp) Run() {
 	go a.TrackingService.RunAutomaticTrackingLoop()
 	for u := range updates {
 		go func(update tgbotapi.Update) {
-			if a.AskService.ProcessIncomingMessage(update) {
+			if a.AskService.OnUpdate(update) {
 				return
 			}
 			var err error
