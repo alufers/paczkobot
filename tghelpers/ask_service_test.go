@@ -1,6 +1,7 @@
 package tghelpers_test
 
 import (
+	"context"
 	"fmt"
 	"testing"
 	"time"
@@ -13,7 +14,7 @@ import (
 func TestAskServiceReturnsFalseForUnrelatedUpdates(t *testing.T) {
 	botApi := &tghelpers.MockBotApi{}
 	askService := tghelpers.NewAskService(botApi)
-	res := askService.OnUpdate(tgbotapi.Update{
+	res := askService.OnUpdate(context.TODO(), tgbotapi.Update{
 		Message: &tgbotapi.Message{
 			Text: "foo",
 			Chat: &tgbotapi.Chat{
@@ -45,7 +46,7 @@ func TestAskServiceConfirmWorks(t *testing.T) {
 				}
 				go func() {
 					time.Sleep(1 * time.Millisecond)
-					res := askService.OnUpdate(tgbotapi.Update{
+					res := askService.OnUpdate(context.TODO(), tgbotapi.Update{
 						CallbackQuery: &tgbotapi.CallbackQuery{
 							ID:      "123",
 							Message: &msg,
@@ -108,7 +109,7 @@ func TestAskServiceAskForArgumentWorks(t *testing.T) {
 				}
 				go func() {
 					time.Sleep(1 * time.Millisecond)
-					askService.OnUpdate(tgbotapi.Update{
+					askService.OnUpdate(context.TODO(), tgbotapi.Update{
 						CallbackQuery: &tgbotapi.CallbackQuery{
 							ID:      "123",
 							Message: &msg,

@@ -7,4 +7,7 @@ import (
 // BotAPI is an interface wrapper over *tgbotapi.BotAPI that allows for mocking.
 type BotAPI interface {
 	Send(c tgbotapi.Chattable) (tgbotapi.Message, error)
+	Request(c tgbotapi.Chattable) (*tgbotapi.APIResponse, error)
+	GetUpdatesChan(config tgbotapi.UpdateConfig) tgbotapi.UpdatesChannel
+	GetFile(config tgbotapi.FileConfig) (tgbotapi.File, error)
 }

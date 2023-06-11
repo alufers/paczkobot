@@ -35,6 +35,28 @@ func NewImageScanningService(app *BotApp) *ImageScanningService {
 	}
 }
 
+func (i *ImageScanningService) OnUpdate(ctx context.Context, update tgbotapi.Update) bool {
+	if update.Message != nil && update.Message.Photo != nil && len(update.Message.Photo) > 0 {
+
+		photo := update.Message.Photo[len(update.Message.Photo)-1]
+
+		file, err := i.App.Bot.GetFile(tgbotapi.FileConfig{
+			FileID: photo.FileID,
+		})
+		if err != nil {
+			log.Printf("Failed to get file: %v", err)
+			return false
+		}
+		url := fmt.Sprintf("https://api.telegram.org/file/bot%s/%s", i.App.Bot.Token, file.FilePath)
+		err = i.ScanIncomingImage(ctx, tghelpers.ArgsFromCtx(ctx), url)
+		if err != nil {
+			log.Printf("Failed to ScanIncomingImage: %v", err)
+		}
+		return true
+	}
+	return false
+}
+
 func (i *ImageScanningService) ScanIncomingImage(ctx context.Context, args *tghelpers.CommandArguments, url string) error {
 	progress, err := tghelpers.NewProgressMessage(i.App.Bot, args.ChatID, "(1/2) Fetching image...")
 	if err != nil {

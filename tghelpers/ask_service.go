@@ -1,6 +1,7 @@
 package tghelpers
 
 import (
+	"context"
 	"errors"
 	"log"
 	"strings"
@@ -25,7 +26,8 @@ func NewAskService(bot BotAPI) *AskService {
 	}
 }
 
-func (a *AskService) OnUpdate(update tgbotapi.Update) bool {
+// Implements UpdateHook
+func (a *AskService) OnUpdate(ctx context.Context, update tgbotapi.Update) bool {
 	a.AskCallbacksMutex.Lock()
 	defer a.AskCallbacksMutex.Unlock()
 	if update.CallbackQuery != nil {
