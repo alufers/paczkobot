@@ -186,22 +186,22 @@ func (s *InpostService) GetParcel(db *gorm.DB, creds *InpostCredentials, shipmen
 
 	// make a get request to /v1/parcel/{shipmentNumber}
 	out := &InpostParcel{}
-	err = s.makeJSONRequest(creds, "GET", fmt.Sprintf("/v1/parcel/%s", shipmentNumber), nil, out)
+	err = s.makeJSONRequest(creds, "GET", fmt.Sprintf("/v3/parcels/tracked/%s", shipmentNumber), nil, out)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (s *InpostService) GetUserParcels(db *gorm.DB, creds *InpostCredentials) ([]*InpostParcel, error) {
+func (s *InpostService) GetUserParcels(db *gorm.DB, creds *InpostCredentials) (*GetTrackedParcelsResponse, error) {
 	err := s.ReauthenticateIfNeeded(db, creds)
 	if err != nil {
 		return nil, err
 	}
 
-	// make a get request to /v1/parcel
-	out := []*InpostParcel{}
-	err = s.makeJSONRequest(creds, "GET", "/v1/parcel?updatedAfter=1970-01-01T00%3A00%3A00.001Z", nil, &out)
+	// make a get request to parcels
+	out := &GetTrackedParcelsResponse{}
+	err = s.makeJSONRequest(creds, "GET", "/v3/parcels/tracked", nil, &out)
 	if err != nil {
 		return nil, err
 	}
@@ -213,18 +213,22 @@ func (s *InpostService) OpenParcelLocker(db *gorm.DB, creds *InpostCredentials, 
 	if err != nil {
 		return fmt.Errorf("error getting parcel details before opening: %v", err)
 	}
-	if parcel.PickupPoint == nil || parcel.PickupPoint.Location == nil {
+	if parcel.PickUpPoint == nil || parcel.PickUpPoint.Location == nil {
 		return fmt.Errorf("parcel %v has no pickup point or location", shipmentNumber)
+	}
+	if parcel.Receiver == nil || parcel.Receiver.PhoneNumber == "" {
+		return fmt.Errorf("parcel %v has no receiver or receiver phone number", shipmentNumber)
 	}
 	startOpenSessionRequest := map[string]any{
 		"geoPoint": map[string]any{
 			"accuracy":  10.0,
-			"latitude":  parcel.PickupPoint.Location.Latitude,
-			"longitude": parcel.PickupPoint.Location.Longitude,
+			"latitude":  parcel.PickUpPoint.Location.Latitude,
+			"longitude": parcel.PickUpPoint.Location.Longitude,
 		},
 		"parcel": map[string]any{
-			"shipmentNumber": shipmentNumber,
-			"openCode":       parcel.OpenCode,
+			"shipmentNumber":      shipmentNumber,
+			"openCode":            parcel.OpenCode,
+			"receiverPhoneNumber": parcel.Receiver.PhoneNumber,
 		},
 	}
 	validateResp := &ValidateCompartmentResponse{}

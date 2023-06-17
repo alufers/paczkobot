@@ -56,6 +56,7 @@ func (f *InpostLoginCommand) Execute(ctx context.Context, args *tghelpers.Comman
 		return fmt.Errorf("failed to save credentials: %v", err)
 	}
 	err = f.App.InpostScannerService.ScanUserPackages(
+		ctx,
 		creds,
 	)
 	if err != nil {

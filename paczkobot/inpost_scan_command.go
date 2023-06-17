@@ -38,6 +38,7 @@ func (f *InpostScanCommand) Execute(ctx context.Context, args *tghelpers.Command
 	successCount := 0
 	for _, cred := range creds {
 		err := f.App.InpostScannerService.ScanUserPackages(
+			ctx,
 			cred,
 		)
 		if err != nil {

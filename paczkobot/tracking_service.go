@@ -202,8 +202,9 @@ func (ts *TrackingService) ScanInpostAccounts() error {
 		Find(&inpostCreds).Error; err != nil {
 		return fmt.Errorf("failed to find inpost credentials to scan: %w", err)
 	}
+	ctx := context.Background()
 	for _, c := range inpostCreds {
-		err := ts.app.InpostScannerService.ScanUserPackages(c)
+		err := ts.app.InpostScannerService.ScanUserPackages(ctx, c)
 		if err != nil {
 			log.Printf("failed to scan user packages for phone number %v: %v", c.PhoneNumber, err)
 		}

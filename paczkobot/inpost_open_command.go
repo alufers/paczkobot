@@ -84,13 +84,13 @@ func (f *InpostOpenCommand) Execute(ctx context.Context, args *tghelpers.Command
 			log.Printf("failed to get parcel: %v", err)
 			continue
 		}
-		if p.OpenCode != "" && p.PickupPoint != nil {
+		if p.OpenCode != "" && p.PickUpPoint != nil {
 			err := f.App.AskService.Confirm(args.ChatID, fmt.Sprintf(
 				"Do you really want to open the locker at %s (%s %s, %s) for the package with this number: %v?\n\n<b>WARNING:</b> The locker will open immediately, without checking your location. Make sure you are at the correct locker before confirming.",
-				p.PickupPoint.Name,
-				p.PickupPoint.AddressDetails.Street,
-				p.PickupPoint.AddressDetails.BuildingNumber,
-				p.PickupPoint.AddressDetails.City,
+				p.PickUpPoint.Name,
+				p.PickUpPoint.AddressDetails.Street,
+				p.PickUpPoint.AddressDetails.BuildingNumber,
+				p.PickUpPoint.AddressDetails.City,
 				trackingNumber,
 			),
 			)

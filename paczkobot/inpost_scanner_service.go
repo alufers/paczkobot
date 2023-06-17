@@ -2,11 +2,16 @@ package paczkobot
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"time"
 
+	"github.com/alufers/paczkobot/commondata"
+	"github.com/alufers/paczkobot/commonerrors"
 	"github.com/alufers/paczkobot/inpostextra"
+	"github.com/alufers/paczkobot/providers"
+	"github.com/alufers/paczkobot/providers/inpost"
 )
 
 type InpostScannerService struct {
@@ -17,31 +22,46 @@ func NewInpostScannerService(app *BotApp) *InpostScannerService {
 	return &InpostScannerService{app: app}
 }
 
-func (s *InpostScannerService) ScanUserPackages(creds *inpostextra.InpostCredentials) error {
-	parcels, err := s.app.InpostService.GetUserParcels(s.app.DB, creds)
+func (s *InpostScannerService) ScanUserPackages(ctx context.Context, creds *inpostextra.InpostCredentials) error {
+	resp, err := s.app.InpostService.GetUserParcels(s.app.DB, creds)
 	if err != nil {
 		return err
 	}
 
 	go func() {
-		for _, parcel := range parcels {
+		for _, parcel := range resp.Parcels {
+
+			inpostProv := &inpost.InpostProvider{}
+			d, err := providers.InvokeProvider(ctx, inpostProv, parcel.ShipmentNumber)
+			if errors.Is(err, commonerrors.NotFoundError) {
+				continue
+			}
+			if err != nil {
+				log.Printf("failed to invoke inpost provider for shipment number %v: %v", parcel.ShipmentNumber, err)
+				continue
+			}
+			lastStep := &commondata.TrackingStep{}
+			if len(d.TrackingSteps) > 0 {
+				lastStep = d.TrackingSteps[len(d.TrackingSteps)-1]
+			}
+			provider := &FollowedPackageProvider{
+				ProviderName:       inpostProv.GetName(),
+				LastStatusValue:    lastStep.Message,
+				LastStatusDate:     lastStep.Datetime,
+				LastStatusLocation: lastStep.Location,
+			}
+
 			followedPackage := &FollowedPackage{
 				InpostCredentials: creds,
-				FromName:          parcel.SenderName,
+				FromName:          parcel.Sender.Name,
 			}
-			lastStep := parcel.StatusHistory[len(parcel.StatusHistory)-1]
+
 			followErr := s.app.FollowService.FollowPackage(
 				context.Background(),
 				parcel.ShipmentNumber,
 				creds.TelegramUserID,
 				creds.TelegramChatID,
-				[]*FollowedPackageProvider{
-					{
-						ProviderName:    "inpost",
-						LastStatusDate:  lastStep.Date,
-						LastStatusValue: lastStep.Status,
-					},
-				},
+				[]*FollowedPackageProvider{provider},
 				followedPackage,
 			)
 			if followErr != nil {

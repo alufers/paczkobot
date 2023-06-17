@@ -73,7 +73,7 @@ func (f *FollowCommand) Execute(ctx context.Context, args *tghelpers.CommandArgu
 
 	for _, p := range providersToCheck {
 
-		d, err := providers.InvokeProvider(context.Background(), p, shipmentNumber)
+		d, err := providers.InvokeProvider(ctx, p, shipmentNumber)
 		if errors.Is(err, commonerrors.NotFoundError) {
 			continue
 		}
