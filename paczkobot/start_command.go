@@ -30,7 +30,7 @@ func (s *StartCommand) Help() string {
 
 func (s *StartCommand) Execute(ctx context.Context, args *tghelpers.CommandArguments) error {
 	categoriesHelp := map[string][]tghelpers.Command{}
-	for _, cmd := range s.App.Commands {
+	for _, cmd := range s.App.CommandDispatcher.Commands {
 		if cmdWithCat, ok := cmd.(tghelpers.CommandWithCategory); ok {
 			categoriesHelp[cmdWithCat.Category()] = append(categoriesHelp[cmdWithCat.Category()], cmd)
 		} else {

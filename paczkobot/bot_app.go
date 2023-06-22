@@ -12,9 +12,9 @@ import (
 )
 
 type BotApp struct {
-	Bot                   *tgbotapi.BotAPI
-	DB                    *gorm.DB
-	Commands              []tghelpers.Command
+	Bot *tgbotapi.BotAPI
+	DB  *gorm.DB
+
 	CommandDispatcher     *tghelpers.CommandDispatcher
 	BaseHTTPClient        httphelpers.Client
 	NotificationsService  *NotificationsService
