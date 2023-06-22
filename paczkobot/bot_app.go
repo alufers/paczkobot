@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/alufers/paczkobot/httphelpers"
 	"github.com/alufers/paczkobot/inpostextra"
 	"github.com/alufers/paczkobot/tghelpers"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -15,7 +16,7 @@ type BotApp struct {
 	DB                    *gorm.DB
 	Commands              []tghelpers.Command
 	CommandDispatcher     *tghelpers.CommandDispatcher
-	BaseHTTPClient        *http.Client
+	BaseHTTPClient        httphelpers.Client
 	NotificationsService  *NotificationsService
 	TrackingService       *TrackingService
 	AskService            *tghelpers.AskService
@@ -33,9 +34,9 @@ func NewBotApp(b *tgbotapi.BotAPI, DB *gorm.DB) (a *BotApp) {
 		Bot: b,
 		DB:  DB,
 	}
-	a.BaseHTTPClient = &http.Client{
+	a.BaseHTTPClient = httphelpers.NewTracingHttpClient(&http.Client{
 		Timeout: 10,
-	}
+	})
 	a.AskService = tghelpers.NewAskService(a.Bot)
 	a.CommandDispatcher = tghelpers.NewCommandDispatcher(
 		b,

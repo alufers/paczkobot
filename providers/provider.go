@@ -10,6 +10,7 @@ import (
 	"github.com/alufers/paczkobot/providers/geis_pl"
 	"github.com/alufers/paczkobot/providers/gls"
 	"github.com/alufers/paczkobot/providers/inpost"
+	"github.com/alufers/paczkobot/providers/orlen"
 	"github.com/alufers/paczkobot/providers/packeta"
 	"github.com/alufers/paczkobot/providers/pocztapolska"
 	"github.com/alufers/paczkobot/providers/postnl"
@@ -30,6 +31,7 @@ var AllProviders = []Provider{
 	&packeta.PacketaProvider{},
 	&fedex_pl.FedexPlProvider{},
 	&geis_pl.GeisPlProvider{},
+	&orlen.OrlenProvider{},
 }
 
 type Provider interface {
