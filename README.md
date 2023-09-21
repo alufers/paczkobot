@@ -14,6 +14,10 @@ See it in action: [@paczko_bot](https://t.me/paczko_bot)
   - [x] Inpost
   - [x] gls
   - [x] packeta
+  - [x] FedEx (Poland)
+  - [x] Geis (Poland)
+  - [x] Orlen
+  - [x] Deutche Post
 - Follow packages and send notifications when a package status changes
 - Generate QR codes for InPost Paczkomaty
 - Automatically import packages from InPost Paczkomaty
