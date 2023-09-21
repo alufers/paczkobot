@@ -21,7 +21,7 @@ type BotApp struct {
 	TrackingService       *TrackingService
 	AskService            *tghelpers.AskService
 	TranslationService    *TranslationService
-	InpostService         *inpostextra.InpostService
+	InpostService         inpostextra.InpostService
 	FollowService         *FollowService
 	InpostScannerService  *InpostScannerService
 	PackagePrinterService *PackagePrinterService
