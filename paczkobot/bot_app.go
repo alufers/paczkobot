@@ -82,6 +82,10 @@ func NewBotApp(b *tgbotapi.BotAPI, DB *gorm.DB) (a *BotApp) {
 }
 
 func (a *BotApp) Run() {
+	if err := MigrateBadInpostAccounts(a.DB); err != nil {
+		log.Fatalf("Failed to migrate bad inpost accounts: %v", err)
+	}
+
 	log.Printf("Flushing enqueued notifications...")
 	if err := a.NotificationsService.FlushEnqueuedNotifications(); err != nil {
 		log.Fatalf("Failed to flush enqueued notifications: %v", err)

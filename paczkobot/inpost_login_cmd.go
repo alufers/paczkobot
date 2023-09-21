@@ -48,6 +48,7 @@ func (f *InpostLoginCommand) Execute(ctx context.Context, args *tghelpers.Comman
 	}
 
 	creds.TelegramUserID = args.FromUserID
+	creds.TelegramChatID = args.FromUserID
 	err = f.App.DB.Where("telegram_user_id = ? AND phone_number = ?", args.FromUserID, phoneNumber).FirstOrCreate(&creds).Error
 	if err != nil {
 		return fmt.Errorf("failed to delete existing credentials: %v", err)
