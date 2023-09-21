@@ -103,5 +103,9 @@ func (op *OrlenProvider) Track(ctx context.Context, trackingNumber string) (*com
 		})
 	}
 
+	if len(td.TrackingSteps) == 0 {
+		return nil, commonerrors.NotFoundError
+	}
+
 	return td, nil
 }
