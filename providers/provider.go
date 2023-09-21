@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/alufers/paczkobot/commondata"
+	"github.com/alufers/paczkobot/providers/deutsche_post"
 	"github.com/alufers/paczkobot/providers/dhl"
 	"github.com/alufers/paczkobot/providers/dpdcompl"
 	"github.com/alufers/paczkobot/providers/fedex_pl"
@@ -32,6 +33,7 @@ var AllProviders = []Provider{
 	&fedex_pl.FedexPlProvider{},
 	&geis_pl.GeisPlProvider{},
 	&orlen.OrlenProvider{},
+	&deutsche_post.DeutschePostProvider{},
 }
 
 type Provider interface {

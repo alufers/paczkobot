@@ -156,9 +156,9 @@ func (t *TrackCommand) Execute(ctx context.Context, args *tghelpers.CommandArgum
 
 			detailsString := ""
 			if rep.data.Destination != "" && rep.data.SentFrom != "" {
-				detailsString += "The package is headed from " + rep.data.SentFrom + " to " + rep.data.Destination + "."
+				detailsString += "The package is headed from <u>" + rep.data.SentFrom + "</u> to <u>" + rep.data.Destination + "</u>."
 			} else if rep.data.Destination != "" {
-				detailsString += "The package is headed to " + rep.data.Destination + "."
+				detailsString += "The package is headed to <u>" + rep.data.Destination + "</u>."
 			}
 
 			if rep.data.Weight != 0.0 {
