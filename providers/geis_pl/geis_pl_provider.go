@@ -4,13 +4,13 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"net/http"
 	"net/url"
 	"strings"
 	"time"
 
 	"github.com/alufers/paczkobot/commondata"
 	"github.com/alufers/paczkobot/commonerrors"
+	providerutil "github.com/alufers/paczkobot/provider_util"
 
 	"github.com/PuerkitoBio/goquery"
 )
@@ -34,30 +34,16 @@ func (gp *GeisPlProvider) MatchesNumber(trackingNumber string) bool {
 }
 
 func (gp *GeisPlProvider) Track(ctx context.Context, trackingNumber string) (*commondata.TrackingData, error) {
-	req, err := http.NewRequestWithContext(
+	doc, err := providerutil.FetchGoqueryDocument(
 		ctx,
-		"GET",
+		gp.GetName(),
 		"https://www.geis.pl/en/detail-of-cargo?packNumber="+url.QueryEscape(trackingNumber),
-		nil,
+		true,
 	)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create GET request: %w", err)
-	}
-	commondata.SetCommonHTTPHeaders(&req.Header)
-
-	httpResponse, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return nil, commonerrors.NewNetworkError(gp.GetName(), req)
-	}
-	defer httpResponse.Body.Close()
-	if httpResponse.StatusCode != 200 {
-		return nil, fmt.Errorf("HTTP status code %v", httpResponse.StatusCode)
-	}
-	doc, err := goquery.NewDocumentFromReader(httpResponse.Body)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read HTML response from DPD: %w", err)
 	}
-	datatables := doc.Find("table.table-tracking").First()
+	datatables := doc.Find(".trace211 table").First()
 	if datatables.Length() <= 0 {
 		return nil, commonerrors.NotFoundError
 	}
@@ -70,8 +56,7 @@ func (gp *GeisPlProvider) Track(ctx context.Context, trackingNumber string) (*co
 		date := strings.ReplaceAll(row.Find("td:nth-child(1)").Text(), " ", "")
 		timeHourMinute := strings.ReplaceAll(row.Find("td:nth-child(2)").Text(), " ", "")
 		date = date + " " + timeHourMinute
-		log.Printf("cols: %v, %v", row.Find("td:nth-child(1)").Text(), row.Find("td:nth-child(1)").Text())
-		log.Printf("date: %v", date)
+
 		location := row.Find("td:nth-child(4)").Text()
 		description := row.Find("td:nth-child(5)").Text()
 
