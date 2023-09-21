@@ -55,7 +55,7 @@ func (f *InpostLogoutCommand) Execute(ctx context.Context, args *tghelpers.Comma
 		return fmt.Errorf("failed to delete existing credentials: %v", err)
 	}
 
-	msg := tgbotapi.NewMessage(args.ChatID, "Successfully logged out from Inpost")
+	msg := tgbotapi.NewMessage(args.ChatID, fmt.Sprintf("Successfully logged out from Inpost account %s", phoneNumber))
 	if _, err := f.App.Bot.Send(msg); err != nil {
 		return fmt.Errorf("failed to send message: %v", err)
 	}
