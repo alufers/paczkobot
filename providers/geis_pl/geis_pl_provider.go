@@ -41,7 +41,7 @@ func (gp *GeisPlProvider) Track(ctx context.Context, trackingNumber string) (*co
 		true,
 	)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read HTML response from DPD: %w", err)
+		return nil, fmt.Errorf("failed to read HTML response from Geis: %w", err)
 	}
 	datatables := doc.Find(".trace211 table").First()
 	if datatables.Length() <= 0 {
