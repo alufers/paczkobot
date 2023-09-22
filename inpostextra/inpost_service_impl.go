@@ -238,7 +238,9 @@ func (s *InpostServiceImpl) OpenParcelLocker(db *gorm.DB, creds *InpostCredentia
 	}
 
 	openResp := make(map[string]any)
-	err = s.makeJSONRequest(creds, "POST", "/v1/collect/compartment/open/"+validateResp.SessionUUID, map[string]any{}, &openResp)
+	err = s.makeJSONRequest(creds, "POST", "/v1/collect/compartment/open/"+validateResp.SessionUUID, map[string]any{
+		"sessionUuid": validateResp.SessionUUID,
+	}, &openResp)
 	if err != nil {
 		return fmt.Errorf("error opening compartment: %v", err)
 	}
