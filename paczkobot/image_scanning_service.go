@@ -35,7 +35,8 @@ func NewImageScanningService(app *BotApp) *ImageScanningService {
 	}
 }
 
-func (i *ImageScanningService) OnUpdate(ctx context.Context, update tgbotapi.Update) bool {
+func (i *ImageScanningService) OnUpdate(ctx context.Context) bool {
+	update := tghelpers.UpdateFromCtx(ctx)
 	if update.Message != nil && update.Message.Photo != nil && len(update.Message.Photo) > 0 {
 
 		photo := update.Message.Photo[len(update.Message.Photo)-1]

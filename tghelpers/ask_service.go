@@ -27,7 +27,8 @@ func NewAskService(bot BotAPI) *AskService {
 }
 
 // Implements UpdateHook
-func (a *AskService) OnUpdate(ctx context.Context, update tgbotapi.Update) bool {
+func (a *AskService) OnUpdate(ctx context.Context) bool {
+	update := UpdateFromCtx(ctx)
 	a.AskCallbacksMutex.Lock()
 	defer a.AskCallbacksMutex.Unlock()
 	if update.CallbackQuery != nil {

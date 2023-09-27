@@ -67,7 +67,7 @@ func (d *CommandDispatcher) RunUpdateLoop() error {
 			ctx := context.WithValue(ctx, UpdateContextKey, u)
 			ctx = context.WithValue(ctx, ArgsContextKey, args)
 			for _, hook := range d.UpdateHooks {
-				if hook.OnUpdate(ctx, u) {
+				if hook.OnUpdate(ctx) {
 					return // hook has handled the message stop processing
 				}
 			}

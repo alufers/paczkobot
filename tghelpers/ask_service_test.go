@@ -14,14 +14,19 @@ import (
 func TestAskServiceReturnsFalseForUnrelatedUpdates(t *testing.T) {
 	botApi := &tghelpers.MockBotApi{}
 	askService := tghelpers.NewAskService(botApi)
-	res := askService.OnUpdate(context.TODO(), tgbotapi.Update{
-		Message: &tgbotapi.Message{
-			Text: "foo",
-			Chat: &tgbotapi.Chat{
-				ID: 123,
+	ctx := context.WithValue(
+		context.Background(),
+		tghelpers.UpdateContextKey,
+		tgbotapi.Update{
+			Message: &tgbotapi.Message{
+				Text: "foo",
+				Chat: &tgbotapi.Chat{
+					ID: 123,
+				},
 			},
 		},
-	})
+	)
+	res := askService.OnUpdate(ctx)
 	assert.False(t, res)
 }
 
@@ -46,13 +51,18 @@ func TestAskServiceConfirmWorks(t *testing.T) {
 				}
 				go func() {
 					time.Sleep(1 * time.Millisecond)
-					res := askService.OnUpdate(context.TODO(), tgbotapi.Update{
-						CallbackQuery: &tgbotapi.CallbackQuery{
-							ID:      "123",
-							Message: &msg,
-							Data:    *c.(tgbotapi.MessageConfig).ReplyMarkup.(tgbotapi.InlineKeyboardMarkup).InlineKeyboard[0][0].CallbackData,
+					ctx := context.WithValue(
+						context.Background(),
+						tghelpers.UpdateContextKey,
+						tgbotapi.Update{
+							CallbackQuery: &tgbotapi.CallbackQuery{
+								ID:      "123",
+								Message: &msg,
+								Data:    *c.(tgbotapi.MessageConfig).ReplyMarkup.(tgbotapi.InlineKeyboardMarkup).InlineKeyboard[0][0].CallbackData,
+							},
 						},
-					})
+					)
+					res := askService.OnUpdate(ctx)
 					assert.True(t, res) // should return true because it's a related update
 				}()
 
@@ -109,13 +119,18 @@ func TestAskServiceAskForArgumentWorks(t *testing.T) {
 				}
 				go func() {
 					time.Sleep(1 * time.Millisecond)
-					askService.OnUpdate(context.TODO(), tgbotapi.Update{
-						CallbackQuery: &tgbotapi.CallbackQuery{
-							ID:      "123",
-							Message: &msg,
-							Data:    *c.(tgbotapi.MessageConfig).ReplyMarkup.(tgbotapi.InlineKeyboardMarkup).InlineKeyboard[0][0].CallbackData,
+					ctx := context.WithValue(
+						context.Background(),
+						tghelpers.UpdateContextKey,
+						tgbotapi.Update{
+							CallbackQuery: &tgbotapi.CallbackQuery{
+								ID:      "123",
+								Message: &msg,
+								Data:    *c.(tgbotapi.MessageConfig).ReplyMarkup.(tgbotapi.InlineKeyboardMarkup).InlineKeyboard[0][0].CallbackData,
+							},
 						},
-					})
+					)
+					askService.OnUpdate(ctx)
 				}()
 
 				return msg, nil
