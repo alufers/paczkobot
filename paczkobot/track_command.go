@@ -47,7 +47,8 @@ type providerReply struct {
 	err      error
 }
 
-func (t *TrackCommand) Execute(ctx context.Context, args *tghelpers.CommandArguments) error {
+func (t *TrackCommand) Execute(ctx context.Context) error {
+	args := tghelpers.ArgsFromCtx(ctx)
 	shipmentNumber, err := args.GetOrAskForArgument("shipmentNumber")
 	if err != nil {
 		return err

@@ -39,7 +39,8 @@ func (f *FollowCommand) Help() string {
 	return "follows a package and sends you an update every time its status changes"
 }
 
-func (f *FollowCommand) Execute(ctx context.Context, args *tghelpers.CommandArguments) error {
+func (f *FollowCommand) Execute(ctx context.Context) error {
+	args := tghelpers.ArgsFromCtx(ctx)
 	msg := tgbotapi.NewMessage(args.ChatID, "⌛ loading...")
 	msg.ParseMode = "HTML"
 	loadingRes, err := f.App.Bot.Send(msg)

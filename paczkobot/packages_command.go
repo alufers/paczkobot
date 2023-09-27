@@ -29,7 +29,8 @@ func (s *PackagesCommand) Category() string {
 	return "Following packages"
 }
 
-func (s *PackagesCommand) Execute(ctx context.Context, args *tghelpers.CommandArguments) error {
+func (s *PackagesCommand) Execute(ctx context.Context) error {
+	args := tghelpers.ArgsFromCtx(ctx)
 	if err := s.App.ArchiveService.FetchAndArchivePackagesForUser(args.FromUserID); err != nil {
 		log.Printf("failed to fetch and archive packages for user %v: %v", args.FromUserID, err)
 	}

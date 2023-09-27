@@ -36,7 +36,8 @@ func (f *InpostLogoutCommand) Category() string {
 	return "Inpost"
 }
 
-func (f *InpostLogoutCommand) Execute(ctx context.Context, args *tghelpers.CommandArguments) error {
+func (f *InpostLogoutCommand) Execute(ctx context.Context) error {
+	args := tghelpers.ArgsFromCtx(ctx)
 	creds := []*inpostextra.InpostCredentials{}
 	if err := f.App.DB.Where("telegram_user_id = ?", args.FromUserID).Find(&creds).Error; err != nil {
 		return fmt.Errorf("failed to get inpost credentials: %v", err)

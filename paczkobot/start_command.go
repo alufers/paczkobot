@@ -28,7 +28,8 @@ func (s *StartCommand) Help() string {
 	return "prints the available commands"
 }
 
-func (s *StartCommand) Execute(ctx context.Context, args *tghelpers.CommandArguments) error {
+func (s *StartCommand) Execute(ctx context.Context) error {
+	args := tghelpers.ArgsFromCtx(ctx)
 	categoriesHelp := map[string][]tghelpers.Command{}
 	for _, cmd := range s.App.CommandDispatcher.Commands {
 		if cmdWithCat, ok := cmd.(tghelpers.CommandWithCategory); ok {

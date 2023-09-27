@@ -164,7 +164,12 @@ func (i *ImageScanningService) ScanIncomingImage(ctx context.Context, args *tghe
 		args.NamedArguments = map[string]string{
 			"shipmentNumber": candidate.Number,
 		}
-		err := (&TrackCommand{App: i.App}).Execute(ctx, args)
+
+		err := (&TrackCommand{App: i.App}).Execute(context.WithValue(
+			ctx,
+			tghelpers.ArgsContextKey,
+			args,
+		))
 		if err != nil {
 			return err
 		}

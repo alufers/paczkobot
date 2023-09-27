@@ -88,7 +88,7 @@ func (d *CommandDispatcher) RunUpdateLoop() error {
 						args.NamedArguments[argTpl.Name] = args.Arguments[i]
 					}
 
-					err = cmd.Execute(ctx, args)
+					err = cmd.Execute(ctx)
 
 					break
 				}

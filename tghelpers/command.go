@@ -19,7 +19,7 @@ type Command interface {
 	Helpable
 	Aliases() []string
 	Arguments() []*CommandDefArgument
-	Execute(ctx context.Context, args *CommandArguments) error
+	Execute(ctx context.Context) error
 }
 
 type Helpable interface {

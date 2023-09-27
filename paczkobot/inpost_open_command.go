@@ -37,7 +37,8 @@ func (f *InpostOpenCommand) Category() string {
 	return "Inpost"
 }
 
-func (f *InpostOpenCommand) Execute(ctx context.Context, args *tghelpers.CommandArguments) error {
+func (f *InpostOpenCommand) Execute(ctx context.Context) error {
+	args := tghelpers.ArgsFromCtx(ctx)
 	suggestions := map[string]string{}
 	followedPackages := []FollowedPackageTelegramUser{}
 

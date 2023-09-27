@@ -39,7 +39,8 @@ func (f *InpostQrCommand) Category() string {
 	return "Inpost"
 }
 
-func (f *InpostQrCommand) Execute(ctx context.Context, args *tghelpers.CommandArguments) error {
+func (f *InpostQrCommand) Execute(ctx context.Context) error {
+	args := tghelpers.ArgsFromCtx(ctx)
 	suggestions := map[string]string{}
 	followedPackages := []FollowedPackageTelegramUser{}
 

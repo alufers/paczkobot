@@ -25,7 +25,8 @@ func (s *ArchivedCommand) Help() string {
 	return "prints your archived packages"
 }
 
-func (s *ArchivedCommand) Execute(ctx context.Context, args *tghelpers.CommandArguments) error {
+func (s *ArchivedCommand) Execute(ctx context.Context) error {
+	args := tghelpers.ArgsFromCtx(ctx)
 	if err := s.App.ArchiveService.FetchAndArchivePackagesForUser(args.FromUserID); err != nil {
 		log.Printf("failed to fetch and archive packages for user %v: %v", args.FromUserID, err)
 	}

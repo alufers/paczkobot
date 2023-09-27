@@ -28,7 +28,8 @@ func (f *InpostLoginCommand) Category() string {
 	return "Inpost"
 }
 
-func (f *InpostLoginCommand) Execute(ctx context.Context, args *tghelpers.CommandArguments) error {
+func (f *InpostLoginCommand) Execute(ctx context.Context) error {
+	args := tghelpers.ArgsFromCtx(ctx)
 	phoneNumber, err := f.App.AskService.AskForArgument(args.ChatID, "Enter your phone number associated with your inpost account:")
 	if err != nil {
 		return err

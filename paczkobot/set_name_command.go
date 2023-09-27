@@ -39,7 +39,8 @@ func (s *SetNameCommand) Category() string {
 	return "Following packages"
 }
 
-func (s *SetNameCommand) Execute(ctx context.Context, args *tghelpers.CommandArguments) error {
+func (s *SetNameCommand) Execute(ctx context.Context) error {
+	args := tghelpers.ArgsFromCtx(ctx)
 	shipmentNumber, err := args.GetOrAskForArgument("shipmentNumber")
 	if err != nil {
 		return err
