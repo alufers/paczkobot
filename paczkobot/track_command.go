@@ -66,8 +66,10 @@ func (t *TrackCommand) Execute(ctx context.Context) error {
 
 	statuses := map[string]string{}
 	replyChan := make(chan *providerReply, len(providersToCheck))
+	var checksStarted int
 	for _, p := range providersToCheck {
 		statuses[p.GetName()] = "⌛ checking..."
+		checksStarted++
 		go func(p providers.Provider) {
 			d, err := t.App.TrackingService.InvokeProviderAndNotifyFollowers(ctx, p, shipmentNumber)
 			if err != nil {
@@ -117,7 +119,9 @@ func (t *TrackCommand) Execute(ctx context.Context) error {
 		}
 	}
 	sendStatuses()
+	var checksFinished int
 	for rep := range replyChan {
+		checksFinished++
 		if rep.err != nil {
 			if errors.Is(rep.err, commonerrors.NotFoundError) {
 				statuses[rep.provider.GetName()] = "🔳 Not found"
@@ -188,6 +192,9 @@ func (t *TrackCommand) Execute(ctx context.Context) error {
 				return err
 			}
 
+		}
+		if checksFinished >= checksStarted {
+			break
 		}
 	}
 
