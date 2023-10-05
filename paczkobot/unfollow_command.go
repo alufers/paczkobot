@@ -49,7 +49,7 @@ func (s *UnfollowCommand) Execute(ctx context.Context) error {
 
 	var currentUser *FollowedPackageTelegramUser
 	for _, tgUser := range followedPackage.FollowedPackageTelegramUsers {
-		if tgUser.ChatID == args.Update.Message.Chat.ID {
+		if tgUser.ChatID == args.ChatID {
 			currentUser = tgUser
 			break
 		}
@@ -69,7 +69,7 @@ func (s *UnfollowCommand) Execute(ctx context.Context) error {
 		}
 	}
 
-	msg := tgbotapi.NewMessage(args.Update.Message.Chat.ID, fmt.Sprintf(`Package %v has been unfollowed!`, shipmentNumber))
+	msg := tgbotapi.NewMessage(args.ChatID, fmt.Sprintf(`Package %v has been unfollowed!`, shipmentNumber))
 	msg.ParseMode = "HTML"
 	_, err = s.App.Bot.Send(msg)
 	return err

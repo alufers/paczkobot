@@ -95,7 +95,7 @@ func (f *InpostQrCommand) Execute(ctx context.Context) error {
 				return fmt.Errorf("failed to generate QR code: %w", err)
 			}
 
-			photo := tgbotapi.NewPhoto(args.Update.Message.Chat.ID, tgbotapi.FileBytes{Name: "qr.png", Bytes: png})
+			photo := tgbotapi.NewPhoto(args.ChatID, tgbotapi.FileBytes{Name: "qr.png", Bytes: png})
 			photo.Caption = fmt.Sprintf(
 				"Phone number: <b>%v</b>\nOpen code: <b>%v</b>",
 				cred.PhoneNumber,

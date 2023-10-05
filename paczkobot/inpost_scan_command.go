@@ -55,7 +55,7 @@ func (f *InpostScanCommand) Execute(ctx context.Context) error {
 			msgTxt += fmt.Sprintf("- %v \n", err)
 		}
 	}
-	msg := tgbotapi.NewMessage(args.Update.Message.Chat.ID, msgTxt)
+	msg := tgbotapi.NewMessage(args.ChatID, msgTxt)
 	msg.ParseMode = "HTML"
 	_, err := f.App.Bot.Send(msg)
 

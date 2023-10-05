@@ -96,7 +96,7 @@ func (t *TrackCommand) Execute(ctx context.Context) error {
 			msgText += fmt.Sprintf("%v: <b>%v</b>\n", n, html.EscapeString(v))
 		}
 		if msgIdToEdit != 0 {
-			msg := tgbotapi.NewEditMessageText(args.Update.Message.Chat.ID, msgIdToEdit, msgText)
+			msg := tgbotapi.NewEditMessageText(args.ChatID, msgIdToEdit, msgText)
 			msg.ParseMode = "HTML"
 			_, err := t.App.Bot.Send(msg)
 			if err != nil {
@@ -104,7 +104,7 @@ func (t *TrackCommand) Execute(ctx context.Context) error {
 				return
 			}
 		} else {
-			msg := tgbotapi.NewMessage(args.Update.Message.Chat.ID, msgText)
+			msg := tgbotapi.NewMessage(args.ChatID, msgText)
 			msg.ParseMode = "HTML"
 			// msg.ReplyToMessageID = update.Message.MessageID
 
@@ -173,9 +173,11 @@ func (t *TrackCommand) Execute(ctx context.Context) error {
 				longTracking += "\n" + detailsString + "\n"
 			}
 
-			msg := tgbotapi.NewMessage(args.Update.Message.Chat.ID, longTracking)
+			msg := tgbotapi.NewMessage(args.ChatID, longTracking)
 			msg.ParseMode = "HTML"
-			msg.ReplyToMessageID = args.Update.Message.MessageID
+			if args.Update.Message != nil {
+				msg.ReplyToMessageID = args.Update.Message.MessageID
+			}
 			msg.ReplyMarkup = tgbotapi.NewInlineKeyboardMarkup(
 				tgbotapi.NewInlineKeyboardRow(
 					tgbotapi.NewInlineKeyboardButtonData("🚶 Follow this package", fmt.Sprintf("/follow %v", rep.data.ShipmentNumber)),

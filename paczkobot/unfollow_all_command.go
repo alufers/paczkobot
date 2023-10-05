@@ -61,7 +61,7 @@ func (s *UnfollowAllCommand) Execute(ctx context.Context) error {
 		}
 	}
 
-	msg := tgbotapi.NewMessage(args.Update.Message.Chat.ID, fmt.Sprintf(`Removed %v followed packages!`, len(followedPackages)))
+	msg := tgbotapi.NewMessage(args.ChatID, fmt.Sprintf(`Removed %v followed packages!`, len(followedPackages)))
 	msg.ParseMode = "HTML"
 	_, err = s.App.Bot.Send(msg)
 	return err

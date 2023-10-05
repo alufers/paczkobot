@@ -68,7 +68,7 @@ func (s *StartCommand) Execute(ctx context.Context) error {
 		extraHelp += e.Help() + "\n"
 	}
 
-	msg := tgbotapi.NewMessage(args.Update.Message.Chat.ID, fmt.Sprintf(`
+	msg := tgbotapi.NewMessage(args.ChatID, fmt.Sprintf(`
 <b>Welcome to @%v!</b>
 
 Available commands:

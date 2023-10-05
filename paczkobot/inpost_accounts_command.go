@@ -42,7 +42,7 @@ func (f *InpostAccountsCommand) Execute(ctx context.Context) error {
 	if len(creds) == 0 {
 		msgContent = "You are not logged into any inpost accounts!"
 	}
-	msg := tgbotapi.NewMessage(args.Update.Message.Chat.ID, msgContent)
+	msg := tgbotapi.NewMessage(args.ChatID, msgContent)
 	msg.ParseMode = "HTML"
 	_, err := f.App.Bot.Send(msg)
 
