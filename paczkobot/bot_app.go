@@ -34,9 +34,9 @@ func NewBotApp(b *tgbotapi.BotAPI, DB *gorm.DB) (a *BotApp) {
 		Bot: b,
 		DB:  DB,
 	}
-	a.BaseHTTPClient = httphelpers.NewTracingHttpClient(&http.Client{
+	a.BaseHTTPClient = &http.Client{
 		Timeout: 10,
-	})
+	}
 	a.AskService = tghelpers.NewAskService(a.Bot)
 	a.CommandDispatcher = tghelpers.NewCommandDispatcher(
 		b,

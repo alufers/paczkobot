@@ -7,20 +7,22 @@ import (
 	"net/http"
 )
 
-type MockHTTPClient struct {
-	DoFunc       func(req *http.Request) (*http.Response, error)
-	RequestCount int
+type RoundTripFuncType func(req *http.Request) (*http.Response, error)
+
+type MockHTTPTransport struct {
+	RoundTripFunc RoundTripFuncType
+	RequestCount  int
 }
 
-func NewMockHTTPClient(doFunc func(req *http.Request) (*http.Response, error)) *MockHTTPClient {
-	return &MockHTTPClient{
-		DoFunc: doFunc,
+func NewMockHTTPTransport(roundTripFunc RoundTripFuncType) *MockHTTPTransport {
+	return &MockHTTPTransport{
+		RoundTripFunc: roundTripFunc,
 	}
 }
 
-func (c *MockHTTPClient) Do(req *http.Request) (*http.Response, error) {
+func (c *MockHTTPTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 	c.RequestCount++
-	return c.DoFunc(req)
+	return c.RoundTripFunc(req)
 }
 
 type MockJSONCtx struct {

@@ -11,7 +11,7 @@ import (
 
 func TestInpostServiceSendSMSCode(t *testing.T) {
 	//nolint:bodyclose
-	mockClient := httphelpers.NewMockHTTPClient(httphelpers.MockJSONEndpoint(func(c *httphelpers.MockJSONCtx) (*http.Response, error) {
+	mockTransport := httphelpers.NewMockHTTPTransport(httphelpers.MockJSONEndpoint(func(c *httphelpers.MockJSONCtx) (*http.Response, error) {
 		assert.Equal(t, "POST", c.Method)
 		assert.Equal(t, "/v1/sendSMSCode", c.Path)
 		assert.Equal(t, true, c.HasBody)
@@ -22,8 +22,10 @@ func TestInpostServiceSendSMSCode(t *testing.T) {
 			"status": "OK",
 		})
 	}))
-	serv := inpostextra.NewInpostService(mockClient)
+	serv := inpostextra.NewInpostService(&http.Client{
+		Transport: mockTransport,
+	})
 	err := serv.SendSMSCode("123456789")
 	assert.NoError(t, err)
-	assert.Equal(t, 1, mockClient.RequestCount)
+	assert.Equal(t, 1, mockTransport.RequestCount)
 }
