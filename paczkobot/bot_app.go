@@ -3,7 +3,9 @@ package paczkobot
 import (
 	"log"
 	"net/http"
+	"time"
 
+	"github.com/alufers/paczkobot/httphelpers"
 	"github.com/alufers/paczkobot/inpostextra"
 	"github.com/alufers/paczkobot/tghelpers"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -33,9 +35,8 @@ func NewBotApp(b *tgbotapi.BotAPI, DB *gorm.DB) (a *BotApp) {
 		Bot: b,
 		DB:  DB,
 	}
-	a.BaseHTTPClient = &http.Client{
-		Timeout: 10,
-	}
+	a.BaseHTTPClient = httphelpers.NewClientWithLogger()
+	a.BaseHTTPClient.Timeout = time.Second * 25
 	a.AskService = tghelpers.NewAskService(a.Bot)
 	a.CommandDispatcher = tghelpers.NewCommandDispatcher(
 		b,

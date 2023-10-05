@@ -1,6 +1,7 @@
 package inpostextra_test
 
 import (
+	"context"
 	"net/http"
 	"testing"
 
@@ -25,7 +26,7 @@ func TestInpostServiceSendSMSCode(t *testing.T) {
 	serv := inpostextra.NewInpostService(&http.Client{
 		Transport: mockTransport,
 	})
-	err := serv.SendSMSCode("123456789")
+	err := serv.SendSMSCode(context.TODO(), "123456789")
 	assert.NoError(t, err)
 	assert.Equal(t, 1, mockTransport.RequestCount)
 }

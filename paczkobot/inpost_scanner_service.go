@@ -23,7 +23,7 @@ func NewInpostScannerService(app *BotApp) *InpostScannerService {
 }
 
 func (s *InpostScannerService) ScanUserPackages(ctx context.Context, creds *inpostextra.InpostCredentials) error {
-	resp, err := s.app.InpostService.GetUserParcels(s.app.DB, creds)
+	resp, err := s.app.InpostService.GetUserParcels(ctx, s.app.DB, creds)
 	if err != nil {
 		return err
 	}

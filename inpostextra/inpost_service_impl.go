@@ -2,6 +2,7 @@ package inpostextra
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -34,7 +35,10 @@ func NewInpostService(
 	}
 }
 
-func (s *InpostServiceImpl) makeJSONRequest(creds *InpostCredentials, method string, path string, data interface{}, respRef interface{}) error {
+func (s *InpostServiceImpl) makeJSONRequest(
+	ctx context.Context,
+	creds *InpostCredentials, method string, path string, data interface{}, respRef interface{},
+) error {
 	var bodyBuf io.Reader
 	if method != "GET" && method != "HEAD" {
 		body, err := json.Marshal(data)
@@ -47,7 +51,7 @@ func (s *InpostServiceImpl) makeJSONRequest(creds *InpostCredentials, method str
 	if bodyBuf != nil {
 		log.Printf("Body: %s", bodyBuf)
 	}
-	httpReq, err := http.NewRequest(method, s.BaseURL+path, bodyBuf)
+	httpReq, err := http.NewRequestWithContext(ctx, method, s.BaseURL+path, bodyBuf)
 	if err != nil {
 		return fmt.Errorf("error creating HTTP request: %s", err)
 	}
@@ -87,17 +91,17 @@ func (s *InpostServiceImpl) makeJSONRequest(creds *InpostCredentials, method str
 	return nil
 }
 
-func (s *InpostServiceImpl) SendSMSCode(phoneNumber string) error {
+func (s *InpostServiceImpl) SendSMSCode(ctx context.Context, phoneNumber string) error {
 	phoneNumber = NormalizePhoneNumber(phoneNumber)
 
 	// make a post request to /v1/sendSMSCode with the phone number sent as JSON
 	data := map[string]string{
 		"phoneNumber": phoneNumber,
 	}
-	return s.makeJSONRequest(nil, "POST", "/v1/sendSMSCode", data, nil)
+	return s.makeJSONRequest(ctx, nil, "POST", "/v1/sendSMSCode", data, nil)
 }
 
-func (s *InpostServiceImpl) ConfirmSMSCode(phoneNumber string, code string) (*InpostCredentials, error) {
+func (s *InpostServiceImpl) ConfirmSMSCode(ctx context.Context, phoneNumber string, code string) (*InpostCredentials, error) {
 	phoneNumber = NormalizePhoneNumber(phoneNumber)
 	// make a post request to /v1/confirmSMSCode with the phone number and code sent as JSON
 	data := map[string]string{
@@ -110,7 +114,7 @@ func (s *InpostServiceImpl) ConfirmSMSCode(phoneNumber string, code string) (*In
 		AuthToken    string `json:"authToken"`
 		RefreshToken string `json:"refreshToken"`
 	}{}
-	err := s.makeJSONRequest(nil, "POST", "/v1/confirmSMSCode", data, out)
+	err := s.makeJSONRequest(ctx, nil, "POST", "/v1/confirmSMSCode", data, out)
 	if err != nil {
 		return nil, err
 	}
@@ -124,7 +128,7 @@ func (s *InpostServiceImpl) ConfirmSMSCode(phoneNumber string, code string) (*In
 }
 
 // Authenticate uses the refresh token to get a new access token.
-func (s *InpostServiceImpl) Authenticate(creds *InpostCredentials) error {
+func (s *InpostServiceImpl) Authenticate(ctx context.Context, creds *InpostCredentials) error {
 	// make a post request to /v1/authenticate with the access token and refresh token sent as JSON
 	data := map[string]string{
 		"phoneOS":      "Android",
@@ -135,7 +139,7 @@ func (s *InpostServiceImpl) Authenticate(creds *InpostCredentials) error {
 		ReauthenticationRequired bool       `json:"reauthenticationRequired"`
 		RefreshTokenExpiryDate   *time.Time `json:"refreshTokenExpiryDate"`
 	}{}
-	err := s.makeJSONRequest(nil, "POST", "/v1/authenticate", data, out)
+	err := s.makeJSONRequest(ctx, nil, "POST", "/v1/authenticate", data, out)
 	if err != nil {
 		return err
 	}
@@ -150,7 +154,7 @@ func (s *InpostServiceImpl) Authenticate(creds *InpostCredentials) error {
 	return nil
 }
 
-func (s *InpostServiceImpl) ReauthenticateIfNeeded(db *gorm.DB, creds *InpostCredentials) error {
+func (s *InpostServiceImpl) ReauthenticateIfNeeded(ctx context.Context, db *gorm.DB, creds *InpostCredentials) error {
 	if creds.RefreshToken == "" {
 		return fmt.Errorf("refresh token is empty")
 	}
@@ -164,7 +168,7 @@ func (s *InpostServiceImpl) ReauthenticateIfNeeded(db *gorm.DB, creds *InpostCre
 	expirationDate := time.Unix(claims.ExpiresAt, 0)
 	if expirationDate.Before(time.Now()) {
 		log.Printf("Inpost token for phone number %v expired %v ago, refreshing...", creds.PhoneNumber, time.Since(expirationDate))
-		err := s.Authenticate(creds)
+		err := s.Authenticate(ctx, creds)
 		if err != nil {
 			return err
 		}
@@ -177,38 +181,38 @@ func (s *InpostServiceImpl) ReauthenticateIfNeeded(db *gorm.DB, creds *InpostCre
 	return nil
 }
 
-func (s *InpostServiceImpl) GetParcel(db *gorm.DB, creds *InpostCredentials, shipmentNumber string) (*InpostParcel, error) {
-	err := s.ReauthenticateIfNeeded(db, creds)
+func (s *InpostServiceImpl) GetParcel(ctx context.Context, db *gorm.DB, creds *InpostCredentials, shipmentNumber string) (*InpostParcel, error) {
+	err := s.ReauthenticateIfNeeded(ctx, db, creds)
 	if err != nil {
 		return nil, err
 	}
 
 	// make a get request to /v1/parcel/{shipmentNumber}
 	out := &InpostParcel{}
-	err = s.makeJSONRequest(creds, "GET", fmt.Sprintf("/v3/parcels/tracked/%s", shipmentNumber), nil, out)
+	err = s.makeJSONRequest(ctx, creds, "GET", fmt.Sprintf("/v3/parcels/tracked/%s", shipmentNumber), nil, out)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (s *InpostServiceImpl) GetUserParcels(db *gorm.DB, creds *InpostCredentials) (*GetTrackedParcelsResponse, error) {
-	err := s.ReauthenticateIfNeeded(db, creds)
+func (s *InpostServiceImpl) GetUserParcels(ctx context.Context, db *gorm.DB, creds *InpostCredentials) (*GetTrackedParcelsResponse, error) {
+	err := s.ReauthenticateIfNeeded(ctx, db, creds)
 	if err != nil {
 		return nil, err
 	}
 
 	// make a get request to parcels
 	out := &GetTrackedParcelsResponse{}
-	err = s.makeJSONRequest(creds, "GET", "/v3/parcels/tracked", nil, &out)
+	err = s.makeJSONRequest(ctx, creds, "GET", "/v3/parcels/tracked", nil, &out)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (s *InpostServiceImpl) OpenParcelLocker(db *gorm.DB, creds *InpostCredentials, shipmentNumber string) error {
-	parcel, err := s.GetParcel(db, creds, shipmentNumber)
+func (s *InpostServiceImpl) OpenParcelLocker(ctx context.Context, db *gorm.DB, creds *InpostCredentials, shipmentNumber string) error {
+	parcel, err := s.GetParcel(ctx, db, creds, shipmentNumber)
 	if err != nil {
 		return fmt.Errorf("error getting parcel details before opening: %v", err)
 	}
@@ -231,13 +235,13 @@ func (s *InpostServiceImpl) OpenParcelLocker(db *gorm.DB, creds *InpostCredentia
 		},
 	}
 	validateResp := &ValidateCompartmentResponse{}
-	err = s.makeJSONRequest(creds, "POST", "/v1/collect/validate", startOpenSessionRequest, validateResp)
+	err = s.makeJSONRequest(ctx, creds, "POST", "/v1/collect/validate", startOpenSessionRequest, validateResp)
 	if err != nil {
 		return fmt.Errorf("error validating compartment: %v", err)
 	}
 
 	openResp := make(map[string]any)
-	err = s.makeJSONRequest(creds, "POST", "/v1/collect/compartment/open/"+validateResp.SessionUUID, map[string]any{
+	err = s.makeJSONRequest(ctx, creds, "POST", "/v1/collect/compartment/open/"+validateResp.SessionUUID, map[string]any{
 		"sessionUuid": validateResp.SessionUUID,
 	}, &openResp)
 	if err != nil {

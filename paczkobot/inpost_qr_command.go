@@ -83,7 +83,7 @@ func (f *InpostQrCommand) Execute(ctx context.Context) error {
 	}
 
 	for _, cred := range creds {
-		p, err := f.App.InpostService.GetParcel(f.App.DB, cred, trackingNumber)
+		p, err := f.App.InpostService.GetParcel(ctx, f.App.DB, cred, trackingNumber)
 		if err != nil {
 			log.Printf("failed to get parcel: %v", err)
 			continue

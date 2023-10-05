@@ -34,7 +34,7 @@ func (f *InpostLoginCommand) Execute(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	err = f.App.InpostService.SendSMSCode(phoneNumber)
+	err = f.App.InpostService.SendSMSCode(ctx, phoneNumber)
 	if err != nil {
 		return fmt.Errorf("failed to send sms code: %v", err)
 	}
@@ -43,7 +43,7 @@ func (f *InpostLoginCommand) Execute(ctx context.Context) error {
 		return err
 	}
 
-	creds, err := f.App.InpostService.ConfirmSMSCode(phoneNumber, code)
+	creds, err := f.App.InpostService.ConfirmSMSCode(ctx, phoneNumber, code)
 	if err != nil {
 		return fmt.Errorf("failed to confirm sms code: %v", err)
 	}

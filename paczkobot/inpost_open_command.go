@@ -80,7 +80,7 @@ func (f *InpostOpenCommand) Execute(ctx context.Context) error {
 	}
 
 	for _, cred := range creds {
-		p, err := f.App.InpostService.GetParcel(f.App.DB, cred, trackingNumber)
+		p, err := f.App.InpostService.GetParcel(ctx, f.App.DB, cred, trackingNumber)
 		if err != nil {
 			log.Printf("failed to get parcel: %v", err)
 			continue
@@ -98,7 +98,7 @@ func (f *InpostOpenCommand) Execute(ctx context.Context) error {
 			if err != nil {
 				return err
 			}
-			err = f.App.InpostService.OpenParcelLocker(f.App.DB, cred, p.ShipmentNumber)
+			err = f.App.InpostService.OpenParcelLocker(ctx, f.App.DB, cred, p.ShipmentNumber)
 			if err != nil {
 				return err
 			}
