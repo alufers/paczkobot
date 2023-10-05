@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/base64"
+	"encoding/json"
 	"io"
 	"net/http"
 	"sync"
@@ -19,6 +20,12 @@ var HarLoggerStorageCtxKey harLoggerStorageCtxKeyType = "harLogger"
 type HarLoggerStorage struct {
 	HarDataLock sync.Mutex
 	HarData     *har.HAR
+}
+
+func (s *HarLoggerStorage) GetJSONData() ([]byte, error) {
+	s.HarDataLock.Lock()
+	defer s.HarDataLock.Unlock()
+	return json.Marshal(s.HarData)
 }
 
 func WithHarLoggerStorage(ctx context.Context) context.Context {
