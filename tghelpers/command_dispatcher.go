@@ -7,6 +7,7 @@ import (
 	"log"
 	"strings"
 
+	"github.com/alufers/paczkobot/httphelpers"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 )
 
@@ -66,9 +67,14 @@ func (d *CommandDispatcher) RunUpdateLoop() error {
 
 			ctx := context.WithValue(ctx, UpdateContextKey, u)
 			ctx = context.WithValue(ctx, ArgsContextKey, args)
-			for _, hook := range d.UpdateHooks {
-				if hook.OnUpdate(ctx) {
-					return // hook has handled the message stop processing
+
+			// TODO: move this to a nice hook
+			if strings.HasSuffix(args.CommandName, "@har") {
+				ctx = httphelpers.WithHarLoggerStorage(ctx)
+				for _, hook := range d.UpdateHooks {
+					if hook.OnUpdate(ctx) {
+						return // hook has handled the message stop processing
+					}
 				}
 			}
 
@@ -91,6 +97,26 @@ func (d *CommandDispatcher) RunUpdateLoop() error {
 					err = cmd.Execute(ctx)
 
 					break
+				}
+			}
+
+			storage := httphelpers.GetHarLoggerStorage(ctx)
+
+			if storage != nil {
+
+				jsonData, err := storage.GetJSONData()
+				if err != nil {
+					log.Printf("Error while getting HAR data: %v", err)
+				} else {
+					sendDoc := tgbotapi.NewDocument(args.ChatID, tgbotapi.FileReader{
+						Name:   "har.json",
+						Reader: strings.NewReader(string(jsonData)),
+					})
+					sendDoc.Caption = "HAR data"
+					_, err := d.BotAPI.Send(sendDoc)
+					if err != nil {
+						log.Printf("Error while sending HAR data: %v", err)
+					}
 				}
 			}
 			if err != nil {

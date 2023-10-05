@@ -63,6 +63,7 @@ func CommandMatches(cmd Command, userInput string) bool {
 	usersCmd := strings.Split(userInput, " ")[0]
 	// strip bot suffix on groups
 	usersCmd = strings.TrimSuffix(usersCmd, "@"+viper.GetString("telegram.username"))
+	usersCmd = strings.TrimSuffix(usersCmd, "@har")
 	for _, alias := range cmd.Aliases() {
 		if alias == usersCmd {
 			return true
