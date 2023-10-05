@@ -11,6 +11,7 @@ import (
 
 	"github.com/alufers/paczkobot/commondata"
 	"github.com/alufers/paczkobot/commonerrors"
+	"github.com/alufers/paczkobot/httphelpers"
 
 	"github.com/PuerkitoBio/goquery"
 )
@@ -31,6 +32,7 @@ func (dp *PacketaProvider) MatchesNumber(trackingNumber string) bool {
 }
 
 func (dp *PacketaProvider) Track(ctx context.Context, trackingNumber string) (*commondata.TrackingData, error) {
+	client := httphelpers.NewClientWithLogger()
 	req, err := http.NewRequestWithContext(
 		ctx,
 		"GET",
@@ -42,7 +44,7 @@ func (dp *PacketaProvider) Track(ctx context.Context, trackingNumber string) (*c
 	}
 	commondata.SetCommonHTTPHeaders(&req.Header)
 	req.Header.Add("Content-type", "application/x-www-form-urlencoded")
-	httpResponse, err := http.DefaultClient.Do(req)
+	httpResponse, err := client.Do(req)
 	if err != nil {
 		return nil, commonerrors.NewNetworkError(dp.GetName(), req)
 	}

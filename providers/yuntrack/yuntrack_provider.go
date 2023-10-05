@@ -10,6 +10,7 @@ import (
 
 	"github.com/alufers/paczkobot/commondata"
 	"github.com/alufers/paczkobot/commonerrors"
+	"github.com/alufers/paczkobot/httphelpers"
 )
 
 type YunTrack struct{}
@@ -24,6 +25,7 @@ func (p *YunTrack) MatchesNumber(trackingNumber string) bool {
 }
 
 func (p *YunTrack) Track(ctx context.Context, trackingNumber string) (*commondata.TrackingData, error) {
+	client := httphelpers.NewClientWithLogger()
 	bodyData := &YunTrackRequest{
 		CaptchaVerification: "",
 		Year:                0,
@@ -77,7 +79,7 @@ func (p *YunTrack) Track(ctx context.Context, trackingNumber string) (*commondat
 	req.Header.Set("Sec-Fetch-Site", "same-site")
 	req.Header.Set("Sec-GPC", "1")
 	req.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.114 Safari/537.36")
-	res, err := http.DefaultClient.Do(req)
+	res, err := client.Do(req)
 	if err != nil {
 		return nil, commonerrors.NewNetworkError(p.GetName(), req)
 	}

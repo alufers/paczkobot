@@ -4,7 +4,6 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/alufers/paczkobot/httphelpers"
 	"github.com/alufers/paczkobot/inpostextra"
 	"github.com/alufers/paczkobot/tghelpers"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -16,7 +15,7 @@ type BotApp struct {
 	DB  *gorm.DB
 
 	CommandDispatcher     *tghelpers.CommandDispatcher
-	BaseHTTPClient        httphelpers.Client
+	BaseHTTPClient        *http.Client
 	NotificationsService  *NotificationsService
 	TrackingService       *TrackingService
 	AskService            *tghelpers.AskService

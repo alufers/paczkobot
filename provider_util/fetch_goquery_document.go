@@ -8,16 +8,19 @@ import (
 	"github.com/PuerkitoBio/goquery"
 	"github.com/alufers/paczkobot/commondata"
 	"github.com/alufers/paczkobot/commonerrors"
+	"github.com/alufers/paczkobot/httphelpers"
 )
 
 func FetchGoqueryDocument(ctx context.Context, providerName string, url string, checkStatusCode bool) (*goquery.Document, error) {
+	client := httphelpers.NewClientWithLogger()
+
 	req, err := http.NewRequestWithContext(ctx, "GET", url, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create GET request: %w", err)
 	}
 	commondata.SetCommonHTTPHeaders(&req.Header)
 
-	httpResponse, err := http.DefaultClient.Do(req)
+	httpResponse, err := client.Do(req)
 	if err != nil {
 		// Assuming NewNetworkError is available in your package
 		return nil, commonerrors.NewNetworkError(providerName, req)

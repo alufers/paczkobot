@@ -11,6 +11,7 @@ import (
 
 	"github.com/alufers/paczkobot/commondata"
 	"github.com/alufers/paczkobot/commonerrors"
+	"github.com/alufers/paczkobot/httphelpers"
 
 	"github.com/PuerkitoBio/goquery"
 )
@@ -42,6 +43,8 @@ func (pp *PostnlProvider) Track(ctx context.Context, trackingNumber string) (*co
 	//"method": "POST",
 	//"mode": "cors"
 	//});
+
+	client := httphelpers.NewClientWithLogger()
 	requestData := url.Values{}
 	requestData.Set("barcodes", trackingNumber)
 
@@ -56,7 +59,7 @@ func (pp *PostnlProvider) Track(ctx context.Context, trackingNumber string) (*co
 	}
 	commondata.SetCommonHTTPHeaders(&req.Header)
 	req.Header.Add("Content-type", "application/x-www-form-urlencoded")
-	httpResponse, err := http.DefaultClient.Do(req)
+	httpResponse, err := client.Do(req)
 	if err != nil {
 		return nil, commonerrors.NewNetworkError(pp.GetName(), req)
 	}

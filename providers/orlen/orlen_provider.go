@@ -12,6 +12,7 @@ import (
 
 	"github.com/alufers/paczkobot/commondata"
 	"github.com/alufers/paczkobot/commonerrors"
+	"github.com/alufers/paczkobot/httphelpers"
 )
 
 // https://www.fedex.com/pl-pl/online/domestic-tracking.html
@@ -35,6 +36,7 @@ func (op *OrlenProvider) MatchesNumber(trackingNumber string) bool {
 }
 
 func (op *OrlenProvider) Track(ctx context.Context, trackingNumber string) (*commondata.TrackingData, error) {
+	client := httphelpers.NewClientWithLogger()
 	trackingReq, err := http.NewRequestWithContext(
 		ctx,
 		"GET",
@@ -48,7 +50,7 @@ func (op *OrlenProvider) Track(ctx context.Context, trackingNumber string) (*com
 	}
 	commondata.SetCommonHTTPHeaders(&trackingReq.Header)
 
-	resp, err := http.DefaultClient.Do(trackingReq)
+	resp, err := client.Do(trackingReq)
 	if err != nil {
 		return nil, err
 	}

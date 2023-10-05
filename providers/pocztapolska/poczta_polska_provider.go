@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/alufers/paczkobot/commondata"
+	"github.com/alufers/paczkobot/httphelpers"
 
 	"github.com/alufers/paczkobot/commonerrors"
 	"github.com/alufers/paczkobot/providers/pocztapolska/sledzeniehttpbinding"
@@ -55,6 +56,8 @@ func EscapeXML(d string) string {
 }
 
 func (ip *PocztaPolskaProvider) Track(ctx context.Context, trackingNumber string) (*commondata.TrackingData, error) {
+	client := httphelpers.NewClientWithLogger()
+
 	req, err := http.NewRequestWithContext(ctx, "POST", "https://tt.poczta-polska.pl/Sledzenie/services/Sledzenie?wsdl", strings.NewReader(fmt.Sprintf(`
 	<soapenv:Envelope   xmlns:sled="http://sledzenie.pocztapolska.pl" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
     <soapenv:Header>
@@ -78,7 +81,7 @@ func (ip *PocztaPolskaProvider) Track(ctx context.Context, trackingNumber string
 		return nil, fmt.Errorf("failed to create POST request: %w", err)
 	}
 	req.Header.Add("Content-type", "text/xml")
-	httpResponse, err := http.DefaultClient.Do(req)
+	httpResponse, err := client.Do(req)
 	if err != nil {
 		return nil, commonerrors.NewNetworkError(ip.GetName(), req)
 	}

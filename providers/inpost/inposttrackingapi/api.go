@@ -9,6 +9,7 @@ import (
 	"net/url"
 
 	"github.com/alufers/paczkobot/commonerrors"
+	"github.com/alufers/paczkobot/httphelpers"
 )
 
 func GetTrackingData(ctx context.Context, parcelNumber string) (*TrackingAPISchema, error) {
@@ -17,7 +18,7 @@ func GetTrackingData(ctx context.Context, parcelNumber string) (*TrackingAPISche
 		return nil, fmt.Errorf("failed to create GET request to get tracking data: %w", err)
 	}
 
-	client := &http.Client{}
+	client := httphelpers.NewClientWithLogger()
 	resp, err := client.Do(request)
 	if err != nil {
 		return nil, fmt.Errorf("failed to make GET request to get tracking data (url: %v): %w", request.URL.String(), err)

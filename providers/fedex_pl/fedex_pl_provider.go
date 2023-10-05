@@ -11,6 +11,7 @@ import (
 
 	"github.com/alufers/paczkobot/commondata"
 	"github.com/alufers/paczkobot/commonerrors"
+	"github.com/alufers/paczkobot/httphelpers"
 )
 
 // https://www.fedex.com/pl-pl/online/domestic-tracking.html
@@ -40,13 +41,14 @@ func (fp *FedexPlProvider) MatchesNumber(trackingNumber string) bool {
 }
 
 func (fp *FedexPlProvider) Track(ctx context.Context, trackingNumber string) (*commondata.TrackingData, error) {
+	client := httphelpers.NewClientWithLogger()
 	trackingReq, err := http.NewRequestWithContext(ctx, "GET", "https://api1.emea.fedex.com/fds2-tracking/trck-v1/info?trackingKey="+url.QueryEscape(trackingNumber), nil)
 	if err != nil {
 		return nil, err
 	}
 	commondata.SetCommonHTTPHeaders(&trackingReq.Header)
 	trackingReq.Header.Add("apikey", FedexStaticAPIKey)
-	resp, err := http.DefaultClient.Do(trackingReq)
+	resp, err := client.Do(trackingReq)
 	if err != nil {
 		return nil, err
 	}

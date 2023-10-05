@@ -12,6 +12,7 @@ import (
 
 	"github.com/alufers/paczkobot/commondata"
 	"github.com/alufers/paczkobot/commonerrors"
+	"github.com/alufers/paczkobot/httphelpers"
 	"github.com/spf13/viper"
 )
 
@@ -39,7 +40,7 @@ func (pp *DHLProvider) MatchesNumber(trackingNumber string) bool {
 }
 
 func (pp *DHLProvider) Track(ctx context.Context, trackingNumber string) (*commondata.TrackingData, error) {
-	client := &http.Client{}
+	client := httphelpers.NewClientWithLogger()
 
 	req, err := http.NewRequestWithContext(
 		ctx,

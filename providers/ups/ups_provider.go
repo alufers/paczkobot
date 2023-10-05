@@ -14,6 +14,7 @@ import (
 
 	"github.com/alufers/paczkobot/commondata"
 	"github.com/alufers/paczkobot/commonerrors"
+	"github.com/alufers/paczkobot/httphelpers"
 )
 
 type UPSProvider struct{}
@@ -27,13 +28,12 @@ func (pp *UPSProvider) MatchesNumber(trackingNumber string) bool {
 }
 
 func (pp *UPSProvider) Track(ctx context.Context, trackingNumber string) (*commondata.TrackingData, error) {
+	client := httphelpers.NewClientWithLogger()
 	jar, err := cookiejar.New(nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create cookie jar: %w", err)
 	}
-	client := &http.Client{
-		Jar: jar,
-	}
+	client.Jar = jar
 	req, err := http.NewRequestWithContext(
 		ctx,
 		"GET",
