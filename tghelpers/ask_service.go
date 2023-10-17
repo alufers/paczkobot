@@ -27,13 +27,13 @@ func NewAskService(bot BotAPI) *AskService {
 }
 
 // Implements UpdateHook
-func (a *AskService) OnUpdate(ctx context.Context) bool {
+func (a *AskService) OnUpdate(ctx context.Context) context.Context {
 	update := UpdateFromCtx(ctx)
 	a.AskCallbacksMutex.Lock()
 	defer a.AskCallbacksMutex.Unlock()
 	if update.CallbackQuery != nil {
 		if update.CallbackQuery.Message == nil || update.CallbackQuery.Message.Chat == nil {
-			return false
+			return ctx
 		}
 		chatID := update.CallbackQuery.Message.Chat.ID
 		if update.CallbackQuery.Data == "/cancel" {
@@ -45,7 +45,7 @@ func (a *AskService) OnUpdate(ctx context.Context) bool {
 				callback("", errors.New("canceled"))
 				delete(a.AskCallbacks, chatID)
 			}
-			return true
+			return WithStopProcessingCommands(ctx)
 		}
 		if update.CallbackQuery.Data == "/yes" {
 			if callback, ok := a.AskCallbacks[chatID]; ok {
@@ -56,7 +56,7 @@ func (a *AskService) OnUpdate(ctx context.Context) bool {
 				callback("", nil)
 				delete(a.AskCallbacks, chatID)
 			}
-			return true
+			return WithStopProcessingCommands(ctx)
 		}
 		if strings.HasPrefix(update.CallbackQuery.Data, "/sugg ") {
 			val := strings.TrimPrefix(update.CallbackQuery.Data, "/sugg ")
@@ -77,7 +77,7 @@ func (a *AskService) OnUpdate(ctx context.Context) bool {
 			if callback, ok := a.AskCallbacks[update.Message.Chat.ID]; ok {
 				callback("", errors.New("canceled"))
 				delete(a.AskCallbacks, update.Message.Chat.ID)
-				return false
+				return ctx
 			}
 		}
 
@@ -88,11 +88,15 @@ func (a *AskService) OnUpdate(ctx context.Context) bool {
 			}
 			callback(update.Message.Text, nil)
 			delete(a.AskCallbacks, update.Message.Chat.ID)
-			return true
+			return WithStopProcessingCommands(ctx)
 		}
 	}
 
-	return false
+	return ctx
+}
+
+func (a *AskService) OnAfterUpdate(ctx context.Context) context.Context {
+	return ctx
 }
 
 // AskForArgument asks the user at the specified chatID for a text value.

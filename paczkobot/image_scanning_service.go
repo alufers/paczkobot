@@ -35,7 +35,7 @@ func NewImageScanningService(app *BotApp) *ImageScanningService {
 	}
 }
 
-func (i *ImageScanningService) OnUpdate(ctx context.Context) bool {
+func (i *ImageScanningService) OnUpdate(ctx context.Context) context.Context {
 	update := tghelpers.UpdateFromCtx(ctx)
 	if update.Message != nil && update.Message.Photo != nil && len(update.Message.Photo) > 0 {
 
@@ -46,16 +46,16 @@ func (i *ImageScanningService) OnUpdate(ctx context.Context) bool {
 		})
 		if err != nil {
 			log.Printf("Failed to get file: %v", err)
-			return false
+			return ctx
 		}
 		url := fmt.Sprintf("https://api.telegram.org/file/bot%s/%s", i.App.Bot.Token, file.FilePath)
 		err = i.ScanIncomingImage(ctx, tghelpers.ArgsFromCtx(ctx), url)
 		if err != nil {
 			log.Printf("Failed to ScanIncomingImage: %v", err)
 		}
-		return true
+		return tghelpers.WithStopProcessingCommands(ctx)
 	}
-	return false
+	return ctx
 }
 
 func (i *ImageScanningService) ScanIncomingImage(ctx context.Context, args *tghelpers.CommandArguments, url string) error {
@@ -176,6 +176,10 @@ func (i *ImageScanningService) ScanIncomingImage(ctx context.Context, args *tghe
 	}
 
 	return nil
+}
+
+func (i *ImageScanningService) OnAfterUpdate(ctx context.Context) context.Context {
+	return ctx
 }
 
 func (*ImageScanningService) DrawResultPoints(img image.Image, points []gozxing.ResultPoint) image.Image {

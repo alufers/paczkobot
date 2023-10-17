@@ -23,7 +23,6 @@ func (pp *CainiaoProvider) MatchesNumber(trackingNumber string) bool {
 }
 
 func (pp *CainiaoProvider) Track(ctx context.Context, trackingNumber string) (*commondata.TrackingData, error) {
-
 	req, err := http.NewRequest(
 		"GET",
 		"https://global.cainiao.com/global/detail.json?mailNos="+url.QueryEscape(trackingNumber)+"&lang=en-US&language=en-US",
@@ -37,6 +36,7 @@ func (pp *CainiaoProvider) Track(ctx context.Context, trackingNumber string) (*c
 	if err != nil {
 		return nil, commonerrors.NewNetworkError(pp.GetName(), req)
 	}
+	defer httpResponse.Body.Close()
 
 	if httpResponse.StatusCode != 200 {
 		return nil, commonerrors.NotFoundError
@@ -83,20 +83,21 @@ func (pp *CainiaoProvider) Track(ctx context.Context, trackingNumber string) (*c
 		nil,
 	)
 	if err != nil {
-		return td, nil
+		return td, nil //nolint:nilerr
 	}
 	commondata.SetCommonHTTPHeaders(&cityReq.Header)
 	cityResp, err := http.DefaultClient.Do(cityReq)
 	if err != nil {
-		return td, nil
+		return td, nil //nolint:nilerr
 	}
+	defer cityResp.Body.Close()
 	if cityResp.StatusCode != 200 {
-		return td, nil
+		return td, nil //nolint:nilerr
 	}
 	var cityResponse GetCityResponse
 	err = json.NewDecoder(cityResp.Body).Decode(&cityResponse)
 	if err != nil || !cityResponse.Success {
-		return td, nil
+		return td, nil //nolint:nilerr
 	}
 
 	td.Destination = cityResponse.Module + ", " + td.Destination

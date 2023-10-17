@@ -11,9 +11,13 @@ type FakeUpdateHook struct {
 	didRun bool
 }
 
-func (h *FakeUpdateHook) OnUpdate(context.Context) bool {
+func (h *FakeUpdateHook) OnUpdate(ctx context.Context) context.Context {
 	h.didRun = true
-	return true
+	return ctx
+}
+
+func (h *FakeUpdateHook) OnAfterUpdate(ctx context.Context) context.Context {
+	return ctx
 }
 
 // a test that chcks if command dispatcher executes update hooks

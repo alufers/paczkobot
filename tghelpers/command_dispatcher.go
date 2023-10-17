@@ -79,30 +79,30 @@ func (d *CommandDispatcher) processIncomingUpdate(ctx context.Context, u tgbotap
 	}
 
 	for _, hook := range d.UpdateHooks {
-		if hook.OnUpdate(ctx) {
-			return // hook has handled the message stop processing
-		}
+		ctx = hook.OnUpdate(ctx)
 	}
 
+	shouldProcessCommands := ctx.Value(StopProcessingCommandsCtxKey) == nil
 	var err error
+	if shouldProcessCommands {
+		for _, cmd := range d.Commands {
+			if CommandMatches(cmd, cmdText) {
+				args.Command = cmd
+				for i, argTpl := range cmd.Arguments() {
+					if argTpl.Variadic {
+						args.NamedArguments[argTpl.Name] = strings.Join(args.Arguments[i:], " ")
+						break
+					}
+					if i >= len(args.Arguments) {
+						break
+					}
+					args.NamedArguments[argTpl.Name] = args.Arguments[i]
+				}
 
-	for _, cmd := range d.Commands {
-		if CommandMatches(cmd, cmdText) {
-			args.Command = cmd
-			for i, argTpl := range cmd.Arguments() {
-				if argTpl.Variadic {
-					args.NamedArguments[argTpl.Name] = strings.Join(args.Arguments[i:], " ")
-					break
-				}
-				if i >= len(args.Arguments) {
-					break
-				}
-				args.NamedArguments[argTpl.Name] = args.Arguments[i]
+				err = cmd.Execute(ctx)
+
+				break
 			}
-
-			err = cmd.Execute(ctx)
-
-			break
 		}
 	}
 

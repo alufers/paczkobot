@@ -27,7 +27,7 @@ func TestAskServiceReturnsFalseForUnrelatedUpdates(t *testing.T) {
 		},
 	)
 	res := askService.OnUpdate(ctx)
-	assert.False(t, res)
+	assert.True(t, res.Value(tghelpers.StopProcessingCommandsCtxKey) == nil) // should return false because it's not a related update
 }
 
 func TestAskServiceConfirmWorks(t *testing.T) {
@@ -63,7 +63,7 @@ func TestAskServiceConfirmWorks(t *testing.T) {
 						},
 					)
 					res := askService.OnUpdate(ctx)
-					assert.True(t, res) // should return true because it's a related update
+					assert.True(t, res.Value(tghelpers.StopProcessingCommandsCtxKey) != nil) // should return true because it's a related update
 				}()
 
 				return msg, nil
