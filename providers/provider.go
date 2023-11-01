@@ -7,6 +7,7 @@ import (
 	"github.com/alufers/paczkobot/providers/cainiao"
 	"github.com/alufers/paczkobot/providers/deutsche_post"
 	"github.com/alufers/paczkobot/providers/dhl"
+	"github.com/alufers/paczkobot/providers/dpd_eu"
 	"github.com/alufers/paczkobot/providers/dpdcompl"
 	"github.com/alufers/paczkobot/providers/fedex_pl"
 	"github.com/alufers/paczkobot/providers/geis_pl"
@@ -35,6 +36,7 @@ var AllProviders = []Provider{
 	&geis_pl.GeisPlProvider{},
 	&orlen.OrlenProvider{},
 	&deutsche_post.DeutschePostProvider{},
+	&dpd_eu.DPDEuProvider{},
 }
 
 type Provider interface {
