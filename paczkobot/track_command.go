@@ -102,6 +102,7 @@ func (t *TrackCommand) Execute(ctx context.Context) error {
 			msg.ParseMode = "HTML"
 			_, err := t.App.Bot.Send(msg)
 			if err != nil {
+				log.Printf("msgval: %v", msgText)
 				log.Printf("failed to edit status msg: %v", err)
 				return
 			}

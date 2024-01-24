@@ -5,12 +5,15 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
+	"net/http/cookiejar"
 	"time"
 
 	"github.com/alufers/paczkobot/commondata"
 	"github.com/alufers/paczkobot/commonerrors"
 	"github.com/alufers/paczkobot/httphelpers"
+	"golang.org/x/net/publicsuffix"
 )
 
 type YunTrack struct{}
@@ -24,8 +27,8 @@ func (p *YunTrack) MatchesNumber(trackingNumber string) bool {
 	return true
 }
 
-func (p *YunTrack) Track(ctx context.Context, trackingNumber string) (*commondata.TrackingData, error) {
-	client := httphelpers.NewClientWithLogger()
+// Utility method to create a new HTTP request
+func (p *YunTrack) createRequest(ctx context.Context, trackingNumber string) (*http.Request, error) {
 	bodyData := &YunTrackRequest{
 		CaptchaVerification: "",
 		Year:                0,
@@ -45,6 +48,7 @@ func (p *YunTrack) Track(ctx context.Context, trackingNumber string) (*commondat
 	if err != nil {
 		return nil, fmt.Errorf("failed to create request: %w", err)
 	}
+
 	/*
 		Accept-Encoding: gzip, deflate, br
 		Accept-Language: en-US,en;q=0.9,de-DE;q=0.8,de;q=0.7,pl-PL;q=0.6,pl;q=0.5
@@ -79,6 +83,22 @@ func (p *YunTrack) Track(ctx context.Context, trackingNumber string) (*commondat
 	req.Header.Set("Sec-Fetch-Site", "same-site")
 	req.Header.Set("Sec-GPC", "1")
 	req.Header.Set("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.5060.114 Safari/537.36")
+	return req, nil
+}
+
+func (p *YunTrack) Track(ctx context.Context, trackingNumber string) (*commondata.TrackingData, error) {
+	jar, err := cookiejar.New(&cookiejar.Options{PublicSuffixList: publicsuffix.List})
+	if err != nil {
+		return nil, fmt.Errorf("failed to create cookie jar: %w", err)
+	}
+	client := httphelpers.NewClientWithLogger()
+	client.Jar = jar
+
+	req, err := p.createRequest(ctx, trackingNumber)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create request: %w", err)
+	}
+
 	res, err := client.Do(req)
 	if err != nil {
 		return nil, commonerrors.NewNetworkError(p.GetName(), req)
@@ -87,10 +107,24 @@ func (p *YunTrack) Track(ctx context.Context, trackingNumber string) (*commondat
 	if res.StatusCode == http.StatusNotFound {
 		return nil, commonerrors.NotFoundError
 	}
+	// Check if the response status is not 200 and retry with cookies
 	if res.StatusCode != 200 {
-		// body, _ := io.ReadAll(res.Body)
-		// log.Printf("YUNTRACK : %v", string(body))
-		return nil, fmt.Errorf("HTTP status code %v", res.StatusCode)
+		req, err = p.createRequest(ctx, trackingNumber)
+		if err != nil {
+			return nil, fmt.Errorf("failed to create second request: %w", err)
+		}
+		// Perform the retry with the same request
+		res, err = client.Do(req)
+		if err != nil {
+			log.Printf("XDDD Failed to retry request: %v", err)
+			return nil, commonerrors.NewNetworkError(p.GetName(), req)
+		}
+		defer res.Body.Close()
+
+		// Check again the status code
+		if res.StatusCode != 200 {
+			return nil, fmt.Errorf("HTTP status code %v after retry", res.StatusCode)
+		}
 	}
 
 	decoder := json.NewDecoder(res.Body)

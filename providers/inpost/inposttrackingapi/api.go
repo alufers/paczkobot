@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/alufers/paczkobot/commondata"
 	"github.com/alufers/paczkobot/commonerrors"
 	"github.com/alufers/paczkobot/httphelpers"
 )
@@ -19,6 +20,7 @@ func GetTrackingData(ctx context.Context, parcelNumber string) (*TrackingAPISche
 	}
 
 	client := httphelpers.NewClientWithLogger()
+	commondata.SetCommonHTTPHeaders(&request.Header)
 	resp, err := client.Do(request)
 	if err != nil {
 		return nil, fmt.Errorf("failed to make GET request to get tracking data (url: %v): %w", request.URL.String(), err)
