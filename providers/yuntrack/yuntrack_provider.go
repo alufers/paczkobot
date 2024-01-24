@@ -5,7 +5,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"net/http/cookiejar"
 	"time"
@@ -116,7 +115,6 @@ func (p *YunTrack) Track(ctx context.Context, trackingNumber string) (*commondat
 		// Perform the retry with the same request
 		res, err = client.Do(req)
 		if err != nil {
-			log.Printf("XDDD Failed to retry request: %v", err)
 			return nil, commonerrors.NewNetworkError(p.GetName(), req)
 		}
 		defer res.Body.Close()
