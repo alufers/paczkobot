@@ -37,6 +37,7 @@ var AllProviders = []Provider{
 	&orlen.OrlenProvider{},
 	&deutsche_post.DeutschePostProvider{},
 	&dpd_eu.DPDEuProvider{},
+	// &usps.USPSProvider{},
 }
 
 type Provider interface {
